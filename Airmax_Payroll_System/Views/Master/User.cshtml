@@ -1,0 +1,152 @@
+﻿@{
+    ViewBag.Title = "User Master";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header">
+                <h4 class="card-title">User Master</h4>
+
+                <a data-bs-toggle="modal" data-bs-target="#addModal"
+                   class="btn btn-primary btn-sm">
+                    Add User
+                </a>
+            </div>
+
+            <div class="table-responsive">
+
+                <table id="userList"
+                       class="display table-hover table-striped w-100">
+
+                    <thead class="table-primary">
+                        <tr>
+                            <th>User Name</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>Role</th>
+                            <th>Passward</th>
+                            <th style="width:2%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tblBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- MODAL -->
+
+<div class="modal fade" id="addModal" tabindex="-1">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="modal-title">User Master</h3>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="entryForm">
+
+                    <input type="hidden" id="IDUser" value="0" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">User Name</label>
+                            <input type="text" class="form-control" id="UserName">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" id="Password">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="FullName">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="Email">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Mobile</label>
+                            <input type="text" class="form-control" id="Mobile">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Role</label>
+                            <select class="default-select form-control  wide" id="RoleName">
+                                <option value="">Select Role</option>
+                                <option value="Admin">Admin</option>
+                                <option value="HR">HR</option>
+                                <option value="Employee">Employee</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Company</label>
+                            <select id="IDCompany" class="  default-select  wide">
+                                <option value="" >Select Company</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Location</label>
+                            <select id="IDLocation" class=" default-select  wide">
+                                <option value="">Select Location</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Department</label>
+                            <select id="IDDepartment" class="default-select   wide">
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-light"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button class="btn btn-primary"
+                        id="btnSave">
+                    Save
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/user.js" asp-append-version="true"></script>
+}

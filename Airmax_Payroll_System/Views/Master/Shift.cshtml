@@ -1,0 +1,322 @@
+﻿@* @{
+    ViewBag.Title = "Shift Master";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Shift Master</h4>
+
+                <a data-bs-toggle="modal"
+                   data-bs-target="#addModal"
+                   class="btn btn-primary btn-sm">
+                    Add Shift
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table id="shiftList"
+                       class="display table-hover table-striped w-100">
+
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Department</th>
+                            <th>Shift</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Working Hour</th>
+                            <th style="width:2%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tblBody"></tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Shift Master</h4>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="entryForm">
+
+                    <input type="hidden" id="IDShift" value="0" />
+
+                    <div class="row g-3">
+
+                        <!-- Department -->
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <select id="IDDepartment" class="form-control">
+                                <option value="">Select Department</option>
+                            </select>
+                        </div>
+
+                        <!-- Shift Description -->
+                        <div class="col-md-6">
+                            <label class="form-label">Shift Description</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="ShiftDesc"
+                                   placeholder="Morning / Evening / Night">
+                        </div>
+
+                        <!-- Start Time -->
+                        <div class="col-md-3">
+                            <label class="form-label">Start Time</label>
+                            <div class="input-group clockpicker">
+                                <input type="text"
+                                       class="form-control"
+                                       id="StartTime"
+                                       placeholder="HH:mm">
+                                <span class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- End Time -->
+                        <div class="col-md-3">
+                            <label class="form-label">End Time</label>
+                            <div class="input-group clockpicker">
+                                <input type="text"
+                                       class="form-control"
+                                       id="EndTime"
+                                       placeholder="HH:mm">
+                                <span class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Total Working Hour (Auto) -->
+                        <div class="col-md-3">
+                            <label class="form-label">Total Working Hour</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="WorkingHour"
+                                   readonly>
+                        </div>
+
+                        <!-- Total Working Minute (Auto) -->
+                        <div class="col-md-3">
+                            <label class="form-label">Total Working Minute</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="WorkingMinute"
+                                   readonly>
+                        </div>
+
+                        <!-- Overtime -->
+                        <div class="col-md-3">
+                            <label class="form-label">Overtime</label>
+                            <div class="input-group clockpicker">
+                                <input type="text"
+                                       class="form-control"
+                                       id="EndTime"
+                                       placeholder="HH:mm">
+                                <span class="input-group-text">
+                                    <i class="far fa-clock"></i>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Remarks -->
+                        <div class="col-md-6">
+                            <label class="form-label">Remarks</label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="Remarks">
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button class="btn btn-primary" id="btnSave">
+                    Save
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts { *@
+@*     <script src="~/AirmaxPayRollJS/Master/shift.js" asp-append-version="true"></script>
+
+    <script>
+        // Initialize clockpicker
+        $('.clockpicker').clockpicker({
+            autoclose: true,
+            twelvehour: false
+        });
+    </script>
+} *@
+
+
+
+
+@{
+    ViewBag.Title = "Shift Master";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Shift Master</h4>
+
+                <a data-bs-toggle="modal"
+                   data-bs-target="#addModal"
+                   class="btn btn-primary btn-sm">
+                    Add Shift
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table id="shiftList"
+                       class="display table-hover table-striped w-100">
+
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Department</th>
+                            <th>Shift</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Working Hour</th>
+                            <th style="width:2%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tblBody"></tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Shift Master</h4>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="entryForm">
+
+                    <input type="hidden" id="IDShift" value="0" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Department</label>
+                            <select id="IDDepartment" class="form-control"></select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Shift Description</label>
+                            <input type="text" id="ShiftDesc" class="form-control">
+                        </div>
+
+                        <!-- KEEP YOUR TEMPLATE STRUCTURE -->
+                        <div class="col-md-3">
+                            <label class="form-label">Start Time</label>
+                            <div class="input-group">
+                                <input type="text" id="StartTime" class="form-control">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">End Time</label>
+                            <div class="input-group">
+                                <input type="text" id="EndTime" class="form-control">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Total Working Hour</label>
+                            <input type="text" id="WorkingHour" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Total Working Minute</label>
+                            <input type="text" id="WorkingMinute" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Overtime</label>
+                            <div class="input-group">
+                                <input type="text" id="Overtime" class="form-control">
+                                <span class="input-group-text"><i class="far fa-clock"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Remarks</label>
+                            <input type="text" id="Remarks" class="form-control">
+                        </div>
+
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="btnSave">Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/shift.js"></script>
+
+    <script>
+        // MATERIAL TIME PICKER (MATCH TEMPLATE)
+        $('#StartTime').bootstrapMaterialDatePicker({
+            date: false,
+            format: 'HH:mm'
+        });
+
+        $('#EndTime').bootstrapMaterialDatePicker({
+            date: false,
+            format: 'HH:mm'
+        });
+
+        $('#Overtime').bootstrapMaterialDatePicker({
+            date: false,
+            format: 'HH:mm'
+        });
+    </script>
+}

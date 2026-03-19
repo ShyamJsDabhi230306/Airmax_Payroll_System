@@ -1,0 +1,233 @@
+﻿@{
+    ViewBag.Title = "Company Master";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header">
+                <h4 class="card-title">Company Master</h4>
+                <a data-bs-toggle="modal" data-bs-target="#addModal" class="btn btn-primary btn-sm">
+                    Add Company
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table id="companyList" class="display table-hover table-striped w-100">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Company Name</th>
+                            <th>City</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th style="width:2%;">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tblBody">
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ADD / EDIT COMPANY MODAL -->
+
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h3 class="modal-title">Company Master</h3>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <form id="entryForm">
+
+                    <input type="hidden" id="IDCompany" value="0" />
+
+                    <div class="row g-3">
+
+                        <!-- COMPANY INFO -->
+
+                        <div class="col-md-6">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="CompanyName">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Unit</label>
+                            <input type="text" class="form-control" id="Unit">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Office Address</label>
+                            <textarea class="form-control" id="Office_Address"></textarea>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">City</label>
+                            <input type="text" class="form-control" id="CityName">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">State Code</label>
+                            <input type="text" class="form-control" id="StateCode">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Pincode</label>
+                            <input type="text" class="form-control" id="Pincode">
+                        </div>
+
+
+                        <!-- CONTACT INFO -->
+
+                        <div class="col-md-4">
+                            <label class="form-label">Contact No</label>
+                            <input type="text" class="form-control" id="ContactNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">OTP Mobile No</label>
+                            <input type="text" class="form-control" id="OTPMobNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Phone No</label>
+                            <input type="text" class="form-control" id="PhoneNo">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="Comp_EmailID">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Website</label>
+                            <input type="text" class="form-control" id="Website">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Fax No</label>
+                            <input type="text" class="form-control" id="FaxNo">
+                        </div>
+
+
+                        <!-- TAX DETAILS -->
+
+                        <div class="col-md-4">
+                            <label class="form-label">PAN No</label>
+                            <input type="text" class="form-control" id="PanNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">GST No</label>
+                            <input type="text" class="form-control" id="GSTNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">GST Date</label>
+                            <input type="date" class="form-control" id="GSTDate">
+                        </div>
+
+
+                        <!-- DATABASE SETTINGS -->
+
+                        <div class="col-md-4">
+                            <label class="form-label">DB User ID</label>
+                            <input type="text" class="form-control" id="DbUserID">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">DB Password</label>
+                            <input type="text" class="form-control" id="DbUserPassword">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Database Name</label>
+                            <input type="text" class="form-control" id="DbDatabaseName">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Datasource</label>
+                            <input type="text" class="form-control" id="DbDatasource">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Timeout</label>
+                            <input type="text" class="form-control" id="DbTimeOut">
+                        </div>
+
+
+                        <!-- SALARY SETTINGS -->
+
+                        <div class="col-md-4">
+                            <label class="form-label">PF</label>
+                            <input type="number" step="0.01" class="form-control" id="PF">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">ESIC</label>
+                            <input type="number" step="0.01" class="form-control" id="ESIC">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">PT</label>
+                            <input type="number" step="0.01" class="form-control" id="PT">
+                        </div>
+
+
+                        <!-- DEVICE DETAILS -->
+
+                        <div class="col-md-6">
+                            <label class="form-label">Device Serial No</label>
+                            <input type="text" class="form-control" id="DeviceSerialNo">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Out Device Serial No</label>
+                            <input type="text" class="form-control" id="OutDeviceSerialNo">
+                        </div>
+
+
+                        <!-- LOGO -->
+
+                        <div class="col-md-6">
+                            <label class="form-label">Company Logo</label>
+                            <input type="file" id="LogoFile" class="form-control">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Signature File</label>
+                            <input type="file" id="SignFile" class="form-control">
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" id="btnSave">Save</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/company.js" asp-append-version="true"></script>
+}

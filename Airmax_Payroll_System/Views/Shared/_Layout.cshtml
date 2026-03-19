@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- PAGE TITLE HERE -->
+    <base href="~/" />
+    <title>@ViewData["Title"]</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="DexignLab">
+    <meta name="robots" content="index, follow">
+
+
+    <!-- MOBILE SPECIFIC -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FAVICONS ICON -->
+    <link rel="shortcut icon" href="images/favicon.png">
+    <!-- Daterange picker -->
+    <link href="vendor/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="vendor/swiper/css/swiper-bundle.min.css" rel="stylesheet">
+    <link href="vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap-select/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap-select/css/bootstrap-select.min.css" rel="stylesheet">
+    <!-- Toastr -->
+    <link rel="stylesheet" href="vendor/toastr/css/toastr.min.css">
+    <link href="vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="vendor/select2/css/select2.min.css">
+    <link href="vendor/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet">
+    <link href="vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="vendor/datatables/responsive/responsive.css" rel="stylesheet">
+    <link href="vendor/datatables/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="vendor/bootstrap-datepicker-master/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <!-- STYLE CSS -->
+    <link href="vendor/bootstrap-select/css/bootstrap-select.min.css" rel="stylesheet">
+    <link class="main-css" href="css/style.css" rel="stylesheet">
+    <link href="~/css/common.css" rel="stylesheet" asp-append-version="true" />
+    <!-- Daterange picker -->
+    <link href="vendor/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Clockpicker -->
+    <link href="vendor/clockpicker/css/bootstrap-clockpicker.min.css" rel="stylesheet">
+    <!-- asColorpicker -->
+    <link href="vendor/jquery-ascolorpicker/css/ascolorpicker.min.css" rel="stylesheet">
+    <!-- Material color picker -->
+    <link href="vendor/bootstrap-material-datetimepicker/css/bootstrap-material-datetimepicker.css" rel="stylesheet">
+
+    <!-- Pick date -->
+    <link rel="stylesheet" href="vendor/pickadate/themes/default.css">
+    <link rel="stylesheet" href="vendor/pickadate/themes/default.date.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <link href="vendor/bootstrap-datepicker-master/css/bootstrap-datepicker.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="loading-wave">
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+
+    <div id="main-wrapper" class="show">
+
+        <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div class="nav-header">
+            <a href="#" class="brand-logo d-flex align-items-center">
+
+                <div class="brand-title">
+                    <svg width="90" height="24" viewBox="0 0 90 24" xmlns="http://www.w3.org/2000/svg">
+                        <text x="0"
+                              y="18"
+                              font-family="Segoe UI, Arial, sans-serif"
+                              font-size="18"
+                              font-weight="800"
+                              letter-spacing="4"
+                              fill="white">
+                            AIRA
+                        </text>
+                    </svg>
+                </div>
+
+            </a>
+            <div class="nav-control">
+                <div class="hamburger">
+                    <span class="line"></span><span class="line"></span><span class="line"></span>
+                </div>
+            </div>
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+        <!--**********************************
+            Header start
+        ***********************************-->
+        <div class="header">
+            <div class="header-content">
+                <nav class="navbar navbar-expand">
+                    <div class="collapse navbar-collapse justify-content-between">
+                        <div class="header-left">
+                            <ul class="navbar-nav header-left">
+
+                                <li class="nav-item dropdown notification_dropdown">
+                                    <button class="ic-theme-mode" type="button">
+                                        <span class="light">Light</span>
+                                        <span class="dark">Dark</span>
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <ul class="navbar-nav header-right">
+                            @*<li class="nav-item dropdown notification_dropdown me-3">
+                            <a class="nav-link-2 text-black" href="javascript:void(0);" role="button" data-bs-toggle="dropdown">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M5.83342 14.1667V13.6667H5.83341L5.83342 14.1667ZM14.1667 14.1667V13.6667V14.1667ZM4.50008 14.1667L4.50008 14.6667L4.50008 14.1667ZM15.5001 14.1667V13.6667V14.1667ZM6.33342 7.50001C6.33342 5.47496 7.97504 3.83334 10.0001 3.83334V2.83334C7.42275 2.83334 5.33342 4.92268 5.33342 7.50001H6.33342ZM6.33342 9.90574V7.50001H5.33342V9.90574H6.33342ZM4.66675 13.8333C4.66675 13.2218 4.88566 12.6628 5.24994 12.2283L4.48365 11.5858C3.97403 12.1936 3.66675 12.9782 3.66675 13.8333H4.66675ZM5.83341 13.6667L4.50008 13.6667L4.50008 14.6667L5.83342 14.6667L5.83341 13.6667ZM14.1667 13.6667H5.83342V14.6667H14.1667V13.6667ZM15.5001 13.6667L14.1667 13.6667V14.6667L15.5001 14.6667V13.6667ZM14.7502 12.2283C15.1145 12.6628 15.3334 13.2218 15.3334 13.8333H16.3334C16.3334 12.9782 16.0261 12.1936 15.5165 11.5858L14.7502 12.2283ZM13.6667 7.50001V9.90574H14.6667V7.50001H13.6667ZM10.0001 3.83334C12.0251 3.83334 13.6667 5.47497 13.6667 7.50001H14.6667C14.6667 4.92268 12.5774 2.83334 10.0001 2.83334V3.83334ZM15.5165 11.5858C15.0228 10.997 14.6667 10.464 14.6667 9.90574H13.6667C13.6667 10.8661 14.2682 11.6534 14.7502 12.2283L15.5165 11.5858ZM3.66675 13.8333C3.66675 14.2936 4.03984 14.6667 4.50008 14.6667L4.50008 13.6667C4.59213 13.6667 4.66675 13.7413 4.66675 13.8333H3.66675ZM15.5001 14.6667C15.9603 14.6667 16.3334 14.2936 16.3334 13.8333H15.3334C15.3334 13.7413 15.408 13.6667 15.5001 13.6667V14.6667ZM5.33342 9.90574C5.33342 10.464 4.97733 10.997 4.48365 11.5858L5.24994 12.2283C5.73194 11.6534 6.33342 10.8661 6.33342 9.90574H5.33342Z" fill="black" />
+                                    <path d="M11.4979 16.5639C11.3593 16.8482 11.1426 17.0871 10.8732 17.2529C10.6039 17.4186 10.2929 17.5042 9.97665 17.4998C9.66041 17.4954 9.35196 17.4011 9.08731 17.2279C8.82267 17.0548 8.61276 16.8099 8.48211 16.5218" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M10 2.5V3.33333" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                Notification
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-end">
+                                <div id="DZ_W_Notification1" class="widget-media ic-scroll p-3"
+                                     style="height:380px;">
+                                    <ul class="timeline">
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2">
+                                                    <img alt="image" width="50" src="images/avatar/1.jpg">
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Dr sultads Send you Photo</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2 media-info">
+                                                    KG
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Resport created successfully</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2 media-success">
+                                                    <i class="fa fa-home"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Reminder : Treatment Time!</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2">
+                                                    <img alt="image" width="50" src="images/avatar/1.jpg">
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Dr sultads Send you Photo</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2 media-danger">
+                                                    KG
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Resport created successfully</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="timeline-panel">
+                                                <div class="media me-2 media-primary">
+                                                    <i class="fa fa-home"></i>
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="mb-1">Reminder : Treatment Time!</h6>
+                                                    <small class="d-block">29 July 2020 - 02:26 PM</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <a class="all-notification" href="javascript:void(0);">
+                                    See all notifications <i class="ti-arrow-end"></i>
+                                </a>
+                            </div>
+                        </li>*@
+                            <li class="nav-item dropdown notification_dropdown">
+                                <a class="nav-link dz-fullscreen " href="javascript:void(0);">
+                                    <svg width="28" height="28" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <g clip-path="url(#clip0_5_876)">
+                                            <path d="M5.5 5.5L0.833334 0.833334M0.833334 0.833334L0.833334 5.5M0.833334 0.833334L5.5 0.833334" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12.5 5.5L17.1667 0.833334M17.1667 0.833334L12.5 0.833334M17.1667 0.833334L17.1667 5.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M5.5 12.5L0.833334 17.1667M0.833334 17.1667L5.5 17.1667M0.833334 17.1667L0.833334 12.5" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                            <path d="M12.5 12.5L17.1667 17.1667M17.1667 17.1667L17.1667 12.5M17.1667 17.1667L12.5 17.1667" stroke="black" stroke-linecap="round" stroke-linejoin="round" />
+                                        </g>
+                                        <defs>
+                                            <clipPath id="clip0_5_876">
+                                                <rect width="18" height="18" fill="white" />
+                                            </clipPath>
+                                        </defs>
+                                    </svg>
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown header-profile">
+                                <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill bg-dark text-white"
+                                   href="javascript:void(0);"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+
+                                    <div class="avatar-circle bg-primary" id="userAvatar">
+                                        F
+                                    </div>
+
+                                    <span id="lblLoginName" class="fs-14 fw-semibold">Franklin Jr.</span>
+
+                                    <i class="fa fa-chevron-down fs-12 ms-1"></i>
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2">
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="javascript:void(0);" onclick="logoutUser()">
+                                            <i class="fa fa-sign-out-alt me-2"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+        <!--**********************************
+            Sidebar start
+        ***********************************-->
+        <div class="ic-sidenav">
+            <div class="ic-sidenav-scroll">
+                <ul class="metismenu" id="menu">
+
+                    <li id="menuTdrHodDashboard">
+                        <a class="ai-icon" href="/Master/Index">
+                            <i class="flaticon-home"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- MASTER (ADMIN ONLY) -->
+                    <li class="menu-title">Master</li>
+
+                    <li>
+                        <a class="ai-icon" href="/Master/Company">
+                            <i class="flaticon-business-and-trade"></i>
+                            <span class="nav-text">Company</span>
+                        </a>
+                    </li>
+
+                    <li>
+                    <a class="ai-icon" href="/Master/Location">
+                        <i class="flaticon-location"></i>
+                        <span class="nav-text">Location</span>
+                    </a>
+                </li>
+                    <li>
+                    <a class="ai-icon" href="/Master/Department">
+                        <i class="flaticon-location"></i>
+                            <span class="nav-text">Department</span>
+                    </a>
+                </li>
+                    <li>
+                    <a class="ai-icon" href="/Master/Designation">
+                        <i class="flaticon-location"></i>
+                            <span class="nav-text">Designation</span>
+                    </a>
+                </li>
+                    <li>
+                        <a class="ai-icon" href="/Master/Shift">
+                            <i class="flaticon-location"></i>
+                            <span class="nav-text">Shift</span>
+                        </a>
+                    </li>
+
+
+                    <li>
+                        <a class="ai-icon" href="/Master/User">
+                            <i class="flaticon-user"></i>
+                            <span class="nav-text">User</span>
+                        </a>
+                    </li>
+
+                    
+
+                </ul>
+
+            </div>
+        </div>
+
+        <!--**********************************
+            Sidebar end
+        ***********************************-->
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        <div class="content-body">
+            <div class="container-fluid">
+                @RenderBody()
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!--**********************************
+        Scripts
+    ***********************************-->
+    <!-- Required vendors -->
+    <script src="vendor/global/global.min.js"></script>
+    <script src="vendor/bootstrap-select/js/bootstrap-select.min.js"></script>
+    <script src="vendor/select2/js/select2.full.min.js"></script>
+    <!-- Apex Chart -->
+    <script src="vendor/apexchart/apexchart.js"></script>
+    <script src="vendor/chart-js/chart.bundle.min.js"></script>
+    <!-- Chart piety plugin files -->
+    <script src="vendor/peity/jquery.peity.min.js"></script>
+    <!-- momment js is must -->
+    <script src="vendor/moment/moment.min.js"></script>
+    <script src="vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+    <script src="vendor/datatables/js/jquery.dataTables.min.js"></script>
+
+    <script src="vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="vendor/datatables/js/dataTables.buttons.min.js"></script>
+    <script src="vendor/datatables/js/buttons.html5.min.js"></script>
+    <script src="vendor/datatables/js/jszip.min.js"></script>
+
+    <script src="vendor/datatables/js/pdfmake.min.js"></script>
+    <script src="vendor/datatables/js/vfs_fonts.js"></script>
+
+    <script src="vendor/datatables/responsive/responsive.js"></script>
+    <script src="js/plugins-init/datatables.init.js"></script>
+
+    <!-- Toastr -->
+    <script src="vendor/toastr/js/toastr.min.js"></script>
+    <script src="vendor/sweetalert2/dist/sweetalert2.min.js"></script>
+    <script src="vendor/dropzone/dist/dropzone.js"></script>
+    <script src="vendor/ckeditor/ckeditor.js"></script>
+
+    <!-- Daterangepicker -->
+    <!-- momment js is must -->
+    <script src="vendor/moment/moment.min.js"></script>
+    <script src="vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!-- clockpicker -->
+    <script src="vendor/clockpicker/js/bootstrap-clockpicker.min.js"></script>
+    <!-- asColorPicker -->
+    <script src="vendor/jquery-ascolor/jquery-ascolor.min.js"></script>
+    <script src="vendor/jquery-asgradient/jquery-asgradient.min.js"></script>
+    <script src="vendor/jquery-ascolorpicker/js/jquery-ascolorpicker.min.js"></script>
+    <!-- Material color picker -->
+    <script src="vendor/bootstrap-material-datetimepicker/js/bootstrap-material-datetimepicker.js"></script>
+    <!-- pickdate -->
+    <script src="vendor/pickadate/picker.js"></script>
+    <script src="vendor/pickadate/picker.time.js"></script>
+    <script src="vendor/pickadate/picker.date.js"></script>
+
+
+
+    <!-- Daterangepicker -->
+    <script src="js/plugins-init/bs-daterange-picker-init.js"></script>
+    <!-- Clockpicker init -->
+    <script src="js/plugins-init/clock-picker-init.js"></script>
+    <!-- asColorPicker init -->
+    <script src="js/plugins-init/jquery-ascolorpicker.init.js"></script>
+    <!-- Material color picker init -->
+    <script src="js/plugins-init/material-date-picker-init.js"></script>
+    <!-- Pickdate -->
+    <script src="js/plugins-init/pickadate-init.js"></script>
+    <!-- All init script -->
+    <script src="vendor/jqvmap/js/jquery.vmap.min.js"></script>
+    <script src="vendor/jqvmap/js/jquery.vmap.world.js"></script>
+    <script src="vendor/jqvmap/js/jquery.vmap.usa.js"></script>
+    <!-- Dashboard 1 -->
+    <script src="js/dashboard/dashboard-1.js"></script>
+    <script src="./vendor/swiper/js/swiper-bundle.min.js"></script>
+    <script src="js/custom.min.js"></script>
+    <script src="js/ic-sidenav-init.js"></script>
+
+    <script src="~/airmaxpayrolljs/common/auth-handler.js"></script>
+    <script src="~/airmaxpayrolljs/common/common.js"></script>
+    <script src="~/airmaxpayrolljs/common/common-upload.js"></script>
+    <script src="~/airmaxpayrolljs/common/home.js" asp-append-version="true"></script>
+
+    <!-- Initialize Swiper -->
+    <script>
+        var swiper = new Swiper(".mySwiper", {
+            slidesPerView: 1.5,
+            spaceBetween: 15,
+            navigation: {
+                nextEl: "",
+                prevEl: "",
+            },
+            breakpoints: {
+                360: {
+                    slidesPerView: 1.5,
+                    spaceBetween: 20,
+                },
+                768: {
+                    slidesPerView: 2.5,
+                    spaceBetween: 40,
+                },
+                1200: {
+                    slidesPerView: 1.5,
+                    spaceBetween: 20,
+                },
+            },
+        });
+        var swiper = new Swiper(".mySwiper1", {
+            slidesPerView: 3.5,
+            spaceBetween: 15,
+            navigation: {
+                nextEl: "",
+                prevEl: "",
+            },
+            breakpoints: {
+                360: {
+                    slidesPerView: 1.5,
+                    spaceBetween: 20,
+                },
+                768: {
+                    slidesPerView: 3.5,
+                    spaceBetween: 20,
+                },
+            },
+        });
+    </script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

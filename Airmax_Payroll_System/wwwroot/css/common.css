@@ -1,0 +1,338 @@
+﻿.ic-sidenav
+{
+    height:100% !important;
+}
+
+input[readonly] {
+    background-color: var(--body-bg) !important;
+    cursor: not-allowed;
+    color: var(--bs-body-color) !important;
+    font-weight: 600;
+}
+
+    input[readonly]:focus {
+        box-shadow: none !important;
+        border-color: #ced4da !important;
+    }
+
+.dataTables_filter input {
+    border-radius: 20px;
+    padding: 6px 12px;
+}
+
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter, .dataTables_wrapper .dataTables_processing, .dataTables_wrapper .dataTables_paginate {
+    margin: 1.25rem;
+}
+
+.active-projects .dataTables_wrapper .dataTables_paginate {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.dataTables_wrapper .dataTables_info {
+    margin: 1.25rem;
+}
+
+.active-projects .dataTables_wrapper .dataTables_info {
+    margin-top: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-top:1.70rem !important;
+}
+
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--border) !important;
+    border-radius: 8px;
+}
+
+.dataTables_wrapper .dataTables_length .bootstrap-select .dropdown-toggle {
+    padding: 0.5rem 1.25rem !important;
+}
+#toast-container > div {
+    max-width: 100% !important;
+    width: auto;
+}
+.icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+    .icon-box svg {
+        width: 20px;
+        height: 20px;
+    }
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+
+/* Readonly input styling */
+.readonly {
+    background-color: var(--body-bg) !important;
+    color: var(--bs-body-color);
+    cursor: not-allowed;
+}
+
+
+/* ============================= */
+/* TYPEAHEAD DROPDOWN STYLING   */
+/* ============================= */
+
+.tt-menu {
+    width: 100%;
+    margin-top: 4px;
+    padding: 4px 0;
+    background-color: var(--body-bg) !important;
+    color: var(--bs-body-color) !important;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 1055; /* higher than modal */
+}
+
+/* Each suggestion */
+.tt-suggestion {
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--body-color);
+}
+
+    /* Hover state */
+    .tt-suggestion:hover,
+    .tt-suggestion.tt-cursor {
+        background-color: var(--primary-light) !important;
+        color: var(--bs-body-color) !important;
+    }
+
+/* Highlight matched text */
+.tt-highlight {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Fix input wrapper width */
+.twitter-typeahead {
+    width: 100%;
+}
+
+    .twitter-typeahead .tt-input {
+        width: 100%;
+    }
+
+    .twitter-typeahead .tt-hint {
+        width: 100%;
+        color: #aaa;
+    }
+    /* ===================================== */
+    /* INPUT BACKGROUND USING THEME VAR     */
+    /* ===================================== */
+
+    .twitter-typeahead .tt-input,
+    .twitter-typeahead .tt-hint {
+        background-color: var(--card) !important;
+        color: var(--body-color) !important;
+    }
+
+        /* Placeholder color */
+        .form-control::placeholder {
+            color: var(--secondary) !important;
+        }
+
+/* Typeahead dropdown */
+.tt-menu {
+    background-color: var(--card);
+    border: 1px solid var(--border-color);
+    color: var(--body-color);
+}
+
+/* Hover */
+.tt-suggestion:hover,
+.tt-suggestion.tt-cursor {
+    background-color: var(--primary-light);
+}
+.tt-menu {
+    text-align: left !important;
+}
+
+.tt-suggestion {
+    text-align: left !important;
+}
+.summary-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(78, 115, 223, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    color: #4e73df;
+    font-size: 18px;
+}
+/* ======================================================
+   SELECT2 FOCUS HIGHLIGHT
+====================================================== */
+
+.select2-container--default .select2-selection--single {
+    border: 1px solid #ced4da;
+    height: 38px;
+    display: flex;
+    align-items: center;
+}
+
+/* When focused */
+.select2-container--default.select2-container--focus
+.select2-selection--single {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+    transition: all 0.15s ease-in-out;
+}
+
+/* Remove ugly default outline */
+.select2-selection--single:focus {
+    outline: none !important;
+}
+
+.dt-buttons {
+    margin: 1.25rem !important;
+    padding: 0.125rem 0 !important;
+}
+
+#itemScrapList tbody tr td.bg-light {
+    background-color: #effbff !important;
+}
+
+#itemScrapList tbody tr td.border-top {
+    border-top: 2px solid #effbff !important;
+}
+
+[data-theme-version="dark"] #itemScrapList tbody tr td.bg-light {
+    background-color: rgba(0, 175, 239, 0.1) !important;
+}
+/* =========================
+   GROUP HEADER STYLE
+========================= */
+
+#itemScrapList tbody tr.group-header-row td,
+#itemScrapList tbody tr td.group-header {
+    background: #f1f5f9 !important;
+    font-weight: 700;
+    color: #334155;
+    padding: 12px 15px;
+    border-top: 2px solid #e2e8f0 !important;
+}
+
+/* Slight separation above each group */
+#itemScrapList tbody tr.dtrg-start {
+    background: #f1f5f9 !important;
+}
+
+/* Alternate rows subtle */
+#itemScrapList tbody tr:not(.dtrg-start) td {
+    border-top: 1px solid #eef2f7;
+}
+
+/* =========================
+   DARK THEME SUPPORT
+========================= */
+
+[data-theme-version="dark"] #itemScrapList tbody tr.dtrg-start {
+    background: rgba(0, 175, 239, 0.12) !important;
+}
+
+[data-theme-version="dark"] #itemScrapList tbody tr td.group-header {
+    background: rgba(0, 175, 239, 0.12) !important;
+    color: #e2e8f0 !important;
+    border-top: 2px solid rgba(0, 175, 239, 0.25) !important;
+}
+
+[data-theme-version="dark"] #itemScrapList tbody tr:not(.dtrg-start) td {
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+#itemScrapList tbody tr.dtrg-start td {
+    background: linear-gradient(to right, #e6f7ff, #f8fbff) !important;
+    font-weight: 600;
+    font-size: 14px;
+}
+[data-theme-version="dark"] #itemScrapList tbody tr.dtrg-start td {
+    background: linear-gradient(to right, rgba(0,175,239,0.18), rgba(0,175,239,0.08)) !important;
+}
+
+
+
+.active-projects tfoot tr th {
+    font-size: 13px;
+    padding: 0.625rem 1.25rem !important;
+    font-weight: bold;
+    background-color: var(--rgba-primary-2) !important;
+    border: 0;
+    vertical-align: middle;
+    color: var(--primary);
+}
+.active-projects .dt-buttons .dt-button {
+    position: relative !important;
+    background: var(--primary) !important;
+    top: 0 !important;
+    right: 0 !important
+}
+.active-projects .dt-buttons
+{
+    float: left !important;
+}
+/* ==========================================
+   DATATABLE EXPORT BUTTON MODERN STYLE
+========================================== */
+
+.dt-buttons {
+    margin: 1.25rem 1.25rem 0 1.25rem !important;
+    display: flex !important;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+    .dt-buttons .dt-button {
+        
+        border: none !important;
+        color: #fff !important;
+        padding: 6px 14px !important;
+        font-size: 13px !important;
+        font-weight: 500;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        transition: all 0.2s ease;
+    }
+
+        /* Hover */
+        .dt-buttons .dt-button:hover {
+            background: #0b5ed7 !important;
+            transform: translateY(-1px);
+        }
+
+        /* Active */
+        .dt-buttons .dt-button:active {
+            transform: translateY(0px);
+        }
+
+        /* Icons spacing */
+        .dt-buttons .dt-button i {
+            margin-right: 6px;
+        }
