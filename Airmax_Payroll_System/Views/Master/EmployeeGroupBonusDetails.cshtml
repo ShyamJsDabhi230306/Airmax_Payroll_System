@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "Employee Group Bonus Details";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+
+            <div class="card-header">
+                <h4 class="card-title">Employee Group Bonus Details</h4>
+
+                <a data-bs-toggle="modal"
+                   data-bs-target="#addModal"
+                   class="btn btn-primary btn-sm">
+                    Add Bonus Details
+                </a>
+            </div>
+
+            <div class="table-responsive">
+
+                <table id="bonusList"
+                       class="display table-hover table-striped w-100">
+
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Employee Group</th>
+                            <th>Min Year</th>
+                            <th>Max Year</th>
+                            <th>Bonus</th>
+                            <th style="width:2%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tblBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- ADD / EDIT MODAL -->
+
+<div class="modal fade"
+     id="addModal"
+     tabindex="-1">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">Employee Group Bonus Details</h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <form id="entryForm">
+
+                    <input type="hidden" id="IDEmployeeGroupBonus" value="0" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-12">
+                            <label class="form-label">Employee Group</label>
+
+                            <select id="IDEmployeeGroup"
+                                    class="form-select">
+                                <option value="">Select Employee Group</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Min Year</label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="MinYear">
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Max Year</label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="MaxYear">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Bonus</label>
+
+                            <input type="number"
+                                   class="form-control"
+                                   id="Bonus">
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button class="btn btn-light"
+                        data-bs-dismiss="modal">
+                    Cancel
+                </button>
+
+                <button class="btn btn-primary"
+                        id="btnSave">
+                    Save
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/employeegroupbonusdetails.js" asp-append-version="true"></script>
+}

@@ -41,7 +41,9 @@ builder.Services.AddScoped<MasterDepartmentRepo>();
 builder.Services.AddScoped<MasterDesignationRepo>();
 builder.Services.AddScoped<MasterShiftRepo>();
 builder.Services.AddScoped<MasterUserRepo>();
-
+builder.Services.AddScoped<MasterEmployeeRepo>();
+builder.Services.AddScoped<MasterEmployeeGroupRepo>();
+builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
@@ -49,6 +51,9 @@ builder.Services.AddScoped<MasterDepartmentService>();
 builder.Services.AddScoped<MasterDesignationService>();
 builder.Services.AddScoped<MasterShiftService>();
 builder.Services.AddScoped<MasterUserService>();
+builder.Services.AddScoped<MasterEmployeeService>();
+builder.Services.AddScoped<MasterEmployeeGroupService>();
+builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
 
 
 // ---------------------------------

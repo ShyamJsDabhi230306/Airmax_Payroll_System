@@ -36,6 +36,18 @@ namespace Airmax_Payroll_System.Controllers
             return View();
 
         }
+        public IActionResult Employee()
+        {
+            return View();
 
+        }
+        public IActionResult EmployeeGroup()
+        {
+            return View();
+        }
+        public IActionResult EmployeeGroupBonusDetails()
+        {
+            return View();
+        }
     }
 }

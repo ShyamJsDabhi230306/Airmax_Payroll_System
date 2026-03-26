@@ -134,53 +134,6 @@ async function bindTable() {
 }
 
 
-//async function editEntry(id) {
-
-//    const res = await apiFetch(`${API}/get-by-id/${id}`);
-//    const json = await safeJson(res);
-
-//    if (!json || !json.success) return;
-
-//    const d = json.data;
-
-//    // BASIC FIELDS
-//    DOM.id().value = d.idUser;
-//    DOM.userName().value = d.userName || "";
-//    DOM.password().value = d.password || "";
-//    DOM.fullName().value = d.fullName || "";
-//    DOM.email().value = d.email || "";
-//    DOM.mobile().value = d.mobile || "";
-//    DOM.role().value = d.roleName || "";
-    
-
-//    // =========================
-//    // 🔥 COMPANY
-//    // =========================
-//    DOM.company().value = d.idCompany || "";
-//    $('.selectpicker').selectpicker('refresh');
-
-//    // =========================
-//    // 🔥 LOCATION
-//    // =========================
-//    await loadLocation(d.idCompany);
-
-//    setTimeout(() => {
-//        DOM.location().value = d.idLocation || "";
-//        $('.selectpicker').selectpicker('refresh');
-//    }, 100);
-
-//    // =========================
-//    // 🔥 DEPARTMENT
-//    // =========================
-//    await loadDepartment(d.idLocation);
-
-//    setTimeout(() => {
-//        DOM.department().value = d.idDepartment || "";
-//        $('.selectpicker').selectpicker('refresh');
-//    }, 150);
-
-//    entryModal.show();
-//}
 
 async function editEntry(id) {
 

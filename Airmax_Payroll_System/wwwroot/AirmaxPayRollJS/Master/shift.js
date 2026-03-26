@@ -80,6 +80,8 @@ async function loadDepartment() {
         json.data.map(d =>
             `<option value="${d.idDepartment}">${d.departmentName}</option>`
         ).join("");
+
+    $(DOM.department()).selectpicker('refresh');
 }
 
 
@@ -93,27 +95,57 @@ async function bindTable() {
 
     if (!json.success) return;
 
-    let html = "";
+    const tbody = DOM.tbody();
+    tbody.innerHTML = "";
 
     json.data.forEach(d => {
 
-        html += `
-        <tr>
-            <td>${d.departmentName || ""}</td>
-            <td>${d.shiftDesc || ""}</td>
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${escapeHtml(d.departmentName || "")}</td>
+            <td>${escapeHtml(d.shiftDesc || "")}</td>
             <td>${formatTime(d.startTimeHour, d.startTimeMinute)}</td>
             <td>${formatTime(d.endTimeHour, d.endTimeMinute)}</td>
             <td>${d.totalWorkingHour || ""}</td>
-            <td>
-                <button onclick="editEntry(${d.idShift})">Edit</button>
-                <button onclick="deleteEntry(${d.idShift})">Delete</button>
+            <td>${d.overtime ? d.overtime.substring(11, 16) : ""}</td>
+
+
+            <td class="text-center">
+                <div class="d-flex justify-content-center">
+                    <a onclick="editEntry(${d.idShift})"
+                       class="btn btn-primary btn-xs sharp me-1">
+                        <i class="fa fa-pencil"></i>
+                    </a>
+
+                    <a onclick="deleteEntry(${d.idShift})"
+                       class="btn btn-danger btn-xs sharp">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </div>
             </td>
-        </tr>`;
+        `;
+
+        tbody.appendChild(tr);
     });
 
-    DOM.tbody().innerHTML = html;
-}
+    // 🔥 Reinitialize DataTable properly
+    if ($.fn.DataTable.isDataTable('#shiftList')) {
+        $('#shiftList').DataTable().destroy();
+    }
 
+    $('#shiftList').DataTable({
+        searching: true,
+        pageLength: 10,
+        ordering: false,
+        language: {
+            paginate: {
+                next: '<i class="fa fa-angle-double-right"></i>',
+                previous: '<i class="fa fa-angle-double-left"></i>'
+            }
+        }
+    });
+}
 
 // ======================================================
 // EDIT
@@ -127,18 +159,41 @@ async function editEntry(id) {
 
     const d = json.data;
 
+    // BASIC
     DOM.id().value = d.idShift;
     DOM.department().value = d.idDepartment;
     DOM.desc().value = d.shiftDesc;
 
-    DOM.startTime().value = formatTime(d.startTimeHour, d.startTimeMinute);
-    DOM.endTime().value = formatTime(d.endTimeHour, d.endTimeMinute);
+    // ✅ USE StartTime if available (BEST)
+    if (d.startTime) {
+        DOM.startTime().value = d.startTime.substring(0, 5);
+    } else {
+        DOM.startTime().value = formatTime(d.startTimeHour, d.startTimeMinute);
+    }
 
-    calculateTime();
+    if (d.endTime) {
+        DOM.endTime().value = d.endTime.substring(0, 5);
+    } else {
+        DOM.endTime().value = formatTime(d.endTimeHour, d.endTimeMinute);
+    }
+
+    // ✅ WORKING TIME
+    DOM.totalHour().value = d.totalWorkingHour || "";
+    DOM.totalMin().value = d.totalWorkingMinute || "";
+
+    // ✅ OVERTIME (handle datetime → time)
+    if (d.overtime) {
+        DOM.overtime().value = d.overtime.substring(11, 16);
+    } else {
+        DOM.overtime().value = "";
+    }
+
+    // OPTIONAL
+    // remark if you have field
+    // document.getElementById("Remark").value = d.remark || "";
 
     entryModal.show();
 }
-
 
 // ======================================================
 // DELETE
@@ -187,9 +242,9 @@ async function saveData() {
         endTimeHour: end.hour,
         endTimeMinute: end.minute,
 
-        overtime: DOM.overtime().value
-            ? `1970-01-01T${DOM.overtime().value}:00`
-            : null
+        //overtime: DOM.overtime().value
+        //    ? `1970-01-01T${DOM.overtime().value}:00`
+        //    : null
     };
 
     DOM.save().disabled = true;
@@ -207,7 +262,9 @@ async function saveData() {
         if (!json.success)
             throw new Error(json.message);
 
-        alert(json.message);
+        showToast("success", json.message, "shift Master");
+
+
 
         entryModal.hide();
         clearForm();
@@ -215,7 +272,7 @@ async function saveData() {
 
     }
     catch (err) {
-        alert(err.message);
+        showToast("error", error.message, "shift Master");
     }
     finally {
         DOM.save().disabled = false;

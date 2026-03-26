@@ -1,36 +1,31 @@
-﻿
-
-// ======================================================
+﻿// ======================================================
 // CONFIG
 // ======================================================
-const API = "/api/master/department";
+const API = "/api/master/employeegroup";
 let entryModal = null;
-
 
 // ======================================================
 // DOM
 // ======================================================
 const DOM = {
-
-    id: () => document.getElementById("IDDepartment"),
-    location: () => document.getElementById("IDLocation"),
-    name: () => document.getElementById("DepartmentName"),
+    id: () => document.getElementById("IDEmployeeGroup"),
+    name: () => document.getElementById("EmployeeGroupName"),
+    dept: () => document.getElementById("IDDepartment"),
+    isActive: () => document.getElementById("IsActive"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
     save: () => document.getElementById("btnSave")
 };
 
-
 // ======================================================
 // INIT
 // ======================================================
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await loadLocation();
+    await loadDepartment();
     await bindTable();
-
-    $('#departmentList').DataTable({
+    $('#groupList').DataTable({
         searching: true,
         pageLength: 10,
         ordering: false,
@@ -41,48 +36,38 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     });
-
     entryModal = new bootstrap.Modal(DOM.modal(), { backdrop: "static" });
 
-    DOM.modal().addEventListener("hidden.bs.modal", clearForm);
+    await loadDepartment();
 
     DOM.save().addEventListener("click", saveData);
-
 });
 
-
 // ======================================================
-// LOAD LOCATION
+// LOAD DEPARTMENT
 // ======================================================
-async function loadLocation() {
+async function loadDepartment() {
 
-    const res = await apiFetch(`/api/master/location/get-all`);
+    const res = await fetch("/api/master/department/get-all");
     const json = await res.json();
 
     if (!json.success) return;
 
-    const ddl = DOM.location();
-    ddl.innerHTML = `<option value="">Select Location</option>`;
+    DOM.dept().innerHTML =
+        `<option value="">-- Select Department --</option>` +
+        json.data.map(d =>
+            `<option value="${d.idDepartment}">${d.departmentName}</option>`
+        ).join("");
 
-    json.data.forEach(l => {
-
-        const opt = document.createElement("option");
-        opt.value = l.idLocation;
-        opt.text = l.locationName;
-
-        ddl.appendChild(opt);
-
-    });
-
+    $(DOM.dept()).selectpicker('refresh');
 }
-
 
 // ======================================================
 // BIND TABLE
 // ======================================================
 async function bindTable() {
 
-    const res = await apiFetch(`${API}/get-all`);
+    const res = await fetch(`${API}/get-all`);
     const json = await res.json();
 
     if (!json.success) return;
@@ -95,74 +80,68 @@ async function bindTable() {
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
-            <td>${escapeHtml(d.locationName ?? "")}</td>
-            <td>${escapeHtml(d.departmentName ?? "")}</td>
+            <td>${escapeHtml(d.employeeGroupName || "")}</td>
+             <td>${escapeHtml(d.departmentName || "")}</td>
+          
+
             <td class="text-center">
-                <div class="d-flex">
-                    <a onclick="editEntry(${d.idDepartment})"
+                <div class="d-flex justify-content-center">
+                    <a onclick="editEntry(${d.idEmployeeGroup})"
                        class="btn btn-primary btn-xs sharp me-1">
-                       <i class="fa fa-pencil"></i>
+                        <i class="fa fa-pencil"></i>
                     </a>
 
-                    <a onclick="deleteEntry(${d.idDepartment})"
+                    <a onclick="deleteEntry(${d.idEmployeeGroup})"
                        class="btn btn-danger btn-xs sharp">
-                       <i class="fa fa-trash"></i>
+                        <i class="fa fa-trash"></i>
                     </a>
                 </div>
             </td>
         `;
 
         tbody.appendChild(tr);
-
     });
 
-}
+    //if ($.fn.DataTable.isDataTable('#groupList')) {
+    //    $('#groupList').DataTable().destroy();
+    //}
 
+    
+}
 
 // ======================================================
 // EDIT
 // ======================================================
 async function editEntry(id) {
 
-    const res = await apiFetch(`${API}/get-by-id/${id}`);
+    const res = await fetch(`${API}/get-by-id/${id}`);
     const json = await res.json();
 
     if (!json.success) return;
 
     const d = json.data;
 
-    DOM.id().value = d.idDepartment;
-    DOM.location().value = d.idLocation;
-    DOM.name().value = d.departmentName;
+    DOM.id().value = d.idEmployeeGroup;
+    DOM.name().value = d.employeeGroupName || "";
+    DOM.dept().value = d.idDepartment || "";
+    DOM.isActive().checked = d.isActive || false;
+
+    $(DOM.dept()).selectpicker('refresh');
 
     entryModal.show();
-
 }
-
 
 // ======================================================
 // DELETE
 // ======================================================
 async function deleteEntry(id) {
 
-    const ok = await confirmDelete("This record will be deleted permanently!");
+    if (!confirm("Delete this record?")) return;
 
-    if (!ok) return;
-
-    const res = await apiFetch(`${API}/delete/${id}`, {
-        method: "DELETE"
-    });
-
-    const json = await res.json();
-
-    if (!json.success) return;
-
-    showToast("success", json.message, "Department Master");
+    await fetch(`${API}/delete/${id}`, { method: "DELETE" });
 
     bindTable();
-
 }
-
 
 // ======================================================
 // SAVE
@@ -170,25 +149,30 @@ async function deleteEntry(id) {
 async function saveData() {
 
     if (!DOM.name().value.trim()) {
-
-        showToast("danger", "Department required", "Department Master");
+        alert("Group name required");
         return;
+    }
 
+    if (!DOM.dept().value) {
+        alert("Department required");
+        return;
     }
 
     const dto = {
 
-        idDepartment: Number(DOM.id().value || 0),
-        idLocation: DOM.location().value || null,
-        departmentName: DOM.name().value.trim()
+        idEmployeeGroup: Number(DOM.id().value || 0),
+        employeeGroupName: DOM.name().value.trim(),
+        idDepartment: Number(DOM.dept().value),
+        isActive: DOM.isActive().checked,
 
+        e_By: "Admin" // 🔥 you can replace with session
     };
 
     DOM.save().disabled = true;
 
     try {
 
-        const res = await apiFetch(`${API}/save`, {
+        const res = await fetch(`${API}/save`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(dto)
@@ -199,34 +183,29 @@ async function saveData() {
         if (!json.success)
             throw new Error(json.message);
 
-        showToast("success", json.message, "Department Master");
+        alert(json.message);
 
         entryModal.hide();
         clearForm();
         bindTable();
 
-    }
-    catch (err) {
-
-        showToast("danger", err.message, "Department Master");
-
+    } catch (err) {
+        alert(err.message);
     }
     finally {
-
         DOM.save().disabled = false;
-
     }
-
 }
 
-
 // ======================================================
-// CLEAR FORM
+// CLEAR
 // ======================================================
 function clearForm() {
 
     DOM.id().value = 0;
-    DOM.location().value = "";
     DOM.name().value = "";
+    DOM.dept().value = "";
+    DOM.isActive().checked = true;
 
+    $(DOM.dept()).selectpicker('refresh');
 }

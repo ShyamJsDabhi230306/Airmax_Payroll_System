@@ -1,9 +1,7 @@
-﻿
-
-// ======================================================
+﻿// ======================================================
 // CONFIG
 // ======================================================
-const API = "/api/master/department";
+const API = "/api/master/employeegroupbonusdetails";
 let entryModal = null;
 
 
@@ -12,9 +10,11 @@ let entryModal = null;
 // ======================================================
 const DOM = {
 
-    id: () => document.getElementById("IDDepartment"),
-    location: () => document.getElementById("IDLocation"),
-    name: () => document.getElementById("DepartmentName"),
+    id: () => document.getElementById("IDEmployeeGroupBonus"),
+    group: () => document.getElementById("IDEmployeeGroup"),
+    minYear: () => document.getElementById("MinYear"),
+    maxYear: () => document.getElementById("MaxYear"),
+    bonus: () => document.getElementById("Bonus"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
@@ -27,10 +27,10 @@ const DOM = {
 // ======================================================
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await loadLocation();
+    await loadEmployeeGroup();
     await bindTable();
 
-    $('#departmentList').DataTable({
+    $('#bonusList').DataTable({
         searching: true,
         pageLength: 10,
         ordering: false,
@@ -52,23 +52,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 // ======================================================
-// LOAD LOCATION
+// LOAD EMPLOYEE GROUP
 // ======================================================
-async function loadLocation() {
+async function loadEmployeeGroup() {
 
-    const res = await apiFetch(`/api/master/location/get-all`);
+    const res = await apiFetch("/api/master/employeegroup/get-all");
     const json = await res.json();
 
     if (!json.success) return;
 
-    const ddl = DOM.location();
-    ddl.innerHTML = `<option value="">Select Location</option>`;
+    const ddl = DOM.group();
 
-    json.data.forEach(l => {
+    ddl.innerHTML = `<option value="">Select Employee Group</option>`;
+
+    json.data.forEach(g => {
 
         const opt = document.createElement("option");
-        opt.value = l.idLocation;
-        opt.text = l.locationName;
+
+        opt.value = g.idEmployeeGroup;
+        opt.textContent = g.employeeGroupName;
 
         ddl.appendChild(opt);
 
@@ -86,25 +88,27 @@ async function bindTable() {
     const json = await res.json();
 
     if (!json.success) return;
-
+    console.log(json.data);
     const tbody = DOM.tbody();
     tbody.innerHTML = "";
 
     json.data.forEach(d => {
 
         const tr = document.createElement("tr");
-
+        
         tr.innerHTML = `
-            <td>${escapeHtml(d.locationName ?? "")}</td>
-            <td>${escapeHtml(d.departmentName ?? "")}</td>
+            <td>${escapeHtml(d.employeeGroupName || "")}</td>
+            <td>${escapeHtml(String(d.minYear || ""))}</td>
+            <td>${escapeHtml(String(d.maxYear || ""))}</td>
+            <td>${escapeHtml(String(d.bonus || ""))}</td>
             <td class="text-center">
                 <div class="d-flex">
-                    <a onclick="editEntry(${d.idDepartment})"
+                    <a onclick="editEntry(${d.idEmployeeGroupBonus})"
                        class="btn btn-primary btn-xs sharp me-1">
                        <i class="fa fa-pencil"></i>
                     </a>
 
-                    <a onclick="deleteEntry(${d.idDepartment})"
+                    <a onclick="deleteEntry(${d.idEmployeeGroupBonus})"
                        class="btn btn-danger btn-xs sharp">
                        <i class="fa fa-trash"></i>
                     </a>
@@ -131,9 +135,11 @@ async function editEntry(id) {
 
     const d = json.data;
 
-    DOM.id().value = d.idDepartment;
-    DOM.location().value = d.idLocation;
-    DOM.name().value = d.departmentName;
+    DOM.id().value = d.idEmployeeGroupBonus;
+    DOM.group().value = d.idEmployeeGroup;
+    DOM.minYear().value = d.minYear;
+    DOM.maxYear().value = d.maxYear;
+    DOM.bonus().value = d.bonus;
 
     entryModal.show();
 
@@ -157,7 +163,7 @@ async function deleteEntry(id) {
 
     if (!json.success) return;
 
-    showToast("success", json.message, "Department Master");
+    showToast("success", json.message, "Bonus Details");
 
     bindTable();
 
@@ -169,18 +175,18 @@ async function deleteEntry(id) {
 // ======================================================
 async function saveData() {
 
-    if (!DOM.name().value.trim()) {
-
-        showToast("danger", "Department required", "Department Master");
+    if (!DOM.group().value) {
+        showToast("danger", "Employee Group required", "Bonus Details");
         return;
-
     }
 
     const dto = {
 
-        idDepartment: Number(DOM.id().value || 0),
-        idLocation: DOM.location().value || null,
-        departmentName: DOM.name().value.trim()
+        idEmployeeGroupBonus: Number(DOM.id().value || 0),
+        idEmployeeGroup: Number(DOM.group().value || 0),
+        minYear: Number(DOM.minYear().value || 0),
+        maxYear: Number(DOM.maxYear().value || 0),
+        bonus: Number(DOM.bonus().value || 0)
 
     };
 
@@ -199,7 +205,7 @@ async function saveData() {
         if (!json.success)
             throw new Error(json.message);
 
-        showToast("success", json.message, "Department Master");
+        showToast("success", json.message, "Bonus Details");
 
         entryModal.hide();
         clearForm();
@@ -208,7 +214,7 @@ async function saveData() {
     }
     catch (err) {
 
-        showToast("danger", err.message, "Department Master");
+        showToast("danger", err.message, "Bonus Details");
 
     }
     finally {
@@ -221,12 +227,14 @@ async function saveData() {
 
 
 // ======================================================
-// CLEAR FORM
+// CLEAR
 // ======================================================
 function clearForm() {
 
     DOM.id().value = 0;
-    DOM.location().value = "";
-    DOM.name().value = "";
+    DOM.group().value = "";
+    DOM.minYear().value = "";
+    DOM.maxYear().value = "";
+    DOM.bonus().value = "";
 
 }

@@ -11,7 +11,7 @@ let entryModal = null;
 const DOM = {
 
     id: () => document.getElementById("IDDesignation"),
-    name: () => document.getElementById("Designetion"),
+    name: () => document.getElementById("Designation"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
