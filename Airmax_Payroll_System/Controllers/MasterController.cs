@@ -41,6 +41,11 @@ namespace Airmax_Payroll_System.Controllers
             return View();
 
         }
+        public IActionResult EmployeeEntry()
+        {
+            return View();
+
+        }
         public IActionResult EmployeeGroup()
         {
             return View();

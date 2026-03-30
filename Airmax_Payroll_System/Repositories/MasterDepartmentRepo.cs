@@ -80,6 +80,9 @@ namespace Airmax_Payroll_System.Repositories
             {
                 var param = new DynamicParameters();
                 param.Add("@IDDepartment", idDepartment);
+                param.Add("@D_By", "ADMIN");
+               
+
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Department_Delete",

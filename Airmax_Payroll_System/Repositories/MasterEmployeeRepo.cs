@@ -137,6 +137,6 @@ namespace Airmax_Payroll_System.Repositories
                 _logger?.LogError(ex, "Error in EmployeeRepo.DeleteAsync");
                 return SaveResult.Fail(ex.Message);
             }
-        }
+    }
     }
 }

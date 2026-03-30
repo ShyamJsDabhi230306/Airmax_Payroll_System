@@ -1,283 +1,35 @@
 ﻿@{
-    ViewBag.Title = "Employee Master";
+    ViewBag.Title = "Employee List";
 }
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
+<div class="card">
+    <div class="card-header">
+        <h4>Employee List</h4>
 
-            <div class="card-header">
-                <h4 class="card-title">Employee Master</h4>
-                <a data-bs-toggle="modal" data-bs-target="#addModal" class="btn btn-primary btn-sm">
-                    Add Employee
-                </a>
-            </div>
-
-            <div class="table-responsive">
-                <table id="employeeList" class="display table-hover table-striped w-100">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Email</th>
-                            <th>Company</th>
-                            <th>Salary</th>
-                            <th style="width:2%">Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="tblBody"></tbody>
-                </table>
-            </div>
-
-        </div>
+        <!-- ✅ CHANGE BUTTON -->
+        <a href="/Master/EmployeeEntry" class="btn btn-primary btn-sm">
+            Add Employee
+        </a>
     </div>
-</div>
 
+    <div class="table-responsive">
+        <table id="employeeList" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Company</th>
+                    <th>Salary</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
 
-<!-- MODAL -->
-<div class="modal fade" id="addModal" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <h3 class="modal-title">Employee Master</h3>
-                <button class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <form id="entryForm">
-                    <input type="hidden" id="IDEmployee" value="0" />
-
-                    <div class="row g-3">
-
-                        <!-- ================= EMPLOYEE DETAILS ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary">Employee Details</h5>
-                            <hr />
-                        </div>
-
-                        
-
-                        <div class="col-md-4">
-                            <label class="form-label">Company</label>
-                            <select class="form-control" id="IDCompany"></select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Location</label>
-                            <select class="form-control" id="IDLocation"></select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Department</label>
-                            <select class="form-control" id="IDDepartment"></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Designation</label>
-                            <select class="form-control" id="IDDesignation"></select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Employee Group</label>
-                            <select class="form-control" id="IDEmployeeGroup"></select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Shift</label>
-                            <select class="form-control" id="IDShift"></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Employee Code</label>
-                            <input type="text" class="form-control" id="EmployeeCode">
-                        </div>
-                        <div class="col-md-8">
-                            <label class="form-label">Employee Name</label>
-                            <input type="text" class="form-control" id="EmployeeName">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Joining Date</label>
-                            <input type="date" class="form-control" id="JoiningDate">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Contact No</label>
-                            <input type="text" class="form-control" id="Emp_ContactNo">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" id="EmailID">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Address</label>
-                            <textarea class="form-control" id="Emp_Address"></textarea>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Blood Group</label>
-                            <input type="text" class="form-control" id="BloodGroup">
-                        </div>
-
-                        <!-- ================= SALARY DETAILS ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary mt-3">Salary Details</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Salary</label>
-                            <input type="number" class="form-control" id="Salary">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Second Salary</label>
-                            <input type="number" class="form-control" id="SecondSalary">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Bonus %</label>
-                            <input type="number" class="form-control" id="BonusPercentage">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Leave %</label>
-                            <input type="number" class="form-control" id="LeavePercentage">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Tea/Coffee</label>
-                            <input type="number" class="form-control" id="TeaCoffeeAmt">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">DA %</label>
-                            <input type="number" class="form-control" id="DAPercentage">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Default Late Hrs</label>
-                            <input type="number" class="form-control" id="DefaultLateHrs">
-                        </div>
-
-                        <!-- ================= BANK DETAILS ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary mt-3">Bank Details</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Aadhar No</label>
-                            <input type="text" class="form-control" id="AadharNo">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">PAN No</label>
-                            <input type="text" class="form-control" id="PanNo">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Bank Name</label>
-                            <input type="text" class="form-control" id="BankName">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Bank A/C No</label>
-                            <input type="text" class="form-control" id="BankACNo">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">IFSC Code</label>
-                            <input type="text" class="form-control" id="IFSCCode">
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">UAN</label>
-                            <input type="text" class="form-control" id="UAN">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">PF No</label>
-                            <input type="text" class="form-control" id="PFNo">
-                        </div>
-
-                        <!-- ================= SETTINGS ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary mt-3">Settings</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-md-3 form-check custom-checkbox">
-                            <label class="form-check-label" ><input type="checkbox" id="CalculatePF" class="form-check-input"> Calculate PF</label>
-                        </div>
-
-                        <div class="col-md-3 form-check custom-checkbox ">
-                            <label class="form-check-label"><input type="checkbox" id="CalculateDA" class="form-check-input" > Calculate DA</label>
-                        </div>
-                         
-                        <div class="col-md-3 form-check custom-checkbox">
-                            <label class="form-check-label"><input type="checkbox" id="ApplyPFBonus" class="form-check-input"> PF Bonus</label>
-                        </div>
-
-                        <div class="col-md-3 form-check custom-checkbox">
-                            <label class="form-check-label" ><input type="checkbox" id="HasDifferentBankAC" class="form-check-input"> Different Bank</label>
-                        </div>
-
-                        <!-- ================= LOGIN ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary mt-3">Login Details</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">User Name</label>
-                            <input type="text" class="form-control" id="UserName">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Password</label>
-                            <input type="text" class="form-control" id="Password">
-                        </div>
-
-                        <!-- ================= LEAVE ================= -->
-                        <div class="col-12">
-                            <h5 class="text-primary mt-3">Leave</h5>
-                            <hr />
-                        </div>
-
-                        <div class="col-md-3 form-check custom-checkbox">
-                            <label class="form-check-label"><input type="checkbox" id="IsLeave" class="form-check-input"> Is Leave</label>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Leave Date</label>
-                            <input type="date" class="form-control" id="LeaveDate">
-                        </div>
-
-                        <!-- ================= REMARK ================= -->
-                        @* <div class="col-md-12">
-                            <label class="form-label">Remark</label>
-                            <textarea class="form-control" id="Remark"></textarea>
-                        </div> *@
-
-                    </div>
-                </form>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" id="btnSave">Save</button>
-            </div>
-
-        </div>
+            <tbody id="tblBody"></tbody>
+        </table>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/AirmaxPayRollJS/Master/employee.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Master/employee_list.js"></script>
 }

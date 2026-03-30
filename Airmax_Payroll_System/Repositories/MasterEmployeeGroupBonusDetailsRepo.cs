@@ -2,6 +2,7 @@
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
 using Dapper;
+using System.Data;
 
 namespace Airmax_Payroll_System.Repositories
 {
@@ -103,10 +104,12 @@ namespace Airmax_Payroll_System.Repositories
             {
                 var param = new DynamicParameters();
                 param.Add("@IDEmployeeGroupBonus", id);
+                param.Add("@D_By", "ADMIN"); // ✅ REQUIRED
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_EmployeeGroupBonusDetails_Delete",
-                    param);
+                    param
+                );
 
                 return result ?? SaveResult.Fail("No response from database.");
             }

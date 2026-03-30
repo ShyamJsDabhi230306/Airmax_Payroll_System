@@ -105,17 +105,25 @@ namespace Airmax_Payroll_System.Repositories
             {
                 var param = new DynamicParameters();
                 param.Add("@IDLocation", idLocation);
+                param.Add("@IsDelete", true);
+                param.Add("@D_By", "Admin");
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Location_Delete",
-                    param);
+                    param   // ✅ VERY IMPORTANT
+                );
 
-                return result ?? SaveResult.Fail("No response from database.");
+                // ✅ Handle null safely
+                if (result == null)
+                {
+                    return SaveResult.Fail("No response from database.");
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex,
-                    "Error in LocationRepo.DeleteAsync");
+                _logger?.LogError(ex, "Error in LocationRepo.DeleteAsync");
 
                 return SaveResult.Fail(
                     "Failed to delete location. " + ex.Message);

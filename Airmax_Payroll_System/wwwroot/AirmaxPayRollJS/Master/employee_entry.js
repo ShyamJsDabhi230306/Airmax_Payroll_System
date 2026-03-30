@@ -2,7 +2,6 @@
 // CONFIG
 // ======================================================
 const API = "/api/master/employee";
-let entryModal = null;
 
 // ======================================================
 // DOM
@@ -23,9 +22,7 @@ const DOM = {
     designation: () => document.getElementById("IDDesignation"),
     group: () => document.getElementById("IDEmployeeGroup"),
 
-    save: () => document.getElementById("btnSave"),
-    tbody: () => document.getElementById("tblBody"),
-    modal: () => document.getElementById("addModal")
+    save: () => document.getElementById("btnSave")
 };
 
 // ======================================================
@@ -42,31 +39,16 @@ async function safeJson(res) {
 // ======================================================
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await bindTable();
+    // ✅ LOAD DROPDOWNS (same as your old JS)
     await loadCompany();
-
-    // 🔥 LOAD INDEPENDENT DROPDOWNS
     await loadShift();
     await loadDesignation();
     await loadGroup();
 
-    $('#employeeList').DataTable({
-        searching: true,
-        pageLength: 10,
-        ordering: false,
-        language: {
-            paginate: {
-                next: '<i class="fa fa-angle-double-right"></i>',
-                previous: '<i class="fa fa-angle-double-left"></i>'
-            }
-        }
-    });
-
     // ==================================================
-    // 🔥 CHAINING (ONLY 2 LEVEL)
+    // CHAINING (same as your JS)
     // ==================================================
 
-    // COMPANY → LOCATION
     DOM.company().addEventListener("change", () => {
 
         const id = DOM.company().value;
@@ -77,7 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadLocation(id);
     });
 
-    // LOCATION → DEPARTMENT
     DOM.location().addEventListener("change", () => {
 
         const id = DOM.location().value;
@@ -87,55 +68,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadDepartment(id);
     });
 
-    entryModal = new bootstrap.Modal(DOM.modal(), { backdrop: "static" });
+    // ==================================================
+    // EDIT MODE
+    // ==================================================
+    const id = new URLSearchParams(window.location.search).get("id");
 
-    DOM.modal().addEventListener("hidden.bs.modal", clearForm);
+    if (id) {
+        await editEntry(id);
+    }
+
+    // SAVE
     DOM.save().addEventListener("click", saveData);
 });
 
-// ======================================================
-// TABLE
-// ======================================================
-async function bindTable() {
-
-    const res = await apiFetch(`${API}/get-all`);
-    const json = await safeJson(res);
-
-    if (!json || !json.success) return;
-
-    const tbody = DOM.tbody();
-    tbody.innerHTML = "";
-
-    json.data.forEach(d => {
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${escapeHtml(d.employeeName)}</td>
-            <td>${escapeHtml(d.emp_ContactNo || "")}</td>
-            <td>${escapeHtml(d.emailID || "")}</td>
-            <td>${escapeHtml(d.companyName || "")}</td>
-            <td>${escapeHtml(String(d.salary || ""))}</td>
-            <td class="text-center">
-                <div class="d-flex">
-                    <a onclick="editEntry(${d.idEmployee})"
-                       class="btn btn-primary btn-xs sharp me-1">
-                       <i class="fa fa-pencil"></i>
-                    </a>
-                    <a onclick="deleteEntry(${d.idEmployee})"
-                       class="btn btn-danger btn-xs sharp">
-                       <i class="fa fa-trash"></i>
-                    </a>
-                </div>
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-    });
-}
 
 // ======================================================
-// EDIT
+// LOAD EMPLOYEE (same as your editEntry without modal)
+// ======================================================
+// ======================================================
+// EDIT ENTRY (FULL VERSION - NO MODAL)
 // ======================================================
 async function editEntry(id) {
 
@@ -167,9 +118,7 @@ async function editEntry(id) {
 
     await loadDepartment(d.idLocation);
     $('#IDDepartment').val(String(d.idDepartment || "")).selectpicker('refresh');
-    await loadDesignation();
-    await loadGroup(g.idEmployeeGroup); 
-
+    await loadGroup();
     // 🔥 INDEPENDENT
     $('#IDShift').val(String(d.idShift || "")).selectpicker('refresh');
     $('#IDDesignation').val(String(d.idDesignation || "")).selectpicker('refresh');
@@ -207,13 +156,11 @@ async function editEntry(id) {
     // 🔹 LEAVE
     document.getElementById("IsLeave").checked = d.isLeave || false;
     document.getElementById("LeaveDate").value = d.leaveDate || "";
-
-
-    entryModal.show();
 }
 
+
 // ======================================================
-// DROPDOWNS
+// DROPDOWNS (FULL COPY FROM YOUR ORIGINAL JS)
 // ======================================================
 async function loadCompany() {
 
@@ -267,7 +214,6 @@ async function loadDepartment(locationId) {
     $(DOM.department()).selectpicker('refresh');
 }
 
-// 🔥 INDEPENDENT DROPDOWNS
 async function loadShift() {
 
     const res = await apiFetch("/api/master/shift/get-all");
@@ -290,11 +236,11 @@ async function loadDesignation() {
     const json = await safeJson(res);
 
     if (!json || !json.success) return;
-    console.log(json.data);
+
     DOM.designation().innerHTML =
         `<option value="">Select Designation</option>` +
         json.data.map(d =>
-            `<option value="${d.idDesignation}">${d.designetion }</option>`
+            `<option value="${d.idDesignation}">${d.designetion}</option>`
         ).join("");
 
     $(DOM.designation()).selectpicker('refresh');
@@ -316,8 +262,9 @@ async function loadGroup() {
     $(DOM.group()).selectpicker('refresh');
 }
 
+
 // ======================================================
-// SAVE
+// SAVE (same logic, only removed modal)
 // ======================================================
 async function saveData() {
 
@@ -420,7 +367,7 @@ async function saveData() {
 
         showToast("success", json.message, "Employee Master");
 
-        entryModal.hide();
+        window.location.href = "/Master/Employee";
         clearForm();
         bindTable();
 
@@ -430,48 +377,4 @@ async function saveData() {
     finally {
         DOM.save().disabled = false;
     }
-}
-// ======================================================
-// DELETE
-// ======================================================
-async function deleteEntry(id) {
-
-    const ok = await confirmDelete("Delete this employee?");
-    if (!ok) return;
-
-    const res = await apiFetch(`${API}/delete/${id}`, {
-        method: "DELETE"
-    });
-
-    const json = await safeJson(res);
-
-    if (!json || !json.success) return;
-
-    showToast("success", json.message, "Employee Master");
-    bindTable();
-}
-
-// ======================================================
-// CLEAR
-// ======================================================
-function clearForm() {
-
-    DOM.id().value = 0;
-
-    document.querySelectorAll("#entryForm input")
-        .forEach(x => x.value = "");
-
-    DOM.company().value = "";
-    DOM.location().value = "";
-    DOM.department().value = "";
-    DOM.shift().value = "";
-    DOM.designation().value = "";
-    DOM.group().value = "";
-
-    $('#IDCompany').selectpicker('refresh');
-    $('#IDLocation').selectpicker('refresh');
-    $('#IDDepartment').selectpicker('refresh');
-    $('#IDShift').selectpicker('refresh');
-    $('#IDDesignation').selectpicker('refresh');
-    $('#IDEmployeeGroup').selectpicker('refresh');
 }

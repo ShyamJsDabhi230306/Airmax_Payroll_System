@@ -91,6 +91,7 @@ namespace Airmax_Payroll_System.Repositories
             {
                 var param = new DynamicParameters();
                 param.Add("@IDDesignation", idDesignation);
+                param.Add("@D_By", "ADMIN"); // ✅ REQUIRED
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Designation_Delete",

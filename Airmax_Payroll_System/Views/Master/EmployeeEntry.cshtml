@@ -1,0 +1,283 @@
+﻿@{
+    ViewBag.Title = "Employee Entry";
+}
+
+<input type="hidden" id="IDEmployee" value="@ViewBag.EmployeeId" />
+
+<div class="card">
+    <div class="card-header">
+        <h4>Employee Entry</h4>
+    </div>
+
+    <div class="card-body">
+        <form id="entryForm">
+            <input type="hidden" id="IDEmployee" value="0" />
+
+            <!-- ================= EMPLOYEE DETAILS ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Employee Details</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-2">
+                            <label class="form-label">Company</label>
+                            <select class="form-control" id="IDCompany"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Location</label>
+                            <select class="form-control" id="IDLocation"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Department</label>
+                            <select class="form-control" id="IDDepartment"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Designation</label>
+                            <select class="form-control" id="IDDesignation"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Employee Group</label>
+                            <select class="form-control" id="IDEmployeeGroup"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Shift</label>
+                            <select class="form-control" id="IDShift"></select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Employee Code</label>
+                            <input type="text" class="form-control" id="EmployeeCode">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Joining Date</label>
+                            <input type="date" class="form-control" id="JoiningDate">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Employee Name</label>
+                            <input type="text" class="form-control" id="EmployeeName">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Blood Group</label>
+                            <input type="text" class="form-control" id="BloodGroup">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Contact No</label>
+                            <input type="text" class="form-control" id="Emp_ContactNo">
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" id="EmailID">
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" id="Emp_Address"></textarea>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SALARY ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Salary Details</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-2">
+                            <label class="form-label">Salary</label>
+                            <input type="number" class="form-control" id="Salary">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Second Salary</label>
+                            <input type="number" class="form-control" id="SecondSalary">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Bonus %</label>
+                            <input type="number" class="form-control" id="BonusPercentage">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Leave %</label>
+                            <input type="number" class="form-control" id="LeavePercentage">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Tea/Coffee</label>
+                            <input type="number" class="form-control" id="TeaCoffeeAmt">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">DA %</label>
+                            <input type="number" class="form-control" id="DAPercentage">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">Default Late Hrs</label>
+                            <input type="number" class="form-control" id="DefaultLateHrs">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= BANK ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Bank Details</h5>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+                            <label class="form-label">Aadhar No</label>
+                            <input type="text" class="form-control" id="AadharNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">PAN No</label>
+                            <input type="text" class="form-control" id="PanNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" id="BankName">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Bank A/C No</label>
+                            <input type="text" class="form-control" id="BankACNo">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">IFSC Code</label>
+                            <input type="text" class="form-control" id="IFSCCode">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">UAN</label>
+                            <input type="text" class="form-control" id="UAN">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">PF No</label>
+                            <input type="text" class="form-control" id="PFNo">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= SETTINGS ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Settings</h5>
+                </div>
+
+                <div class="card-body row">
+
+                    <div class="col-md-3 form-check">
+                        <input type="checkbox" id="CalculatePF" class="form-check-input">
+                        <label class="form-check-label">Calculate PF</label>
+                    </div>
+
+                    <div class="col-md-3 form-check">
+                        <input type="checkbox" id="CalculateDA" class="form-check-input">
+                        <label class="form-check-label">Calculate DA</label>
+                    </div>
+
+                    <div class="col-md-3 form-check">
+                        <input type="checkbox" id="ApplyPFBonus" class="form-check-input">
+                        <label class="form-check-label">PF Bonus</label>
+                    </div>
+
+                    <div class="col-md-3 form-check">
+                        <input type="checkbox" id="HasDifferentBankAC" class="form-check-input">
+                        <label class="form-check-label">Different Bank</label>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= LOGIN ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Login Details</h5>
+                </div>
+
+                <div class="card-body row g-3">
+
+                    <div class="col-md-6">
+                        <label>User Name</label>
+                        <input type="text" class="form-control" id="UserName">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label>Password</label>
+                        <input type="text" class="form-control" id="Password">
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= LEAVE ================= -->
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-primary">Leave</h5>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="form-check mb-2">
+                        <input type="checkbox" id="IsLeave" class="form-check-input">
+                        <label class="form-check-label">Is Leave</label>
+                    </div>
+
+                    <div>
+                        <label>Leave Date</label>
+                        <input type="date" class="form-control" id="LeaveDate">
+                    </div>
+
+                </div>
+            </div>
+
+        </form>
+
+        <!-- ✅ PASTE YOUR FULL FORM HERE -->
+        <!-- REMOVE: modal, modal-dialog, modal-content -->
+
+        
+
+    </div>
+
+    <div class="card-footer text-end">
+        <button class="btn btn-primary" id="btnSave">Save</button>
+
+        <a href="/Master/Employee" class="btn btn-secondary">
+            Back
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/employee_entry.js"></script>
+}

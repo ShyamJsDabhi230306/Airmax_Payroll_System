@@ -107,12 +107,18 @@ namespace Airmax_Payroll_System.Repositories
             {
                 var param = new DynamicParameters();
                 param.Add("@IDShift", idShift);
+                param.Add("@D_By", "ADMIN");
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Shift_Delete",
                     param);
 
-                return result ?? SaveResult.Fail("No response from database.");
+                if (result == null)
+                {
+                    return SaveResult.Fail("Database did not return any response.");
+                }
+
+                return result;
             }
             catch (Exception ex)
             {

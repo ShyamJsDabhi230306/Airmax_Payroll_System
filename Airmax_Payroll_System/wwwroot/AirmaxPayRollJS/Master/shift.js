@@ -19,7 +19,7 @@ const DOM = {
     totalHour: () => document.getElementById("WorkingHour"),
     totalMin: () => document.getElementById("WorkingMinute"),
 
-    overtime: () => document.getElementById("Overtime"),
+    //overtime: () => document.getElementById("Overtime"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
@@ -90,7 +90,9 @@ async function loadDepartment() {
 // ======================================================
 async function bindTable() {
 
-    const res = await fetch(`${API}/get-all`);
+    //const res = await fetch(`${API}/get-all`);
+    // Add a timestamp (?v=...) to prevent the browser from using a cached version
+    const res = await fetch(`${API}/get-all?v=${new Date().getTime()}`);
     const json = await res.json();
 
     if (!json.success) return;
@@ -181,12 +183,12 @@ async function editEntry(id) {
     DOM.totalHour().value = d.totalWorkingHour || "";
     DOM.totalMin().value = d.totalWorkingMinute || "";
 
-    // ✅ OVERTIME (handle datetime → time)
-    if (d.overtime) {
-        DOM.overtime().value = d.overtime.substring(11, 16);
-    } else {
-        DOM.overtime().value = "";
-    }
+    //// ✅ OVERTIME (handle datetime → time)
+    //if (d.overtime) {
+    //    DOM.overtime().value = d.overtime.substring(11, 16);
+    //} else {
+    //    DOM.overtime().value = "";
+    //}
 
     // OPTIONAL
     // remark if you have field
@@ -198,13 +200,35 @@ async function editEntry(id) {
 // ======================================================
 // DELETE
 // ======================================================
+// ======================================================
+// DELETE (SHIFT - UPDATED LIKE DESIGNATION)
+// ======================================================
 async function deleteEntry(id) {
 
-    if (!confirm("Delete this record?")) return;
+    const ok = await confirmDelete("This record will be deleted permanently!");
 
-    await fetch(`${API}/delete/${id}`, { method: "DELETE" });
+    if (!ok) return;
 
-    bindTable();
+    try {
+
+        const res = await apiFetch(`${API}/delete/${id}`, {
+            method: "DELETE"
+        });
+
+        const json = await res.json();
+
+        if (!json.success)
+            throw new Error(json.message);
+
+        showToast("success", json.message, "Shift Master");
+
+        await bindTable();
+
+    } catch (err) {
+
+        showToast("danger", err.message, "Shift Master");
+
+    }
 }
 
 
