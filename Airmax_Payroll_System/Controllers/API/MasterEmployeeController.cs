@@ -75,5 +75,17 @@ namespace Airmax_Payroll_System.Controllers.API
 
             return Ok(ApiResponse<string>.SuccessResponse(result.Message));
         }
+
+        [HttpGet("by-department/{id}")]
+        public async Task<IActionResult> GetByDepartment(int id)
+        {
+            var data = await _service.GetByDepartmentAsync(id);
+
+            return Ok(new
+            {
+                success = true,
+                data
+            });
+        }
     }
 }

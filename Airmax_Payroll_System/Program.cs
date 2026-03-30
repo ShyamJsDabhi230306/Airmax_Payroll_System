@@ -44,6 +44,13 @@ builder.Services.AddScoped<MasterUserRepo>();
 builder.Services.AddScoped<MasterEmployeeRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
+
+
+// FOR TRANSACTION REPOSITORY
+
+builder.Services.AddScoped<TransactionEmployeeKharchiRepo>();
+
+
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
@@ -54,6 +61,9 @@ builder.Services.AddScoped<MasterUserService>();
 builder.Services.AddScoped<MasterEmployeeService>();
 builder.Services.AddScoped<MasterEmployeeGroupService>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
+
+// FOR TRANSACTION SERVICE
+builder.Services.AddScoped<TransactionEmployeeKharchiService>();
 
 
 // ---------------------------------

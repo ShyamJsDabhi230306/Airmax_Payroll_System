@@ -1,6 +1,7 @@
 ﻿using Airmax_Payroll_System.Helpers;
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
+using Airmax_Payroll_System.Models.Transaction;
 using Dapper;
 
 namespace Airmax_Payroll_System.Repositories
@@ -137,6 +138,18 @@ namespace Airmax_Payroll_System.Repositories
                 _logger?.LogError(ex, "Error in EmployeeRepo.DeleteAsync");
                 return SaveResult.Fail(ex.Message);
             }
-    }
+        }
+
+
+
+        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDDepartment", id);
+
+            return await _dapper.QueryAsync<EmployeeModel>(
+                "usp_Employee_GetByDepartment",
+                param);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
+using Airmax_Payroll_System.Models.Transaction;
 using Airmax_Payroll_System.Repositories;
 
 namespace Airmax_Payroll_System.Services
@@ -24,5 +25,9 @@ namespace Airmax_Payroll_System.Services
 
         public async Task<SaveResult> DeleteAsync(int id)
             => await _repo.DeleteAsync(id);
+
+
+        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)
+           => await _repo.GetByDepartmentAsync(id);
     }
 }
