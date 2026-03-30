@@ -135,8 +135,9 @@ async function editEntry(id) {
 // DELETE
 // ======================================================
 async function deleteEntry(id) {
+    const ok = await confirmDelete("This record will be deleted permanently!");
 
-    if (!confirm("Delete this record?")) return;
+    if (!ok) return;
 
     await fetch(`${API}/delete/${id}`, { method: "DELETE" });
 
