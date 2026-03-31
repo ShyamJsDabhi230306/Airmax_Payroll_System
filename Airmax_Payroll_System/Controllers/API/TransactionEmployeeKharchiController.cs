@@ -24,7 +24,7 @@ namespace Airmax_Payroll_System.Controllers.API
             return Ok(new { success = true, data });
         }
 
-        [HttpGet("get-by-id/{id}")]
+        [HttpGet("get-by-id/{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             var data = await _service.GetByIdAsync(id);

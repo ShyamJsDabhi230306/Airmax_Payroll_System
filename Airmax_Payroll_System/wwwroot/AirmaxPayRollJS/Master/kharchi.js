@@ -181,12 +181,78 @@ async function bindTable() {
     });
 }
 
-// ======================================================
-// EDIT → REDIRECT
-// ======================================================
-function editEntry(id) {
-    window.location.href = "/Transaction/KharchiEntry?id=" + id;
+ ======================================================
+ EDIT ENTRY (KHARCHI)
+ ======================================================
+async function editEntry(id) {
+
+    const res = await apiFetch(`${API}/get-by-id/${id}`);
+    const json = await safeJson(res);
+
+    if (!json || !json.success) return;
+
+    const d = json.data;
+
+    // ==================================================
+    // 🔹 BASIC
+    // ==================================================
+    DOM.id().value = d.idEmployeeKharchi || 0;
+    DOM.kharchiNo().value = d.kharchiNo || "";
+
+    DOM.kharchiDate().value = d.kharchiDate
+        ? d.kharchiDate.split('T')[0].substring(0, 7) // yyyy-MM
+        : "";
+
+    DOM.date().value = d.date
+        ? d.date.split('T')[0]
+        : "";
+
+    // ==================================================
+    // 🔹 DEPARTMENT
+    // ==================================================
+    await loadDepartment();
+    DOM.department().value = d.idDepartment || "";
+
+    // ==================================================
+    // 🔹 LOAD EMPLOYEES GRID
+    // ==================================================
+    await loadEmployees();
+
+    // ==================================================
+    // 🔹 SET DETAILS (IMPORTANT 🔥)
+    // ==================================================
+    if (d.details && d.details.length > 0) {
+
+        d.details.forEach(item => {
+
+            const row = document.querySelector(
+                `input[data-id="${item.idEmployee}"]`
+            );
+
+            if (row) {
+
+                // amount
+                row.value = item.amount || 0;
+
+                // checkbox
+                const chk = row.closest("tr").querySelector(".allowCalc");
+                if (chk) {
+                    chk.checked = item.allowForCalculate || false;
+                }
+            }
+
+        });
+    }
+
+    // ==================================================
+    // 🔹 SHOW MODAL
+    // ==================================================
+    entryModal.show();
 }
+
+
+
+
 
 // ======================================================
 // DELETE
