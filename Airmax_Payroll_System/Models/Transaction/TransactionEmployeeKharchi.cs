@@ -7,7 +7,7 @@ namespace Airmax_Payroll_System.Models.Transaction
         public int IDEmployeeKharchi { get; set; }
 
         public string? KharchiNo { get; set; }
-
+        public string? EmployeeCode { get; set; }
         public DateTime? KharchiDate { get; set; }
 
         public DateTime? Date { get; set; }
@@ -31,9 +31,9 @@ namespace Airmax_Payroll_System.Models.Transaction
 
     public class EmployeeModel
     {
-        public int IDEmployee { get; set; }
-        public string EmployeeCode { get; set; }
-        public string EmployeeName { get; set; }
+        public int? IDEmployee { get; set; }
+        public string? EmployeeCode { get; set; }
+        public string? EmployeeName { get; set; }
     }
 
 

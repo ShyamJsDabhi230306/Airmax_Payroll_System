@@ -22,20 +22,51 @@ namespace Airmax_Payroll_System.Repositories
                 "usp_Transaction_EmployeeKharchi_SelectAll");
         }
 
-        public async Task<TransactionEmployeeKharchi?> GetByIdAsync(int id)
+        //public async Task<TransactionEmployeeKharchi?> GetByIdAsync(int id)
+        //{
+        //    var param = new DynamicParameters();
+        //    param.Add("@IDEmployeeKharchi", id);
+
+        //    return await _dapper.QueryFirstOrDefaultAsync<TransactionEmployeeKharchi>(
+        //        "usp_Transaction_EmployeeKharchi_SelectById",
+        //        param);
+        //}
+        // 🔥 UPDATED: Returns a DTO containing the Master record + the Details list
+        // 1. First, update your GetByIdAsync to handle JSON string deserialization
+        public async Task<TransactionEmployeeKharchiSaveDto?> GetByIdAsync(int id)
         {
             var param = new DynamicParameters();
             param.Add("@IDEmployeeKharchi", id);
 
-            return await _dapper.QueryFirstOrDefaultAsync<TransactionEmployeeKharchi>(
+            // Fetch as a dynamic object so we can read the 'details' string
+            var row = await _dapper.QueryFirstOrDefaultAsync<dynamic>(
                 "usp_Transaction_EmployeeKharchi_SelectById",
                 param);
+
+            if (row == null) return null;
+
+            // 2. Deserialize the 'details' string manually
+            string detailsJson = row.details; // This is the string from FOR JSON PATH
+            var detailsList = string.IsNullOrEmpty(detailsJson)
+                ? new List<TransactionEmployeeKharchiDetailDto>()
+                : JsonConvert.DeserializeObject<List<TransactionEmployeeKharchiDetailDto>>(detailsJson);
+
+            // 3. Map to your final DTO
+            return new TransactionEmployeeKharchiSaveDto
+            {
+                IDEmployeeKharchi = (int)row.idEmployeeKharchi,
+                KharchiNo = (string)row.kharchiNo,
+                KharchiDate = (DateTime?)row.kharchiDate,
+                Date = (DateTime?)row.date,
+                IDDepartment = (int)row.idDepartment,
+                Details = detailsList // 🔥 Now this will contain your employees!
+            };
         }
 
         public async Task<SaveResult> SaveAsync(TransactionEmployeeKharchiSaveDto model)
         {
             var param = new DynamicParameters();
-
+            param.Add("@IDEmployeeKharchi", model.IDEmployeeKharchi);
             param.Add("@KharchiNo", model.KharchiNo);
             param.Add("@KharchiDate", model.KharchiDate);
             param.Add("@Date", model.Date);

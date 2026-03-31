@@ -17,9 +17,12 @@ namespace Airmax_Payroll_System.Services
         public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync()
             => await _repo.GetAllAsync();
 
-        public async Task<TransactionEmployeeKharchi?> GetByIdAsync(int id)
-            => await _repo.GetByIdAsync(id);
+        //public async Task<TransactionEmployeeKharchi?> GetByIdAsync(int id)
+        //    => await _repo.GetByIdAsync(id);
 
+        // 🔥 UPDATED: Now returns the DTO with the details list
+        public async Task<TransactionEmployeeKharchiSaveDto?> GetByIdAsync(int id)
+            => await _repo.GetByIdAsync(id);
         public async Task<SaveResult> SaveAsync(TransactionEmployeeKharchiSaveDto model)
             => await _repo.SaveAsync(model);
 

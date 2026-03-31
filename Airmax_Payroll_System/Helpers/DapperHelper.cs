@@ -11,6 +11,8 @@ namespace Airmax_Payroll_System.Helpers
         Task<T?> QuerySingleOrDefaultAsync<T>(string sp, object? param = null);
         Task<T> QuerySingleAsync<T>(string sp, object? param = null);
         Task<int> ExecuteAsync(string sp, object? param = null);
+        Task<(SqlMapper.GridReader Reader, SqlConnection Conn)> QueryMultipleAsync(string sp, object? param = null);
+
     }
 
     public class DapperHelper : IDapperHelper   
@@ -112,7 +114,23 @@ namespace Airmax_Payroll_System.Helpers
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<(SqlMapper.GridReader Reader, SqlConnection Conn)> QueryMultipleAsync(string sp, object? param = null)
+        {
+            var conn = CreateConnection();
+            try
+            {
+                await conn.OpenAsync();
+                var reader = await conn.QueryMultipleAsync(sp, param,
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: _defaultTimeout);
 
+                return (reader, conn);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
         //private void ThrowFormattedException(string sp, object? param, Exception ex)
         //{

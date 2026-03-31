@@ -5,7 +5,8 @@ namespace Airmax_Payroll_System.Models.AllDTOS
   
         public class TransactionEmployeeKharchiSaveDto
         {
-            public string KharchiNo { get; set; }
+            public int IDEmployeeKharchi { get; set; }
+            public string? KharchiNo { get; set; }
 
             public DateTime? KharchiDate { get; set; } // Month selection
 
@@ -13,7 +14,7 @@ namespace Airmax_Payroll_System.Models.AllDTOS
 
             public int IDDepartment { get; set; }
 
-            public List<TransactionEmployeeKharchiDetailDto> Details { get; set; }
+            public List<TransactionEmployeeKharchiDetailDto>? Details { get; set; }
         }
     
 }
