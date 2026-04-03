@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/master/employee";
@@ -168,7 +168,7 @@ async function editEntry(id) {
     await loadDepartment(d.idLocation);
     $('#IDDepartment').val(String(d.idDepartment || "")).selectpicker('refresh');
     await loadDesignation();
-    await loadGroup(g.idEmployeeGroup); 
+    await loadGroup(); 
 
     // 🔥 INDEPENDENT
     $('#IDShift').val(String(d.idShift || "")).selectpicker('refresh');
@@ -302,7 +302,7 @@ async function loadDesignation() {
 
 async function loadGroup() {
 
-    const res = await apiFetch("api/master/employeegroup");
+    const res = await apiFetch("/api/master/employeegroup/get-all");
     const json = await safeJson(res);
 
     if (!json || !json.success) return;

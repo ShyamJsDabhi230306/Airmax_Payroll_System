@@ -48,8 +48,9 @@ builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
 
 // FOR TRANSACTION REPOSITORY
 
-builder.Services.AddScoped<TransactionEmployeeKharchiRepo>();
 
+builder.Services.AddScoped<TransactionEmployeeLoanService>();
+builder.Services.AddScoped<TransactionEmployeeLoanRepo>();
 
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
@@ -64,6 +65,7 @@ builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
 
 // FOR TRANSACTION SERVICE
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();
+builder.Services.AddScoped<TransactionEmployeeKharchiRepo>();
 
 
 // ---------------------------------

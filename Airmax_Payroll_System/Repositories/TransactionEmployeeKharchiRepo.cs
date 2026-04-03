@@ -90,7 +90,16 @@ namespace Airmax_Payroll_System.Repositories
                 param);
         }
 
+        public async Task<string> GenerateKharchiNoAsync()
+        {
+            // Queries the Maximum ID in the table and adds 1
+            string sql = "SELECT ISNULL(MAX(IDEmployeeKharchi), 0) + 1 FROM Transaction_EmployeeKharchi";
+            int nextId = await _dapper.ExecuteScalarAsync<int>(sql);
 
-        
+            // Returns the number padded to 3 digits (e.g., 001, 002)
+            return nextId.ToString("D3");
+        }
+
+
     }
 }

@@ -9,6 +9,9 @@ namespace Airmax_Payroll_System.Controllers
             return View();
         }
 
-
+        public IActionResult TransactionEmployeeLoan()
+        {
+            return View();
+        }
     }
 }

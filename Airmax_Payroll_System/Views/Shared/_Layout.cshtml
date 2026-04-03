@@ -170,7 +170,7 @@
         <!--**********************************
             Sidebar start
         ***********************************-->
-        <div class="ic-sidenav">
+        @* <div class="ic-sidenav">
             <div class="ic-sidenav-scroll">
                 <ul class="metismenu" id="menu">
 
@@ -225,7 +225,7 @@
                     </li>
                     <li>
                         <a class="ai-icon" href="/Master/Employee">
-                            <i class="flaticon-behance"></i>
+                            <i class="flaticon-registration "></i>
                             <span class="nav-text">Employee List</span>
                         </a>
                     </li>
@@ -253,7 +253,7 @@
 
                     <li>
                         <a class="ai-icon" href="/Transaction/TransactionEmployeeKharchi">
-                            <i class="flaticon-app"></i>
+                            <i class="flaticon-rocket"></i>
                             <span class="nav-text">EmployeeKharchi</span>
                         </a>
                     </li>
@@ -261,7 +261,63 @@
                 </ul>
 
             </div>
+        </div> *@
+
+
+        <!--********************************** Sidebar start ***********************************-->
+        <!--********************************** Sidebar start ***********************************-->
+        <!--********************************** Sidebar start ***********************************-->
+        <div class="ic-sidenav">
+            <div class="ic-sidenav-scroll">
+                <ul class="metismenu" id="menu">
+
+                    <!-- DASHBOARD -->
+                    <li id="menuTdrHodDashboard">
+                        <a class="ai-icon" href="/Master/Index">
+                            <i class="flaticon-home"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- EXPANDABLE MASTER SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-project"></i>
+                            <span class="nav-text">Master</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li><a href="/Master/Company"><i class="flaticon-business-and-trade"></i> Company</a></li>
+                            <li><a href="/Master/Location"><i class="flaticon-location"></i> Location</a></li>
+                            <li><a href="/Master/Department"><i class="flaticon-grid"></i> Department</a></li>
+                            <li><a href="/Master/Designation"><i class="flaticon-file"></i> Designation</a></li>
+                            <li><a href="/Master/Shift"><i class="flaticon-send"></i> Shift</a></li>
+                            <li><a href="/Master/User"><i class="flaticon-user"></i> User List</a></li>
+                            <li><a href="/Master/Employee"><i class="flaticon-registration"></i> Employee List</a></li>
+                            <li><a href="/Master/EmployeeEntry"><i class="flaticon-behance"></i> Employee Entry</a></li>
+                            <li><a href="/Master/EmployeeGroup"><i class="flaticon-shopping-cart"></i> Employee Group</a></li>
+                            <li><a href="/Master/employeegroupbonusdetails"><i class="flaticon-app"></i> Emp Group Bonus</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- EXPANDABLE TRANSACTION SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-notes"></i>
+                            <span class="nav-text">Transaction</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li><a href="/Transaction/TransactionEmployeeKharchi"><i class="flaticon-rocket"></i> Employee Kharchi</a></li>
+                            <li><a href="/Transaction/TransactionEmployeeLoan"><i class="flaticon-rocket"></i> Employee Loan</a></li>
+
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
         </div>
+
+
+
 
         <!--**********************************
             Sidebar end

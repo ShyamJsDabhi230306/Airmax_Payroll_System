@@ -1,0 +1,362 @@
+USE [AirmaxSalaryPayroll_DB]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Transaction_EmployeeKharchi_SelectById]    Script Date: 01-04-2026 16:39:11 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[usp_Transaction_EmployeeKharchi_SelectById]
+(
+    @IDEmployeeKharchi INT
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+
+        SELECT 
+            k.IDEmployeeKharchi AS idEmployeeKharchi,
+            k.KharchiNo AS kharchiNo,
+            k.KharchiDate AS kharchiDate,
+            k.Date AS date,
+            k.Month AS month,
+            k.Year AS year,
+            k.IDDepartment AS idDepartment,
+            d.DepartmentName AS departmentName,
+
+            -- 🔥 DETAILS AS JSON
+            (
+                SELECT 
+                    kd.IDEmployee AS idEmployee,
+                    e.EmployeeName AS employeeName,
+                    kd.EmployeeCode AS employeeCode,
+                    kd.Amount AS amount,
+                    kd.AllowForCalculate AS allowForCalculate
+                FROM Transaction_EmployeeKharchiDetails kd
+                LEFT JOIN Master_Employee e 
+                    ON kd.IDEmployee = e.IDEmployee
+                WHERE kd.IDEmployeeKharchi = k.IDEmployeeKharchi
+                FOR JSON PATH
+            ) AS details
+
+        FROM Transaction_EmployeeKharchi k
+        INNER JOIN Master_Department d 
+            ON k.IDDepartment = d.IDDepartment
+
+        WHERE k.IDEmployeeKharchi = @IDEmployeeKharchi
+        AND ISNULL(k.IsDeleted,0) = 0;
+
+    END TRY
+    BEGIN CATCH
+        SELECT 
+            Result = -1,
+            Message = ERROR_MESSAGE();
+    END CATCH
+END
+
+
+
+
+
+
+
+
+
+USE [AirmaxSalaryPayroll_DB]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Transaction_EmployeeKharchi_SelectAll]    Script Date: 01-04-2026 16:39:09 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[usp_Transaction_EmployeeKharchi_SelectAll]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+
+        SELECT 
+            -- HEADER
+            k.IDEmployeeKharchi,
+            k.KharchiNo,
+            k.KharchiDate,
+            k.Date,
+            k.Month,
+            k.Year,
+            k.IDDepartment,
+
+            -- DEPARTMENT
+            ISNULL(d.DepartmentName, '') AS DepartmentName,
+
+            -- DETAILS
+            kd.IDEmployee,
+            kd.EmployeeCode,
+            kd.Amount,
+            kd.AllowForCalculate,
+
+            -- EMPLOYEE
+            ISNULL(e.EmployeeName, '') AS EmployeeName,
+
+            -- AUDIT
+
+        
+            k.E_Date,
+            k.E_By,
+            k.U_Date,
+            k.U_By,
+            k.IsDeleted,
+            k.D_Date,
+            k.D_By
+
+        FROM Transaction_EmployeeKharchi k
+
+        -- 🔥 DETAILS JOIN
+        LEFT JOIN Transaction_EmployeeKharchiDetails kd
+            ON k.IDEmployeeKharchi = kd.IDEmployeeKharchi
+
+        -- EMPLOYEE JOIN
+        LEFT JOIN Master_Employee e
+            ON kd.IDEmployee = e.IDEmployee
+
+        -- DEPARTMENT JOIN
+        LEFT JOIN Master_Department d
+            ON k.IDDepartment = d.IDDepartment
+
+        WHERE ISNULL(k.IsDeleted, 0) = 0
+
+        ORDER BY k.IDEmployeeKharchi DESC;
+
+    END TRY
+    BEGIN CATCH
+        SELECT 
+            Result = -1,
+            Message = ERROR_MESSAGE(),
+            Error_Code = 'SQL_ERROR';
+    END CATCH
+END 
+
+
+
+
+
+
+USE [AirmaxSalaryPayroll_DB]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Transaction_EmployeeKharchi_Save]    Script Date: 01-04-2026 16:39:06 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[usp_Transaction_EmployeeKharchi_Save]
+(
+    @IDEmployeeKharchi INT,         -- 🔥 NEW (for update)
+    @KharchiNo NVARCHAR(50),
+    @KharchiDate DATE,
+    @Date DATE,
+    @IDDepartment INT,
+    @Details NVARCHAR(MAX),
+    @UserName NVARCHAR(100) = NULL
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+
+        DECLARE @Month INT = MONTH(@Date);
+        DECLARE @Year INT = YEAR(@Date);
+
+        -- =====================================================
+        -- INSERT
+        -- =====================================================
+        IF @IDEmployeeKharchi = 0
+        BEGIN
+
+            INSERT INTO Transaction_EmployeeKharchi
+            (
+                KharchiNo,
+                KharchiDate,
+                Date,
+                Month,
+                Year,
+                IDDepartment,
+                E_By,
+                E_Date,
+                IsDeleted
+            )
+            VALUES
+            (
+                @KharchiNo,
+                @KharchiDate,
+                @Date,
+                @Month,
+                @Year,
+                @IDDepartment,
+                @UserName,
+                GETDATE(),
+                0
+            )
+
+            DECLARE @NewId INT = SCOPE_IDENTITY();
+
+            -- INSERT DETAILS
+            INSERT INTO Transaction_EmployeeKharchiDetails
+            (
+                IDEmployeeKharchi,
+                EmployeeCode,
+                IDEmployee,
+                Amount,
+                AllowForCalculate
+            )
+            SELECT 
+                @NewId,
+                EmployeeCode,
+                IDEmployee,
+                Amount,
+                AllowForCalculate
+            FROM OPENJSON(@Details)
+            WITH (
+                EmployeeCode NVARCHAR(50),
+                IDEmployee INT,
+                Amount DECIMAL(18,2),
+                AllowForCalculate BIT
+            );
+
+            SELECT 
+                Result = 1,
+                Message = 'Kharchi Created Successfully',
+                NewId = @NewId,
+                Error_Code = '';
+            RETURN;
+
+        END
+        ELSE
+        BEGIN
+        -- =====================================================
+        -- UPDATE
+        -- =====================================================
+
+            UPDATE Transaction_EmployeeKharchi
+            SET 
+                KharchiNo = @KharchiNo,
+                KharchiDate = @KharchiDate,
+                Date = @Date,
+                Month = @Month,
+                Year = @Year,
+                IDDepartment = @IDDepartment,
+                U_By = @UserName,
+                U_Date = GETDATE()
+            WHERE IDEmployeeKharchi = @IDEmployeeKharchi
+            AND IsDeleted = 0;
+
+            IF @@ROWCOUNT = 0
+            BEGIN
+                SELECT 
+                    Result = -1,
+                    Message = 'NOT FOUND THIS RECORD',
+                    NewId = NULL,
+                    Error_Code = 'NOT_FOUND';
+                RETURN;
+            END
+
+            -- 🔥 DELETE OLD DETAILS
+            DELETE FROM Transaction_EmployeeKharchiDetails
+            WHERE IDEmployeeKharchi = @IDEmployeeKharchi;
+
+            -- 🔥 INSERT NEW DETAILS
+            INSERT INTO Transaction_EmployeeKharchiDetails
+            (
+                IDEmployeeKharchi,
+                EmployeeCode,
+                IDEmployee,
+                Amount,
+                AllowForCalculate
+            )
+            SELECT 
+                @IDEmployeeKharchi,
+                EmployeeCode,
+                IDEmployee,
+                Amount,
+                AllowForCalculate
+            FROM OPENJSON(@Details)
+            WITH (
+                EmployeeCode NVARCHAR(50),
+                IDEmployee INT,
+                Amount DECIMAL(18,2),
+                AllowForCalculate BIT
+            );
+
+            SELECT 
+                Result = 1,
+                Message = 'Kharchi Updated Successfully',
+                NewId = @IDEmployeeKharchi,
+                Error_Code = '';
+            RETURN;
+
+        END
+
+    END TRY
+    BEGIN CATCH
+        SELECT 
+            Result = -1,
+            Message = ERROR_MESSAGE(),
+            NewId = NULL,
+            Error_Code = 'SQL_ERROR';
+        RETURN;
+    END CATCH
+END 
+
+
+
+
+USE [AirmaxSalaryPayroll_DB]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Transaction_EmployeeKharchi_Delete]    Script Date: 01-04-2026 16:39:05 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[usp_Transaction_EmployeeKharchi_Delete]
+(
+    @IDEmployeeKharchi INT,
+    @D_By NVARCHAR(50)
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+
+        UPDATE Transaction_EmployeeKharchi
+        SET 
+            IsDeleted = 1,
+            D_By = @D_By,
+            D_Date = GETDATE()
+        WHERE IDEmployeeKharchi = @IDEmployeeKharchi;
+
+        SELECT 
+            Result = 1,
+            Message = 'Kharchi deleted successfully';
+
+    END TRY
+    BEGIN CATCH
+        SELECT 
+            Result = -1,
+            Message = ERROR_MESSAGE();
+    END CATCH
+END  
+
+
+
+
+
+
+
+
+
+
+
+
+

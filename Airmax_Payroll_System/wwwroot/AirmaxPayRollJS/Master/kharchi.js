@@ -104,14 +104,31 @@ async function generateKharchiNo() {
         DOM.kharchiNo().value = "KH-" + Math.floor(Math.random() * 1000);
     }
 }
+
 function onModalOpen() {
-    // Only generate new data if the ID is 0 (New Record)
-    if (Number(DOM.id().value) === 0) {
+    const currentId = parseInt(DOM.id().value) || 0;
+    if (currentId === 0) {
         clearForm();
-        generateKharchiNo();
+        generateKharchiNo(); // This calls the API to get "001"
         setCurrentDate();
+    } else {
+        // During an EDIT, the Kharchi No should NOT change
+        // It stays as whatever was returned from your Edit API
     }
 }
+// 🔥 DELETE BOTH OLD 'onModalOpen' FUNCTIONS AND REPLACE WITH THIS ONE:
+function onModalOpen() {
+    const currentId = parseInt(DOM.id().value) || 0;
+    const currentNo = (DOM.kharchiNo().value || "").trim();
+
+    // 1. If it's a NEW record (ID is 0) AND no number is assigned yet
+    if (currentId === 0 && currentNo === "") {
+        generateKharchiNo(); // Fetch 001, 002 etc. from server
+        setCurrentDate();
+    }
+    // 2. If it's an EDIT, do nothing (keep the server's number)
+}
+
 // ======================================================
 // LOAD DEPARTMENT
 // ======================================================

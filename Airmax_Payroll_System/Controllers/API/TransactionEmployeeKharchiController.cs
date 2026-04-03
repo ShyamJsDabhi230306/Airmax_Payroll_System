@@ -56,18 +56,21 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
         [HttpGet("generate-no")]
-        public IActionResult GenerateKharchiNo()
+        public async Task< IActionResult > GenerateKharchiNo()
         {
             // Example logic
-            var kharchiNo = "KH-" + DateTime.Now.Ticks.ToString().Substring(10);
-
+            // 🔥 Calls the sequence logic from the Repo
+            var nextNo = await _service.GenerateKharchiNoAsync();
             return Ok(new
             {
                 success = true,
-                data = kharchiNo
+                data = nextNo // This will return "001", "002", etc.
             });
         }
 
+
+
        
+
     }
 }

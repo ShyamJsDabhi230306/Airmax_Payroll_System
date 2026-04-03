@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/master/employee";
@@ -247,8 +247,8 @@ async function loadDesignation() {
 }
 
 async function loadGroup() {
-
-    const res = await apiFetch("api/master/employeegroup");
+    // Added leading / and /get-all suffix
+    const res = await apiFetch("/api/master/employeegroup/get-all");
     const json = await safeJson(res);
 
     if (!json || !json.success) return;
@@ -261,6 +261,31 @@ async function loadGroup() {
 
     $(DOM.group()).selectpicker('refresh');
 }
+
+
+//this is the load group for sefty
+//async function loadGroup() {
+//    try {
+//        const res = await apiFetch("/api/master/employeegroup/get-all");
+//        const json = await safeJson(res);
+//        if (!json || !json.success) return;
+//        // Populate options, checking for both camelCase and PascalCase
+//        DOM.group().innerHTML =
+//            `<option value="">Select Employee Group</option>` +
+//            json.data.map(g => {
+//                const id = g.idEmployeeGroup || g.IDEmployeeGroup;
+//                const name = g.employeeGroupName || g.EmployeeGroupName;
+//                return `<option value="${id}">${name}</option>`;
+//            }).join("");
+//        // Explicitly initialize and refresh selectpicker
+//        if ($.fn.selectpicker) {
+//            $(DOM.group()).selectpicker('destroy').selectpicker();
+//            $(DOM.group()).selectpicker('refresh');
+//        }
+//    } catch (err) {
+//        console.error("Error loading employee groups:", err);
+//    }
+//}
 
 
 // ======================================================

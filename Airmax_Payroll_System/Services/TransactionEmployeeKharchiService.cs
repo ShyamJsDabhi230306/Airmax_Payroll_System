@@ -29,6 +29,8 @@ namespace Airmax_Payroll_System.Services
         public async Task<SaveResult> DeleteAsync(int id)
             => await _repo.DeleteAsync(id);
 
-       
+        public async Task<string> GenerateKharchiNoAsync()
+            => await _repo.GenerateKharchiNoAsync();
+
     }
 }
