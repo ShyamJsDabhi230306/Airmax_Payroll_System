@@ -1,4 +1,4 @@
-﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Helpers;
 using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction;
@@ -94,7 +94,7 @@ namespace Airmax_Payroll_System.Repositories
         {
             // Queries the Maximum ID in the table and adds 1
             string sql = "SELECT ISNULL(MAX(IDEmployeeKharchi), 0) + 1 FROM Transaction_EmployeeKharchi";
-            int nextId = await _dapper.ExecuteScalarAsync<int>(sql);
+            int nextId = await _dapper.ExecuteScalarAsync<int>(sql, null, System.Data.CommandType.Text);
 
             // Returns the number padded to 3 digits (e.g., 001, 002)
             return nextId.ToString("D3");

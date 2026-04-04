@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG & DOM
 // ======================================================
 const API = "/api/transaction/employee-loan";
@@ -315,10 +315,18 @@ async function saveData() {
 function clearForm() {
     DOM.id().value = 0;
     if (DOM.form()) DOM.form().reset();
+
+    // Explicitly wipe the values clean so no '0' remains
+    DOM.loanNo().value = "";
+    DOM.loanAmount().value = "";
+    DOM.totalInstallments().value = "";
     DOM.grid().innerHTML = "";
     DOM.totalLabel().innerText = "0.00";
+
+    // Refresh the dropdowns
     if ($.fn.selectpicker) {
-        $(DOM.department()).selectpicker('refresh');
-        $(DOM.employee()).selectpicker('refresh');
+        $(DOM.department()).val('').selectpicker('refresh');
+        $(DOM.employee()).val('').selectpicker('refresh');
     }
 }
+

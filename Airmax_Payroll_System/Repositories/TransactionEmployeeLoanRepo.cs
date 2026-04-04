@@ -1,4 +1,4 @@
-﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Helpers;
 using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction;
@@ -96,7 +96,7 @@ namespace Airmax_Payroll_System.Repositories
             {
                 // Safer SQL: Using COALESCE and ensuring it returns a number
                 string sql = "SELECT COALESCE(MAX(IDEmployeeLoan), 0) + 1 FROM Transaction_EmployeeLoan";
-                int nextId = await _dapper.ExecuteScalarAsync<int>(sql);
+                int nextId = await _dapper.ExecuteScalarAsync<int>(sql, null, System.Data.CommandType.Text);
 
                 // Returns LOAN-001 format which looks much better
                 return "LOAN-" + nextId.ToString("D3");
