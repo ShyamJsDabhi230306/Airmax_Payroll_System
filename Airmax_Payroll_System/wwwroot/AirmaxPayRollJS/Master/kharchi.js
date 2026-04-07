@@ -329,6 +329,7 @@ async function bindTable() {
 
         tr.innerHTML = `
             <td>${index + 1}</td>
+            <td>${escapeHtml(d.kharchiNo||"")}</td>
             <td>${escapeHtml(d.employeeName || "")}</td>
             <td>${escapeHtml(d.departmentName || "")}</td>
             <td>${monthDisplay}</td>
