@@ -1,11 +1,14 @@
-﻿using Airmax_Payroll_System.Models.Common;
+﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [Route("api/master/employee")]
     [ApiController]
     public class MasterEmployeeController : ControllerBase
@@ -18,13 +21,35 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
         // 🔹 GET ALL
+        //[HttpGet("get-all")]
+        //public async Task<IActionResult> GetAll()
+        //{
+        //    var data = await _service.GetAllAsync();
+
+        //    return Ok(ApiResponse<IEnumerable<MasterEmployee>>.SuccessResponse(
+        //        "Employees loaded successfully", data));
+        //}
+
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _service.GetAllAsync();
-
-            return Ok(ApiResponse<IEnumerable<MasterEmployee>>.SuccessResponse(
-                "Employees loaded successfully", data));
+            // 💡 AUTOMATICALLY GET USER RIGHTS:
+            int compId = User.GetIDCompany();
+            int locId = User.GetIDLocation();
+            int deptId = User.GetIDDepartment();
+            // 💡 If NOT an Admin, we force the filters. If Admin, we show everything.
+            if (!User.IsAdmin())
+            {
+                // 🔥 Call the service with the filters
+                var data = await _service.GetAllAsync(compId, locId, deptId);
+                return Ok(ApiResponse<IEnumerable<MasterEmployee>>.SuccessResponse("Data loaded securely!", data));
+            }
+            else
+            {
+                // 🔥 Admin sees EVERYTHING (pass 0 for no filter)
+                var allData = await _service.GetAllAsync(0, 0, 0);
+                return Ok(ApiResponse<IEnumerable<MasterEmployee>>.SuccessResponse("All Data loaded (Admin view)", allData));
+            }
         }
 
         // 🔹 GET BY ID

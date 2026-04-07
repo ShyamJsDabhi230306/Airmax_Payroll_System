@@ -77,7 +77,8 @@ namespace Airmax_Payroll_System.Services
                 user.FullName,
                 user.RoleName,
                 user.IDCompany ?? 0,
-                user.IDLocation ?? 0);
+                user.IDLocation ?? 0,
+                user.IDDepartment ?? 0);
 
             return new LoginResponse
             {
@@ -103,7 +104,8 @@ namespace Airmax_Payroll_System.Services
                 Mobile = user.Mobile ?? "",
                 Role = user.RoleName,
                 IDCompany = user.IDCompany ?? 0,
-                IDLocation = user.IDLocation ?? 0
+                IDLocation = user.IDLocation ?? 0,
+                IDDepartment = user.IDDepartment ?? 0,
             };
         }
     }

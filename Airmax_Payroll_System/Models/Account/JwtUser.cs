@@ -1,4 +1,4 @@
-﻿namespace DRSPortals.Models.Account
+namespace DRSPortals.Models.Account
 {
     public class JwtUser
     {
@@ -15,5 +15,6 @@
         public string Role { get; set; } = "";
         public int IDCompany { get; set; }
         public int IDLocation { get; set; }
+        public int IDDepartment { get; set; }
     }
 }

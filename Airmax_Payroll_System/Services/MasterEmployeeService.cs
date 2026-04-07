@@ -14,8 +14,8 @@ namespace Airmax_Payroll_System.Services
             _repo = repo;
         }
 
-        public async Task<IEnumerable<MasterEmployee>> GetAllAsync()
-            => await _repo.GetAllAsync();
+        public async Task<IEnumerable<MasterEmployee>> GetAllAsync(int idCompany, int idLocation, int idDepartment)
+            => await _repo.GetAllAsync(idCompany, idLocation, idDepartment);
 
         public async Task<MasterEmployee?> GetByIdAsync(int id)
             => await _repo.GetByIdAsync(id);

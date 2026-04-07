@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
-{
+{   
     [ApiController]
     [Route("api/master/shift")]
     public class MasterShiftController : ControllerBase

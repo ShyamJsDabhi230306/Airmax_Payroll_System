@@ -48,10 +48,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ======================================================
 async function loadDepartment() {
 
-    const res = await fetch("/api/master/department/get-all");
-    const json = await res.json();
 
-    if (!json.success) return;
+
+    //const res = await fetch("/api/master/department/get-all");
+    //const json = await res.json();
+    // 1. Get the token you saved during login
+    const token = localStorage.getItem("auth_token");
+    // 2. Add the headers to your fetch call
+    const response = await fetch("/api/master/department/get-all", {
+        method: "GET",
+        headers: {
+            "Authorization": "Bearer " + token, // 👈 THIS IS THE FIX
+            "Content-Type": "application/json"
+        }
+    });
+
+    if (!response.success) return;
 
     DOM.dept().innerHTML =
         `<option value="">-- Select Department --</option>` +

@@ -176,28 +176,28 @@ function redirectByRole(role) {
 
     switch (role) {
         case "admin":
-            window.location.href = "/home/index";
+            window.location.href = "/Home/Index";
             break;
-
-        case "rms":
-            window.location.href = "/DRS/ManageRMS";
-            break;
-
-        case "tdr":
-            window.location.href = "/DRS/ManageTdr";
-            break;
-
         case "hod":
-            window.location.href = "/DRS/HodList";
+            // 🏫 Redirect HOD to their specific starting page
+            window.location.href = "/Home/Index"; // Or a specific dashboard
+            break;
+        case "hr":
+            // 👔 Redirect HR to their starting page
+            window.location.href = "/Home/Index";
             break;
 
-        case "design":
-            window.location.href = "/DRS/DesignerView";
-            break;
+        //case "hod":
+        //    window.location.href = "/DRS/HodList";
+        //    break;
 
-        case "user":
-            window.location.href = "/drs/ManageUser";
-            break;
+        //case "design":
+        //    window.location.href = "/DRS/DesignerView";
+        //    break;
+
+        //case "user":
+        //    window.location.href = "/drs/ManageUser";
+        //    break;
 
         default:
             window.location.href = "/";

@@ -1,10 +1,12 @@
 ﻿using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [Route("api/transaction/employee-loan")]
     [ApiController]
     public class TransactionEmployeeLoanController : ControllerBase
@@ -20,7 +22,7 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpGet("get-by-id/{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var data = await _service.GetByIdAsync(id);
+             var data = await _service.GetByIdAsync(id);
             return Ok(new { success = true, data });
         }
         [HttpPost("save")]

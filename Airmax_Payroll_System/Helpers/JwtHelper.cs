@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,7 +20,8 @@ namespace DRSPortal.Helpers
             string fullName,
             string role,
             int idCompany,
-            int idLocation)
+            int idLocation,
+            int idDepartment)
         {
             var key = Encoding.UTF8.GetBytes(
                 _config["Jwt:Key"] ?? throw new Exception("JWT key missing"));
@@ -40,6 +41,7 @@ namespace DRSPortal.Helpers
                 new(ClaimTypes.Role, role),
                 new("IDCompany", idCompany.ToString()),
                 new("IDLocation", idLocation.ToString()),
+                new("IDDepartment", idDepartment.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

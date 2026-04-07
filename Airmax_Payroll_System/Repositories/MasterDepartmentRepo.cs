@@ -18,20 +18,42 @@ namespace Airmax_Payroll_System.Repositories
             _logger = logger;
         }
 
-        public async Task<IEnumerable<MasterDepartment>> GetAllAsync()
+        //public async Task<IEnumerable<MasterDepartment>> GetAllAsync()
+        //{
+        //    try
+        //    {
+        //        return await _dapper.QueryAsync<MasterDepartment>(
+        //            "usp_Master_Department_SelectAll");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger?.LogError(ex,
+        //            "Error in DepartmentRepo.GetAllAsync");
+        //        return Enumerable.Empty<MasterDepartment>();
+        //    }
+        //}
+
+        // Path: Repositories\MasterDepartmentRepo.cs
+
+        public async Task<IEnumerable<MasterDepartment>> GetAllAsync(int idCompany, int idLocation, int idDepartment)
         {
             try
             {
-                return await _dapper.QueryAsync<MasterDepartment>(
-                    "usp_Master_Department_SelectAll");
+                var param = new DynamicParameters();
+                param.Add("@IDCompany", idCompany); 
+                param.Add("@IDLocation", idLocation); 
+                param.Add("@IDDepartment", idDepartment);
+        
+        // 🔍 This calls your updated "usp_Master_Department_SelectAll"
+        return await _dapper.QueryAsync<MasterDepartment>("usp_Master_Department_SelectAll", param);
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex,
-                    "Error in DepartmentRepo.GetAllAsync");
+                _logger?.LogError(ex, "Error in MasterDepartmentRepo.GetAllAsync");
                 return Enumerable.Empty<MasterDepartment>();
             }
         }
+
 
         public async Task<MasterDepartment?> GetByIdAsync(int idDepartment)
         {

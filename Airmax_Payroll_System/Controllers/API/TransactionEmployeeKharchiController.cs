@@ -1,11 +1,13 @@
 ﻿using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Models.Transaction;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [Route("api/transaction/kharchi")]
     [ApiController]
     public class TransactionEmployeeKharchiController : ControllerBase

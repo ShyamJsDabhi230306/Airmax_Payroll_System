@@ -19,18 +19,41 @@ namespace Airmax_Payroll_System.Repositories
         }
 
         // 🔹 GET ALL
-        public async Task<IEnumerable<MasterEmployee>> GetAllAsync()
+        //public async Task<IEnumerable<MasterEmployee>> GetAllAsync()
+        //{
+        //    try
+        //    {
+        //        return await _dapper.QueryAsync<MasterEmployee>("usp_Master_Employee_SelectAll");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger?.LogError(ex, "Error in EmployeeRepo.GetAllAsync");
+        //        return Enumerable.Empty<MasterEmployee>();
+        //    }
+        //}
+
+
+        // Path: Repositories\MasterEmployeeRepo.cs
+
+        public async Task<IEnumerable<MasterEmployee>> GetAllAsync(int idCompany, int idLocation, int idDepartment)
         {
             try
             {
-                return await _dapper.QueryAsync<MasterEmployee>("usp_Master_Employee_SelectAll");
+                var param = new DynamicParameters();
+                param.Add("@IDCompany", idCompany); 
+                param.Add("@IDLocation", idLocation);
+                param.Add("@IDDepartment", idDepartment);
+        
+        // 🔍 This calls your updated "usp_Master_Employee_SelectAll"
+        return await _dapper.QueryAsync<MasterEmployee>("usp_Master_Employee_SelectAll", param);
             }
             catch (Exception ex)
             {
-                _logger?.LogError(ex, "Error in EmployeeRepo.GetAllAsync");
+                _logger?.LogError(ex, "Error in MasterEmployeeRepo.GetAllAsync");
                 return Enumerable.Empty<MasterEmployee>();
             }
         }
+
 
         // 🔹 GET BY ID
         public async Task<MasterEmployee?> GetByIdAsync(int id)
