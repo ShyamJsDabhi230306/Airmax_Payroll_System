@@ -54,5 +54,9 @@ namespace Airmax_Payroll_System.Controllers
         {
             return View();
         }
+        public IActionResult UserRights()
+        {
+            return View();
+        }
     }
 }

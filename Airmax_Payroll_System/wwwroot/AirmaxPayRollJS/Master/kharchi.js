@@ -154,35 +154,62 @@ async function loadDepartment() {
 async function loadEmployees() {
     const idDepartment = DOM.department().value;
     const ddl = DOM.employeeDropdown();
+    const token = localStorage.getItem("auth_token");
 
+    // 1. Initial UI Loading State
     ddl.innerHTML = '<option value="">Loading...</option>';
-    if (typeof $ !== 'undefined' && $.fn.selectpicker) $(ddl).selectpicker('refresh'); // Clear UI
+    if (typeof $ !== 'undefined' && $.fn.selectpicker) $(ddl).selectpicker('refresh');
 
-    if (!idDepartment) return;
-
-    const res = await fetch(`/api/master/employee/by-department/${idDepartment}`);
-    const json = await res.json();
-
-    ddl.innerHTML = '<option value="">Select Employee</option>';
-    const employees = json.data || [];
-
-    if (employees.length === 0) {
-        ddl.innerHTML = '<option value="">No Employees Found</option>';
+    if (!idDepartment || idDepartment == "0") {
+        ddl.innerHTML = '<option value="">Select Employee</option>';
         if (typeof $ !== 'undefined' && $.fn.selectpicker) $(ddl).selectpicker('refresh');
         return;
     }
 
-    employees.forEach(emp => {
-        const opt = document.createElement("option");
-        opt.value = emp.idEmployee; // Ensure this matches your API casing (idEmployee)
-        opt.textContent = emp.employeeName;
-        opt.setAttribute("data-code", emp.employeeCode);
-        ddl.appendChild(opt);
-    });
+    try {
+        // 2. MAKE THE SECURE FETCH
+        const res = await fetch(`/api/master/employee/by-department/${idDepartment}`, {
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        });
 
-    // 🔥 ADD THIS LINE AT THE END
-    if (typeof $ !== 'undefined' && $.fn.selectpicker) {
-        $(ddl).selectpicker('refresh');
+        // 🛡️ 3. CRASH-PROOF CHECK: Avoid "Unexpected end of JSON"
+        if (!res.ok) {
+            console.warn(`Permission Denied or Server Error: ${res.status}`);
+            ddl.innerHTML = '<option value="">No Access to Employees</option>';
+            if (typeof $ !== 'undefined' && $.fn.selectpicker) $(ddl).selectpicker('refresh');
+            return; // 🛑 Safe Exit!
+        }
+
+        const json = await res.json();
+
+        // 4. Fill the Dropdown
+        ddl.innerHTML = '<option value="">Select Employee</option>';
+        const employees = json.data || [];
+
+        if (employees.length === 0) {
+            ddl.innerHTML = '<option value="">No Employees Found</option>';
+        } else {
+            employees.forEach(emp => {
+                const opt = document.createElement("option");
+                // 💡 Matches your DB Casing
+                opt.value = emp.idEmployee || emp.IDEmployee;
+                opt.textContent = emp.employeeName || emp.EmployeeName;
+                opt.setAttribute("data-code", emp.employeeCode || emp.EmployeeCode || "");
+                ddl.appendChild(opt);
+            });
+        }
+
+    } catch (error) {
+        console.error("Critical Failure in loadEmployees:", error);
+        ddl.innerHTML = '<option value="">Error loading list</option>';
+    } finally {
+        // 5. Always Refresh the Selectpicker UI
+        if (typeof $ !== 'undefined' && $.fn.selectpicker) {
+            $(ddl).selectpicker('refresh');
+        }
     }
 }
 // ======================================================

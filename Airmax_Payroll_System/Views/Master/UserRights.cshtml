@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "User Access Management";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow rounded-3 border-0">
+    <div class="card-header bg-white py-3 border-bottom-light">
+        <div class="row align-items-center">
+            <div class="col">
+                <h4 class="mb-1 font-weight-bold">User Access Management</h4>
+                <p class="text-muted small mb-0">Manage system-wide page and action permissions</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- 🏢 Cascading Dropdowns for Filtering -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold text-dark">Company</label>
+                <select id="ddlCompany" class="form-control selectpicker show-tick" data-live-search="true" data-size="5">
+                    <option value="0">Select Company...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold text-dark">Location</label>
+                <select id="ddlLocation" class="form-control selectpicker show-tick" data-live-search="true" disabled>
+                    <option value="0">Select Location...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold text-dark">Department</label>
+                <select id="ddlDepartment" class="form-control selectpicker show-tick" data-live-search="true" disabled>
+                    <option value="0">Select Department...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label font-weight-bold text-dark">Select User</label>
+                <select id="ddlUser" class="form-control selectpicker show-tick" data-live-search="true" disabled>
+                    <option value="0">Select User...</option>
+                </select>
+            </div>
+        </div>
+
+        <hr />
+
+        <!-- 🛡️ Permissions Grid -->
+        <div id="permissionsGridWrapper" style="display:none;" class="animated fadeIn">
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                <table id="tblPermissions" class="table table-hover table-striped border">
+                    <thead class="bg-primary text-white sticky-top">
+                        <tr>
+                            <th width="35%">Page Name</th>
+                            <th class="text-center">View</th>
+                            <th class="text-center">Create</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be loaded by userrights.js -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-right mt-4 p-3 bg-light border-top rounded">
+                <button type="button" id="btnSaveRights" class="btn btn-primary px-5 shadow-sm btn-lg">
+                    <i class="fa fa-save mr-2"></i> Save Access Rights
+                </button>
+            </div>
+        </div>
+
+        <!-- ℹ️ Info State (Fixed: Removed missing SVG) -->
+        <div id="noUserSelectedState" class="text-center py-5">
+            <div class="mb-4">
+                <i class="fa fa-users-cog text-muted" style="font-size: 100px; opacity: 0.15;"></i>
+            </div>
+            <h5 class="text-muted font-weight-light">User Selection Required</h5>
+            <p class="text-muted small">Please select a user to manage their system permissions.</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Your Style for Toasts and API fetching is already in the main Layout -->
+    <script src="~/AirmaxPayRollJS/Master/UserRights.js"></script>
+}

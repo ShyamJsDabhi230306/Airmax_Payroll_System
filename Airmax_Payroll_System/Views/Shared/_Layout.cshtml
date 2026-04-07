@@ -1,3 +1,4 @@
+﻿
 <!DOCTYPE html>
 <html lang="en">
 
@@ -269,7 +270,7 @@
         <!--********************************** Sidebar start ***********************************-->
         <div class="ic-sidenav">
             <div class="ic-sidenav-scroll">
-                <ul class="metismenu" id="menu">
+                @* <ul class="metismenu" id="menu">
 
                     <!-- DASHBOARD -->
                     <li id="menuTdrHodDashboard">
@@ -292,6 +293,7 @@
                             <li><a href="/Master/Designation"><i class="flaticon-file"></i> Designation</a></li>
                             <li><a href="/Master/Shift"><i class="flaticon-send"></i> Shift</a></li>
                             <li><a href="/Master/User"><i class="flaticon-user"></i> User List</a></li>
+                            <li><a href="/Master/UserRights"> <i class="flaticon-user">User Rights</i> </a></li>
                             <li><a href="/Master/Employee"><i class="flaticon-registration"></i> Employee List</a></li>
                             <li><a href="/Master/EmployeeEntry"><i class="flaticon-behance"></i> Employee Entry</a></li>
                             <li><a href="/Master/EmployeeGroup"><i class="flaticon-shopping-cart"></i> Employee Group</a></li>
@@ -312,7 +314,57 @@
                         </ul>
                     </li>
 
+                </ul> *@
+
+
+                <ul class="metismenu" id="menu">
+
+                    <!-- DASHBOARD (Always Visible) -->
+                    <li id="menuTdrHodDashboard">
+                        <a class="ai-icon" href="/Master/Index">
+                            <i class="flaticon-home"></i>
+                            <span class="nav-text">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <!-- MASTER SECTION -->
+                    <!-- MASTER SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-project"></i>
+                            <span class="nav-text">Master</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li data-menu="Company Master"><a href="/Master/Company">Company</a></li>
+                            <li data-menu="Location Master"><a href="/Master/Location">Location</a></li>
+                            <li data-menu="Department Master"><a href="/Master/Department">Department</a></li>
+                            <li data-menu="Designation Master"><a href="/Master/Designation">Designation</a></li>
+                            <li data-menu="Shift Master"><a href="/Master/Shift">Shift</a></li>
+                            <li data-menu="User Master"><a href="/Master/User">User List</a></li>
+                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li>
+                            <li data-menu="Employee Master"><a href="/Master/Employee">Employee List</a></li>
+                            <li data-menu="Employee Master"><a href="/Master/EmployeeEntry">Employee Entry</a></li>
+                            <li data-menu="Employee Group"><a href="/Master/EmployeeGroup">Employee Group</a></li>
+                            <li data-menu="Group Bonus Details"><a href="/Master/employeegroupbonusdetails">Emp Group Bonus</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- TRANSACTION SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-notes"></i>
+                            <span class="nav-text">Transaction</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li data-menu="Employee Kharchi"><a href="/Transaction/TransactionEmployeeKharchi">Employee Kharchi</a></li>
+                            <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li>
+                        </ul>
+                    </li>
+
+
+                    
                 </ul>
+
             </div>
         </div>
 
@@ -413,6 +465,8 @@
     <script src="~/airmaxpayrolljs/common/common.js"></script>
     <script src="~/airmaxpayrolljs/common/common-upload.js"></script>
     <script src="~/airmaxpayrolljs/common/home.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/common/rights-handler.js" asp-append-version="true"></script>
+
 
     <!-- Initialize Swiper -->
     <script>

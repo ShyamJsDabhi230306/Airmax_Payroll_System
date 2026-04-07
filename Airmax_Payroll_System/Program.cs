@@ -1,4 +1,5 @@
 ﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Middlewares;
 using Airmax_Payroll_System.Repositories;
 using Airmax_Payroll_System.Services;
 using DRSPortal.Helpers;
@@ -30,6 +31,7 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<JwtHelper>();
@@ -44,8 +46,9 @@ builder.Services.AddScoped<MasterUserRepo>();
 builder.Services.AddScoped<MasterEmployeeRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
+builder.Services.AddScoped<UserRightsRepo>();
 
-
+// In your Program.cs, add these lines:
 // FOR TRANSACTION REPOSITORY
 
 
@@ -62,6 +65,7 @@ builder.Services.AddScoped<MasterUserService>();
 builder.Services.AddScoped<MasterEmployeeService>();
 builder.Services.AddScoped<MasterEmployeeGroupService>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
+builder.Services.AddScoped<UserRightsService>();
 
 // FOR TRANSACTION SERVICE
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();
@@ -152,6 +156,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+// 🛡️ PUT THE SECURITY GUARD HERE (After Auth)
+app.UseMiddleware<PageRightsMiddleware>();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");

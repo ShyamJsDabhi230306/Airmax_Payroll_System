@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/master/department")]
     public class DepartmentController : ControllerBase
