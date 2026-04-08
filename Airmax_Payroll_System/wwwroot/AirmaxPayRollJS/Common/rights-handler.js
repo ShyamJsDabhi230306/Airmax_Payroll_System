@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 if (pname === "company master") return currentURL.includes("/company");
                 if (pname === "department master") return currentURL.includes("/department");
                 if (pname === "designation master") return currentURL.includes("/designation");
-                if (pname === "employee master") return currentURL.includes("/employee") && !currentURL.includes("loan") && !currentURL.includes("kharchi");
+                if (pname === "employee master") return currentURL.includes("/employee") && !currentURL.includes("loan") && !currentURL.includes("kharchi") && !currentURL.includes("group") && currentURL.includes("bonus");
                 if (pname === "employee loan") return currentURL.includes("loan");
                 if (pname === "employee kharchi") return currentURL.includes("kharchi");
                 if (pname === "employee group") return currentURL.includes("employeegroup") && !currentURL.includes("bonus");

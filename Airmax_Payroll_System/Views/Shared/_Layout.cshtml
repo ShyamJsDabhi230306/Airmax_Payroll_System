@@ -340,15 +340,25 @@
                             <li data-menu="Department Master"><a href="/Master/Department">Department</a></li>
                             <li data-menu="Designation Master"><a href="/Master/Designation">Designation</a></li>
                             <li data-menu="Shift Master"><a href="/Master/Shift">Shift</a></li>
-                            <li data-menu="User Master"><a href="/Master/User">User List</a></li>
-                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li>
+                            @* <li data-menu="User Master"><a href="/Master/User">User List</a></li>
+                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li> *@
+                           
+                        </ul>
+                    </li>
+
+                    <!-- Emloyees Related Details SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-user"></i>
+                            <span class="nav-text">Employee</span>
+                        </a>
+                        <ul aria-expanded="false">
                             <li data-menu="Employee Master"><a href="/Master/Employee">Employee List</a></li>
                             <li data-menu="Employee Master"><a href="/Master/EmployeeEntry">Employee Entry</a></li>
                             <li data-menu="Employee Group"><a href="/Master/EmployeeGroup">Employee Group</a></li>
                             <li data-menu="Group Bonus Details"><a href="/Master/employeegroupbonusdetails">Emp Group Bonus</a></li>
                         </ul>
                     </li>
-
                     <!-- TRANSACTION SECTION -->
                     <li>
                         <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
@@ -358,6 +368,18 @@
                         <ul aria-expanded="false">
                             <li data-menu="Employee Kharchi"><a href="/Transaction/TransactionEmployeeKharchi">Employee Kharchi</a></li>
                             <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li>
+                        </ul>
+                    </li>
+
+                    <!-- USER Configuration SECTION -->
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                            <i class="flaticon-filter"></i>
+                            <span class="nav-text">User Configuration</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li data-menu="User Master"><a href="/Master/User">User List</a></li>
+                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li>
                         </ul>
                     </li>
 
@@ -461,7 +483,9 @@
     <script src="js/custom.min.js"></script>
     <script src="js/ic-sidenav-init.js"></script>
 
-    <script src="~/airmaxpayrolljs/common/auth-handler.js"></script>
+     @* <script src="~/airmaxpayrolljs/common/auth-handler.js"></script>  *@
+    <!-- ✅ STEP 1: Add permission-guard.js FIRST (replaces auth-handler.js) -->
+  <script src="~/AirmaxPayRollJS/Common/permission-guard.js"></script> 
     <script src="~/airmaxpayrolljs/common/common.js"></script>
     <script src="~/airmaxpayrolljs/common/common-upload.js"></script>
     <script src="~/airmaxpayrolljs/common/home.js" asp-append-version="true"></script>

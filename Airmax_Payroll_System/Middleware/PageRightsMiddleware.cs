@@ -1,4 +1,4 @@
-﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Helpers;
 using Dapper;
 using System.Security.Claims;
 using Airmax_Payroll_System.Models.Master;
@@ -15,8 +15,16 @@ namespace Airmax_Payroll_System.Middlewares
         {
             var path = context.Request.Path.Value.ToLower();
 
-            // 🛡️ 1. ALWAYS ALLOW: Security check (get-permissions) & Lookups (by-department, get-all dropdowns)
+            // 🛡️ 1. ALWAYS ALLOW: Security endpoints, lookups, and dropdown data
             if (path.Contains("/get-permissions/") || path.Contains("/by-") || path.Contains("/generate-no") || path.Contains("/login"))
+            {
+                await _next(context); return;
+            }
+
+            // ✅ ALLOW all GET /get-all requests — these are dropdown lookups
+            //    e.g. Department page loading Location dropdown → should NOT be blocked
+            //    by Location Master permission
+            if (context.Request.Method == "GET" && path.EndsWith("/get-all"))
             {
                 await _next(context); return;
             }

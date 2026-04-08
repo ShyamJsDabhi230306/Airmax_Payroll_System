@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/transaction/kharchi";
@@ -485,9 +485,18 @@ async function deleteEntry(id) {
         method: "DELETE"
     });
 
+    // If null, apiFetch already handled 401 (redirect to login)
+    if (!res) return;
+
+    // If 403, apiFetch already showed "Access Denied" toast
+    if (res.status === 403) return;
+
     const json = await safeJson(res);
 
-    if (!json || !json.success) return;
+    if (!json || !json.success) {
+        showToast("danger", json?.message || "Delete failed.", "Kharchi");
+        return;
+    }
 
     showToast("success", json.message, "Kharchi");
     bindTable();

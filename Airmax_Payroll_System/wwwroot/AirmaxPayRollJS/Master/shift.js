@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/master/shift";
@@ -214,6 +214,12 @@ async function deleteEntry(id) {
         const res = await apiFetch(`${API}/delete/${id}`, {
             method: "DELETE"
         });
+
+        // If null, apiFetch already handled 401 (redirect to login)
+        if (!res) return;
+
+        // If 403, apiFetch already showed "Access Denied" toast
+        if (res.status === 403) return;
 
         const json = await res.json();
 

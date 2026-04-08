@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/master/employeegroup";
@@ -46,24 +46,43 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ======================================================
 // LOAD DEPARTMENT
 // ======================================================
+//async function loadDepartment() {
+
+
+
+//    //const res = await fetch("/api/master/department/get-all");
+//    //const json = await res.json();
+//    // 1. Get the token you saved during login
+//    const token = localStorage.getItem("auth_token");
+//    // 2. Add the headers to your fetch call
+//    const response = await fetch("/api/master/department/get-all", {
+//        method: "GET",
+//        headers: {
+//            "Authorization": "Bearer " + token, // 👈 THIS IS THE FIX
+//            "Content-Type": "application/json"
+//        }
+//    });
+
+//    if (!response.success) return;
+
+//    DOM.dept().innerHTML =
+//        `<option value="">-- Select Department --</option>` +
+//        json.data.map(d =>
+//            `<option value="${d.idDepartment}">${d.departmentName}</option>`
+//        ).join("");
+
+//    $(DOM.dept()).selectpicker('refresh');
+//}
+
+
 async function loadDepartment() {
 
+    // We use your global apiFetch which automatically handles the token
+    const res = await apiFetch("/api/master/department/get-all");
+    if (!res) return;
 
-
-    //const res = await fetch("/api/master/department/get-all");
-    //const json = await res.json();
-    // 1. Get the token you saved during login
-    const token = localStorage.getItem("auth_token");
-    // 2. Add the headers to your fetch call
-    const response = await fetch("/api/master/department/get-all", {
-        method: "GET",
-        headers: {
-            "Authorization": "Bearer " + token, // 👈 THIS IS THE FIX
-            "Content-Type": "application/json"
-        }
-    });
-
-    if (!response.success) return;
+    const json = await res.json();
+    if (!json.success) return;
 
     DOM.dept().innerHTML =
         `<option value="">-- Select Department --</option>` +
@@ -71,15 +90,20 @@ async function loadDepartment() {
             `<option value="${d.idDepartment}">${d.departmentName}</option>`
         ).join("");
 
-    $(DOM.dept()).selectpicker('refresh');
+    if ($.fn.selectpicker) $(DOM.dept()).selectpicker('refresh');
 }
+
 
 // ======================================================
 // BIND TABLE
 // ======================================================
 async function bindTable() {
 
-    const res = await fetch(`${API}/get-all`);
+    //const res = await fetch(`${API}/get-all`);
+    //const json = await res.json();
+
+    const res = await apiFetch(`${API}/get-all`);
+    if (!res) return;
     const json = await res.json();
 
     if (!json.success) return;
@@ -126,17 +150,24 @@ async function bindTable() {
 // ======================================================
 async function editEntry(id) {
 
-    const res = await fetch(`${API}/get-by-id/${id}`);
+    //const res = await fetch(`${API}/get-by-id/${id}`);
+    //const json = await res.json();
+    const res = await apiFetch(`${API}/get-by-id/${id}`);
+    if (!res) return;
     const json = await res.json();
 
     if (!json.success) return;
 
     const d = json.data;
-
     DOM.id().value = d.idEmployeeGroup;
     DOM.name().value = d.employeeGroupName || "";
-    DOM.dept().value = d.idDepartment || "";
     DOM.isActive().checked = d.isActive || false;
+    // Properly sets the dropdown value so it becomes visible on screen
+    if (d.idDepartment) {
+        $(DOM.dept()).val(d.idDepartment);
+    } else {
+        $(DOM.dept()).val("");
+    }
 
     $(DOM.dept()).selectpicker('refresh');
 
@@ -151,8 +182,22 @@ async function deleteEntry(id) {
 
     if (!ok) return;
 
-    await fetch(`${API}/delete/${id}`, { method: "DELETE" });
+    const res = await apiFetch(`${API}/delete/${id}`, { method: "DELETE" });
 
+    // If null, apiFetch already handled 401 (redirect to login)
+    if (!res) return;
+
+    // If 403, apiFetch already showed "Access Denied" toast
+    if (res.status === 403) return;
+
+    const json = await res.json();
+
+    if (!json.success) {
+        showToast("danger", json.message, "Employee Group");
+        return;
+    }
+
+    showToast("success", json.message, "Employee Group");
     bindTable();
 }
 

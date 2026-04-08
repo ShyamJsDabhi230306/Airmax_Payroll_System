@@ -1,4 +1,4 @@
-﻿
+
 
 // ======================================================
 // CONFIG
@@ -57,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function loadLocation() {
 
     const res = await apiFetch(`/api/master/location/get-all`);
+    if (!res) return;  // null = 401 or 403, already handled
     const json = await res.json();
 
     if (!json.success) return;
@@ -83,6 +84,7 @@ async function loadLocation() {
 async function bindTable() {
 
     const res = await apiFetch(`${API}/get-all`);
+    if (!res) return;  // null = 401 or 403, already handled
     const json = await res.json();
 
     if (!json.success) return;
@@ -125,6 +127,7 @@ async function bindTable() {
 async function editEntry(id) {
 
     const res = await apiFetch(`${API}/get-by-id/${id}`);
+    if (!res) return;  // null = 401 or 403, already handled
     const json = await res.json();
 
     if (!json.success) return;
@@ -153,9 +156,18 @@ async function deleteEntry(id) {
         method: "DELETE"
     });
 
+    // If null, apiFetch already handled 401 (redirect to login)
+    if (!res) return;
+
+    // If 403, apiFetch already showed "Access Denied" toast
+    if (res.status === 403) return;
+
     const json = await res.json();
 
-    if (!json.success) return;
+    if (!json.success) {
+        showToast("danger", json.message, "Department Master");
+        return;
+    }
 
     showToast("success", json.message, "Department Master");
 
@@ -194,6 +206,7 @@ async function saveData() {
             body: JSON.stringify(dto)
         });
 
+        if (!res) return;  // null = 401 or 403, already handled
         const json = await res.json();
 
         if (!json.success)

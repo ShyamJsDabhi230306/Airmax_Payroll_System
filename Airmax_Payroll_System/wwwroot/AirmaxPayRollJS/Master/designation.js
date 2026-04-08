@@ -1,4 +1,4 @@
-﻿// ======================================================
+// ======================================================
 // CONFIG
 // ======================================================
 const API = "/api/master/designation";
@@ -125,9 +125,18 @@ async function deleteEntry(id) {
         method: "DELETE"
     });
 
+    // If null, apiFetch already handled 401 (redirect to login)
+    if (!res) return;
+
+    // If 403, apiFetch already showed "Access Denied" toast
+    if (res.status === 403) return;
+
     const json = await res.json();
 
-    if (!json.success) return;
+    if (!json.success) {
+        showToast("danger", json.message, "Designation Master");
+        return;
+    }
 
     showToast("success", json.message, "Designation Master");
 

@@ -1,4 +1,4 @@
-﻿async function apiFetch(url, options = {}) {
+async function apiFetch(url, options = {}) {
     const token = localStorage.getItem("auth_token");
 
     options.headers = {
@@ -13,6 +13,14 @@
         localStorage.clear();
         window.location.href = "/Account/Login";
         return null;
+    }
+
+    if (response.status === 403) {
+        if (typeof showToast === 'function') {
+            showToast("danger", "You do not have permission to perform this action.", "Access Denied");
+        } else {
+            alert("Access Denied: You do not have permission to perform this action.");
+        }
     }
 
     return response;

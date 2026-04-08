@@ -111,11 +111,22 @@ window.deleteEntry = async function (id) {
     if (!ok) return;
 
     const res = await apiFetch(`${API}/delete/${id}`, { method: "DELETE" });
+
+    // If null, apiFetch already handled 401 (redirect to login)
+    if (!res) return;
+
+    // If 403, apiFetch already showed "Access Denied" toast
+    if (res.status === 403) return;
+
     const json = await res.json();
-    if (json.success) {
-        showToast("success", json.message);
-        bindTable();
+
+    if (!json.success) {
+        showToast("danger", json.message || "Delete failed.", "Employee Loan");
+        return;
     }
+
+    showToast("success", json.message, "Employee Loan");
+    bindTable();
 };
 
 // ======================================================
