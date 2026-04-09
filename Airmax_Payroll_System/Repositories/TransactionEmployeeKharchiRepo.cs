@@ -71,7 +71,7 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@KharchiDate", model.KharchiDate);
             param.Add("@Date", model.Date);
             param.Add("@IDDepartment", model.IDDepartment);
-
+            param.Add("@UserFullName", model.E_By);
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
@@ -79,11 +79,11 @@ namespace Airmax_Payroll_System.Repositories
                 param);
         }
 
-        public async Task<SaveResult> DeleteAsync(int id)
+        public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
         {
             var param = new DynamicParameters();
             param.Add("@IDEmployeeKharchi", id);
-            param.Add("@D_By", "ADMIN");
+            param.Add("@D_By", deleteBy);
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Transaction_EmployeeKharchi_Delete",

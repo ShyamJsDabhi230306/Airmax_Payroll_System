@@ -22,7 +22,7 @@ namespace Airmax_Payroll_System.Services
         public async Task<SaveResult> SaveAsync(MasterShift shift)
             => await _shiftRepo.SaveAsync(shift);
 
-        public async Task<SaveResult> DeleteAsync(int idShift)
-            => await _shiftRepo.DeleteAsync(idShift);
+        public async Task<SaveResult> DeleteAsync(int idShift,string deleteBy)
+            => await _shiftRepo.DeleteAsync(idShift , deleteBy);
     }
 }

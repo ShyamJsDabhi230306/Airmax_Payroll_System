@@ -11,7 +11,7 @@ let entryModal = null;
 const DOM = {
 
     id: () => document.getElementById("IDDesignation"),
-    name: () => document.getElementById("Designation"),
+    name: () => document.getElementById("Designetion"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
@@ -104,6 +104,7 @@ async function editEntry(id) {
     const d = json.data;
 
     DOM.id().value = d.idDesignation;
+    console.log(d.designetion)
     DOM.name().value = d.designetion;
 
     entryModal.show();

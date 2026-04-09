@@ -23,8 +23,8 @@ namespace Airmax_Payroll_System.Services
         public async Task<SaveResult> SaveAsync(MasterEmployee emp)
             => await _repo.SaveAsync(emp);
 
-        public async Task<SaveResult> DeleteAsync(int id)
-            => await _repo.DeleteAsync(id);
+        public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
+            => await _repo.DeleteAsync(id, deleteBy);
 
 
         public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)

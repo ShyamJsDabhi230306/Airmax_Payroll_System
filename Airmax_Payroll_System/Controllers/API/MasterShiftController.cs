@@ -1,11 +1,13 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
-{   
+{
+    //[Authorize]
     [ApiController]
     [Route("api/master/shift")]
     public class MasterShiftController : ControllerBase
@@ -50,6 +52,8 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpPost("save")]
         public async Task<IActionResult> Save([FromBody] MasterShift shift)
         {
+            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
+            shift.E_By = loggedInUserFullName;
             var result = await _shiftService.SaveAsync(shift);
 
             if (result.Result != 1)
@@ -73,7 +77,8 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpDelete("delete/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _shiftService.DeleteAsync(id);
+            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System"; 
+            var result = await _shiftService.DeleteAsync(id, loggedInUserFullName);
 
             if (result.Result != 1)
             {

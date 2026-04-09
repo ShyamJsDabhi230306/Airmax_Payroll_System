@@ -42,6 +42,8 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpPost("save")]
         public async Task<IActionResult> Save([FromBody] MasterEmployeeGroup model)
         {
+            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
+            model.E_By = loggedInUserFullName;
             var result = await _service.SaveAsync(model);
 
             if (result.Result != 1)
@@ -56,7 +58,8 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _service.DeleteAsync(id);
+            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
+            var result = await _service.DeleteAsync(id, loggedInUserFullName);
 
             if (result.Result != 1)
                 return Ok(ApiResponse<string>.FailResponse(result.Message));

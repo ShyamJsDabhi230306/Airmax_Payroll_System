@@ -85,7 +85,7 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@Remarks", model.Remarks);
             param.Add("@IsActive", model.IsActive);
 
-            param.Add("@username", "Admin");
+            param.Add("@username", model.E_By);
             param.Add("@E_Date", DateTime.Now);
             param.Add("@U_Date", DateTime.Now);
 
@@ -96,13 +96,13 @@ namespace Airmax_Payroll_System.Repositories
             return result;
         }
 
-        public async Task<SaveResult> DeleteAsync(int idDepartment)
+        public async Task<SaveResult> DeleteAsync(int idDepartment, string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDDepartment", idDepartment);
-                param.Add("@D_By", "ADMIN");
+                param.Add("@D_By", deleteBy);
                
 
 

@@ -98,13 +98,13 @@ namespace Airmax_Payroll_System.Repositories
         // ---------------------------------------------------------
         // DELETE
         // ---------------------------------------------------------
-        public async Task<SaveResult> DeleteAsync(int id)
+        public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDEmployeeGroupBonus", id);
-                param.Add("@D_By", "ADMIN"); // ✅ REQUIRED
+                param.Add("@D_By", deleteBy); // ✅ REQUIRED
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_EmployeeGroupBonusDetails_Delete",

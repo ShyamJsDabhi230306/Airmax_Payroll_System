@@ -1,8 +1,9 @@
-﻿using Airmax_Payroll_System.Models.Transaction;
+﻿using Airmax_Payroll_System.Models.Common;
+using Airmax_Payroll_System.Models.Transaction;
 
 namespace Airmax_Payroll_System.Models.AllDTOS
 {
-   public class TransactionEmployeeLoanSaveDto
+   public class TransactionEmployeeLoanSaveDto:AuditFields
     {
         public int IDEmployeeLoan { get; set; }
         public string? LoanNo { get; set; }

@@ -22,13 +22,14 @@ function getUrlParams(dParam) {
 	var direction = getUrlParams('dir');
 
 	icSettingsOptions = {
-		typography: "poppins",
+		//typography: "poppins",
+		typography: "Robot",
 		version: "light",
 		layout: "vertical",
-		primary: "color_14",
-		headerBg: "color_14",
-		navheaderBg: "color_14",
-		sidebarBg: "color_14",
+		primary: "color_15",
+		headerBg: "color_15",
+		navheaderBg: "color_12",
+		sidebarBg: "color_15",
 		sidebarStyle: "overlay",
 		sidebarPosition: "fixed",
 		headerPosition: "fixed",

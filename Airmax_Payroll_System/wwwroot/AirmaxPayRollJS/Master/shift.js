@@ -19,7 +19,7 @@ const DOM = {
     totalHour: () => document.getElementById("WorkingHour"),
     totalMin: () => document.getElementById("WorkingMinute"),
 
-    //overtime: () => document.getElementById("Overtime"),
+    overtime: () => document.getElementById("Overtime"),
 
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal"),
@@ -97,6 +97,11 @@ async function bindTable() {
 
     if (!json.success) return;
 
+    // 🔥 Reinitialize DataTable properly MUST happen BEFORE changing innerHTML
+    if ($.fn.DataTable.isDataTable('#shiftList')) {
+        $('#shiftList').DataTable().destroy();
+    }
+
     const tbody = DOM.tbody();
     tbody.innerHTML = "";
 
@@ -131,10 +136,8 @@ async function bindTable() {
         tbody.appendChild(tr);
     });
 
-    // 🔥 Reinitialize DataTable properly
-    if ($.fn.DataTable.isDataTable('#shiftList')) {
-        $('#shiftList').DataTable().destroy();
-    }
+    // Data inserted into DOM, now initialize DataTable
+
 
     $('#shiftList').DataTable({
         searching: true,
@@ -152,6 +155,54 @@ async function bindTable() {
 // ======================================================
 // EDIT
 // ======================================================
+//async function editEntry(id) {
+
+//    const res = await fetch(`${API}/get-by-id/${id}`);
+//    const json = await res.json();
+
+//    if (!json.success) return;
+
+//    const d = json.data;
+
+//    // BASIC
+//    DOM.id().value = d.idShift;
+//    DOM.department().value = d.idDepartment;
+//    DOM.desc().value = d.shiftDesc;
+
+//    // ✅ USE StartTime if available (BEST)
+//    if (d.startTime) {
+//        DOM.startTime().value = d.startTime.substring(0, 5);
+//    } else {
+//        DOM.startTime().value = formatTime(d.startTimeHour, d.startTimeMinute);
+//    }
+
+//    if (d.endTime) {
+//        DOM.endTime().value = d.endTime.substring(0, 5);
+//    } else {
+//        DOM.endTime().value = formatTime(d.endTimeHour, d.endTimeMinute);
+//    }
+
+//    // ✅ WORKING TIME
+//    DOM.totalHour().value = d.totalWorkingHour || "";
+//    DOM.totalMin().value = d.totalWorkingMinute || "";
+
+//    //// ✅ OVERTIME (handle datetime → time)
+//    //if (d.overtime) {
+//    //    DOM.overtime().value = d.overtime.substring(11, 16);
+//    //} else {
+//    //    DOM.overtime().value = "";
+//    //}
+
+//    // OPTIONAL
+//    // remark if you have field
+//    // document.getElementById("Remark").value = d.remark || "";
+
+//    entryModal.show();
+//}
+
+
+// Duplicated loadDepartment function removed!
+
 async function editEntry(id) {
 
     const res = await fetch(`${API}/get-by-id/${id}`);
@@ -161,12 +212,18 @@ async function editEntry(id) {
 
     const d = json.data;
 
+    // 🔥 LOAD DEPARTMENT FIRST (Wait for original method at the top of file)
+    await loadDepartment();
+
     // BASIC
     DOM.id().value = d.idShift;
     DOM.department().value = d.idDepartment;
+    
+    if ($.fn.selectpicker) $(DOM.department()).selectpicker('refresh'); // 🔥 Important to refresh UI after setting
+
     DOM.desc().value = d.shiftDesc;
 
-    // ✅ USE StartTime if available (BEST)
+    // TIME
     if (d.startTime) {
         DOM.startTime().value = d.startTime.substring(0, 5);
     } else {
@@ -179,20 +236,14 @@ async function editEntry(id) {
         DOM.endTime().value = formatTime(d.endTimeHour, d.endTimeMinute);
     }
 
-    // ✅ WORKING TIME
+    // WORKING TIME
     DOM.totalHour().value = d.totalWorkingHour || "";
     DOM.totalMin().value = d.totalWorkingMinute || "";
 
-    //// ✅ OVERTIME (handle datetime → time)
-    //if (d.overtime) {
-    //    DOM.overtime().value = d.overtime.substring(11, 16);
-    //} else {
-    //    DOM.overtime().value = "";
-    //}
-
-    // OPTIONAL
-    // remark if you have field
-    // document.getElementById("Remark").value = d.remark || "";
+    // ✅ FIXED OVERTIME
+    if (DOM.overtime) { 
+        DOM.overtime().value = d.overtime ? d.overtime.substring(11, 16) : "";
+    }
 
     entryModal.show();
 }
@@ -302,7 +353,7 @@ async function saveData() {
 
     }
     catch (err) {
-        showToast("error", error.message, "shift Master");
+        showToast("error", err.message, "shift Master");
     }
     finally {
         DOM.save().disabled = false;
@@ -337,6 +388,10 @@ function calculateTime() {
 
     DOM.totalMin().value = total;
     DOM.totalHour().value = (total / 60).toFixed(2);
+
+    if (DOM.overtime) {
+        DOM.overtime().value = endVal;
+    }
 }
 
 

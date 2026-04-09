@@ -107,7 +107,7 @@ namespace Airmax_Payroll_System.Repositories
                 param.Add("@OutDeviceSerialNo", company.OutDeviceSerialNo);
 
         
-                param.Add("@E_By", company.E_By);
+                param.Add("@UserName", company.E_By);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Company_Save",
@@ -130,13 +130,13 @@ namespace Airmax_Payroll_System.Repositories
         // ---------------------------------------------------------
         // DELETE COMPANY
         // ---------------------------------------------------------
-        public async Task<SaveResult> DeleteAsync(int idCompany)
+        public async Task<SaveResult> DeleteAsync(int idCompany,string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDCompany", idCompany);
-                //param.Add("@D_By", deletedBy);
+                param.Add("@D_By", deleteBy);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Company_Delete",

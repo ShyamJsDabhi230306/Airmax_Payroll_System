@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+
     [ApiController]
     [Route("api/master/company")]
     public class MasterCompanyController : ControllerBase
@@ -50,6 +51,9 @@ namespace Airmax_Payroll_System.Controllers.API
         {
             //var actionBy = ClaimsHelper.GetCurrentUserFullName(User);
             //company.E_By = actionBy;
+
+            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
+            company.E_By = loggedInUserFullName;
             var result = await _companyService.SaveAsync(company);
 
             if (result.Result != 1)
@@ -73,9 +77,9 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpDelete("delete/{id:int}")]
         public async Task<IActionResult> Delete(int id)
         {
-            //var deletedBy = ClaimsHelper.GetCurrentUserFullName(User);
+            var LoggedInUser = User.FindFirst("FullName")?.Value ?? "System";
 
-            var result = await _companyService.DeleteAsync(id);
+            var result = await _companyService.DeleteAsync(id,LoggedInUser);
 
             if (result.Result != 1)
             {

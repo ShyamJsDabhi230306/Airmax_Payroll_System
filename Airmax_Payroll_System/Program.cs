@@ -154,6 +154,8 @@ app.Use(async (context, next) =>
 
 app.UseRouting();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 

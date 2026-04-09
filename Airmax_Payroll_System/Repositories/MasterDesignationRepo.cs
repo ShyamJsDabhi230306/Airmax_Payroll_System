@@ -62,10 +62,8 @@ namespace Airmax_Payroll_System.Repositories
                 param.Add("@IDDesignation", model.IDDesignation);
                 param.Add("@Designetion", model.Designetion);
                 param.Add("@IsActive", model.IsActive);
-                param.Add("@E_By", model.E_By ?? "Admin");
-                param.Add("@E_Date", DateTime.Now);
-                param.Add("@U_Date", DateTime.Now);
-                param.Add("@U_By", model.U_By ?? "Admin");
+                param.Add("@UserFullName", model.E_By );
+                //param.Add("@UserFullName", model.U_By);
                 param.Add("@Remark", model.Remarks);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
@@ -85,13 +83,13 @@ namespace Airmax_Payroll_System.Repositories
             }
         }
 
-        public async Task<SaveResult> DeleteAsync(int idDesignation)
+        public async Task<SaveResult> DeleteAsync(int idDesignation ,string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDDesignation", idDesignation);
-                param.Add("@D_By", "ADMIN"); // ✅ REQUIRED
+                param.Add("@D_By", deleteBy); // ✅ REQUIRED
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Designation_Delete",

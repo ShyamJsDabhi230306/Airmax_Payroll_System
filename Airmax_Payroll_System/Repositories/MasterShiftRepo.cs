@@ -79,7 +79,7 @@ namespace Airmax_Payroll_System.Repositories
 
                 param.Add("@Remarks", shift.Remarks);
                 param.Add("@IsActive", shift.IsActive);
-                param.Add("@E_By", shift.E_By);
+                param.Add("@UserFullName", shift.E_By);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Shift_Save",
@@ -101,13 +101,13 @@ namespace Airmax_Payroll_System.Repositories
         // ---------------------------------------------------------
         // DELETE
         // ---------------------------------------------------------
-        public async Task<SaveResult> DeleteAsync(int idShift)
+        public async Task<SaveResult> DeleteAsync(int idShift,string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDShift", idShift);
-                param.Add("@D_By", "ADMIN");
+                param.Add("@D_By", deleteBy);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_Shift_Delete",

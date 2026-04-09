@@ -61,7 +61,7 @@ namespace Airmax_Payroll_System.Repositories
                 param.Add("@EmployeeGroupName", group.EmployeeGroupName);
                 param.Add("@IDDepartment", group.IDDepartment);
                 param.Add("@IsActive", group.IsActive);
-                param.Add("@E_By", group.E_By);
+                param.Add("@UserFullName", group.E_By);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_EmployeeGroup_Save", param);
@@ -76,12 +76,13 @@ namespace Airmax_Payroll_System.Repositories
         }
 
         // DELETE
-        public async Task<SaveResult> DeleteAsync(int id)
+        public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
         {
             try
             {
                 var param = new DynamicParameters();
                 param.Add("@IDEmployeeGroup", id);
+                param.Add("D_By", deleteBy);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Master_EmployeeGroup_Delete", param);

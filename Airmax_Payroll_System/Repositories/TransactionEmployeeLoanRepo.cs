@@ -72,18 +72,18 @@ namespace Airmax_Payroll_System.Repositories
 
             // Serialize list to JSON just like Kharchi
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
-            param.Add("@UserName", "ADMIN"); // or your user context
+            param.Add("@UserFullName", model.E_By); // or your user context
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Transaction_EmployeeLoan_Save",
                 param);
         }
 
-        public async Task<SaveResult> DeleteAsync(int id)
+        public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
         {
             var param = new DynamicParameters();
             param.Add("@IDEmployeeLoan", id);
-            param.Add("@D_By", "ADMIN");
+            param.Add("@D_By", deleteBy);
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Transaction_EmployeeLoan_Delete",
