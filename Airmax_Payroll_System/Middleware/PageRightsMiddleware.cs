@@ -13,55 +13,44 @@ namespace Airmax_Payroll_System.Middlewares
 
         public async Task InvokeAsync(HttpContext context, IDapperHelper _dapper)
         {
-            var path = context.Request.Path.Value.ToLower();
+            var path = context.Request.Path.Value?.ToLower() ?? "";
 
-            // 🛡️ 1. ALWAYS ALLOW: Security endpoints, lookups, and dropdown data
-            if (path.Contains("/get-permissions/") || path.Contains("/by-") || path.Contains("/generate-no") || path.Contains("/login"))
+            // 1. ALWAYS ALLOW: Core system paths
+            if (path.Contains("/get-permissions/") || path.Contains("/login") ||
+                path.Contains("/accessdenied") || path.Contains("/home/error") ||
+                path.Contains("/get-all") || path.Contains("/by-"))
             {
                 await _next(context); return;
             }
 
-            // ✅ ALLOW all GET /get-all requests — these are dropdown lookups
-            //    e.g. Department page loading Location dropdown → should NOT be blocked
-            //    by Location Master permission
-            if (context.Request.Method == "GET" && path.EndsWith("/get-all"))
-            {
-                await _next(context); return;
-            }
+            // 2. Map the URL to the DB Page Name (Flexible Matching)
+            string pageName = "";
+            if (path.Contains("/company")) pageName = "Company Master";
+            else if (path.Contains("/location")) pageName = "Location Master";
+            else if (path.Contains("/department")) pageName = "Department Master";
+            else if (path.Contains("/designation")) pageName = "Designation Master";
+            else if (path.Contains("/shift")) pageName = "Shift Master";
+            else if (path.Contains("/user") && !path.Contains("rights")) pageName = "User Master";
+            else if (path.Contains("/userrights")) pageName = "User Access Management";
+            else if (path.Contains("/employeegroup") && !path.Contains("/bonus")) pageName = "Employee Group";
+            else if (path.Contains("/employeegroupbonusdetails")) pageName = "Group Bonus Details";
+            else if (path.Contains("/employee") && !path.Contains("loan") && !path.Contains("kharchi") && !path.Contains("group")) pageName = "Employee Master";
+            else if (path.Contains("/kharchi")) pageName = "Employee Kharchi";
+            else if (path.Contains("/loan")) pageName = "Employee Loan";
 
-            // 🛡️ 2. Only protect API calls
-            if (!path.Contains("/api/master/") && !path.Contains("/api/transaction/"))
-            {
-                await _next(context); return;
-            }
-
-            // 🛡️ 3. FINAL ACCURATE MAPPING (Based on your Controllers)
-            string pageName = path switch
-            {
-                var p when p.Contains("/api/master/company") => "Company Master",
-                var p when p.Contains("/api/master/department") => "Department Master",
-                var p when p.Contains("/api/master/designation") => "Designation Master",
-                var p when p.Contains("/api/master/employee") && !p.Contains("group") => "Employee Master",
-                var p when p.Contains("/api/master/employeegroup") && !p.Contains("bonus") => "Employee Group",
-                var p when p.Contains("/api/master/employeegroupbonusdetails") => "Group Bonus Details",
-                var p when p.Contains("/api/master/location") => "Location Master",
-                var p when p.Contains("/api/master/shift") => "Shift Master",
-                var p when p.Contains("/api/master/user") && !p.Contains("rights") => "User Master",
-                var p when p.Contains("/api/master/userrights") => "User Access Management",
-                var p when p.Contains("/api/transaction/kharchi") => "Employee Kharchi",
-                var p when p.Contains("/api/transaction/employee-loan") => "Employee Loan",
-                _ => ""
-            };
-
-            // If we don't recognize the URL, let it pass
-            if (string.IsNullOrEmpty(pageName)) { await _next(context); return; }
+            // If it's a dashboard or unrecognized system page, let it pass
+            if (string.IsNullOrEmpty(pageName) || path == "/" || path.EndsWith("/index")) { await _next(context); return; }
 
             var user = context.User;
 
-            // 🛡️ 4. Admins bypass the check
-            if (user.IsInRole("Admin")) { await _next(context); return; }
+            // 3. 🛡️ ROBUST ADMIN BYPASS (Checks for "Admin" and "Administrator" case-insensitive)
+            var userRole = user.FindFirst(ClaimTypes.Role)?.Value?.ToLower() ?? "";
+            if (userRole == "admin" || userRole == "administrator" || user.IsInRole("Admin") || user.IsInRole("Administrator"))
+            {
+                await _next(context); return;
+            }
 
-            // 🛡️ 5. Fetch User ID and Validate Rights
+            // 4. Fetch User Permissions
             var userIdStr = user.FindFirst("IDUser")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userIdStr != null)
@@ -71,29 +60,34 @@ namespace Airmax_Payroll_System.Middlewares
                 param.Add("@UserId", userId);
 
                 var rights = await _dapper.QueryAsync<UserPagePermission>("usp_UserRights_GetPagePermissions", param);
-                var currentRight = rights.FirstOrDefault(r => r.PageName.Equals(pageName, StringComparison.OrdinalIgnoreCase));
+                var currentRight = rights.FirstOrDefault(r => r.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase));
 
-                // 🛡️ 6. Enforce Permission (GET=View, POST=Edit/Create, DELETE=Delete)
-                string method = context.Request.Method;
+                // 5. ENFORCE SECURITY
                 bool isAllowed = false;
+                string method = context.Request.Method;
 
-                if (method == "GET")
+                if (!path.Contains("/api/")) // Page Navigation
                 {
                     isAllowed = currentRight?.CanView ?? false;
                 }
-                else if (method == "POST" || method == "PUT")
+                else // API Actions
                 {
-                    isAllowed = currentRight?.CanEdit ?? currentRight?.CanCreate ?? false;
-                }
-                else if (method == "DELETE")
-                {
-                    isAllowed = currentRight?.CanDelete ?? false;
+                    if (method == "GET") isAllowed = currentRight?.CanView ?? false;
+                    else if (method == "POST" || method == "PUT") isAllowed = currentRight?.CanEdit ?? currentRight?.CanCreate ?? false;
+                    else if (method == "DELETE") isAllowed = currentRight?.CanDelete ?? false;
                 }
 
                 if (!isAllowed)
                 {
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsJsonAsync(new { success = false, message = "Access Denied: Missing Right for " + pageName });
+                    if (path.Contains("/api/"))
+                    {
+                        context.Response.StatusCode = 403;
+                        await context.Response.WriteAsJsonAsync(new { success = false, message = "Access Denied" });
+                    }
+                    else
+                    {
+                        context.Response.Redirect("/Account/AccessDenied");
+                    }
                     return;
                 }
             }
