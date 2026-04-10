@@ -47,6 +47,8 @@ builder.Services.AddScoped<MasterEmployeeRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
 builder.Services.AddScoped<UserRightsRepo>();
+builder.Services.AddScoped<MasterPageRepo>();
+
 
 // In your Program.cs, add these lines:
 // FOR TRANSACTION REPOSITORY
@@ -66,6 +68,8 @@ builder.Services.AddScoped<MasterEmployeeService>();
 builder.Services.AddScoped<MasterEmployeeGroupService>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
 builder.Services.AddScoped<UserRightsService>();
+builder.Services.AddScoped<MasterPageService>();
+
 
 // FOR TRANSACTION SERVICE
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();

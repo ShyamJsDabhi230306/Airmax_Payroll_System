@@ -8,6 +8,9 @@ namespace Airmax_Payroll_System.Middlewares
     public class PageRightsMiddleware
     {
         private readonly RequestDelegate _next;
+        // 🚀 SMART CACHE: Keeps performance lightning fast
+        private static Dictionary<string, string> _pageMap = new();
+        private static DateTime _lastUpdate = DateTime.MinValue;
 
         public PageRightsMiddleware(RequestDelegate next) { _next = next; }
 
@@ -15,7 +18,7 @@ namespace Airmax_Payroll_System.Middlewares
         {
             var path = context.Request.Path.Value?.ToLower() ?? "";
 
-            // 1. ALWAYS ALLOW: Core system paths
+            // 1. ALWAYS ALLOW: system paths
             if (path.Contains("/get-permissions/") || path.Contains("/login") ||
                 path.Contains("/accessdenied") || path.Contains("/home/error") ||
                 path.Contains("/get-all") || path.Contains("/by-"))
@@ -23,55 +26,45 @@ namespace Airmax_Payroll_System.Middlewares
                 await _next(context); return;
             }
 
-            // 2. Map the URL to the DB Page Name (Flexible Matching)
-            string pageName = "";
-            if (path.Contains("/company")) pageName = "Company Master";
-            else if (path.Contains("/location")) pageName = "Location Master";
-            else if (path.Contains("/department")) pageName = "Department Master";
-            else if (path.Contains("/designation")) pageName = "Designation Master";
-            else if (path.Contains("/shift")) pageName = "Shift Master";
-            else if (path.Contains("/user") && !path.Contains("rights")) pageName = "User Master";
-            else if (path.Contains("/userrights")) pageName = "User Access Management";
-            else if (path.Contains("/employeegroup") && !path.Contains("/bonus")) pageName = "Employee Group";
-            else if (path.Contains("/employeegroupbonusdetails")) pageName = "Group Bonus Details";
-            else if (path.Contains("/employee") && !path.Contains("loan") && !path.Contains("kharchi") && !path.Contains("group")) pageName = "Employee Master";
-            else if (path.Contains("/kharchi")) pageName = "Employee Kharchi";
-            else if (path.Contains("/loan")) pageName = "Employee Loan";
+            // 2. 🛡️ DYNAMIC LOOKUP: Sync with database every 5 minutes
+            if (DateTime.Now.Subtract(_lastUpdate).TotalMinutes > 5)
+            {
+                var pages = await _dapper.QueryAsync<MasterPage>("usp_Master_Page_SelectAll");
+                _pageMap = pages.Where(p => !string.IsNullOrEmpty(p.PageUrl))
+                                .ToDictionary(p => p.PageUrl!.ToLower(), p => p.PageName);
+                _lastUpdate = DateTime.Now;
+            }
 
-            // If it's a dashboard or unrecognized system page, let it pass
+            // 3. Find the Page Name by comparing the URL
+            string pageName = _pageMap.FirstOrDefault(m => path.StartsWith(m.Key)).Value ?? "";
+
+            // Allow if page is not tracked or it's a root/index
             if (string.IsNullOrEmpty(pageName) || path == "/" || path.EndsWith("/index")) { await _next(context); return; }
 
             var user = context.User;
-
-            // 3. 🛡️ ROBUST ADMIN BYPASS (Checks for "Admin" and "Administrator" case-insensitive)
             var userRole = user.FindFirst(ClaimTypes.Role)?.Value?.ToLower() ?? "";
+
+            // 4. ADMIN BYPASS
             if (userRole == "admin" || userRole == "administrator" || user.IsInRole("Admin") || user.IsInRole("Administrator"))
             {
                 await _next(context); return;
             }
 
-            // 4. Fetch User Permissions
+            // 5. FETCH RIGHTS
             var userIdStr = user.FindFirst("IDUser")?.Value ?? user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (userIdStr != null)
             {
-                int userId = int.Parse(userIdStr);
-                var param = new DynamicParameters();
-                param.Add("@UserId", userId);
-
-                var rights = await _dapper.QueryAsync<UserPagePermission>("usp_UserRights_GetPagePermissions", param);
+                var rights = await _dapper.QueryAsync<UserPagePermission>("usp_UserRights_GetPagePermissions", new { UserId = int.Parse(userIdStr) });
                 var currentRight = rights.FirstOrDefault(r => r.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase));
 
-                // 5. ENFORCE SECURITY
                 bool isAllowed = false;
-                string method = context.Request.Method;
-
-                if (!path.Contains("/api/")) // Page Navigation
+                if (!path.Contains("/api/"))
                 {
                     isAllowed = currentRight?.CanView ?? false;
                 }
-                else // API Actions
+                else
                 {
+                    string method = context.Request.Method;
                     if (method == "GET") isAllowed = currentRight?.CanView ?? false;
                     else if (method == "POST" || method == "PUT") isAllowed = currentRight?.CanEdit ?? currentRight?.CanCreate ?? false;
                     else if (method == "DELETE") isAllowed = currentRight?.CanDelete ?? false;

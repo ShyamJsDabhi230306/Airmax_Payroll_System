@@ -28,7 +28,7 @@ function getUrlParams(dParam) {
 		layout: "vertical",
 		primary: "color_15",
 		headerBg: "color_15",
-		navheaderBg: "color_12",
+		navheaderBg: "color_15",
 		sidebarBg: "color_15",
 		sidebarStyle: "overlay",
 		sidebarPosition: "fixed",
