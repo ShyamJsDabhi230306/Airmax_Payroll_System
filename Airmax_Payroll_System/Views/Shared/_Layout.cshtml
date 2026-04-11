@@ -1,4 +1,22 @@
-﻿
+@using Airmax_Payroll_System.Services
+@inject UserRightsService _rightsService
+@{
+    // 🛡️ SERVER-SIDE SECURITY GUARD (PERMANENT FIX)
+    var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    int userId = int.TryParse(userIdClaim, out var id) ? id : 0;
+    var userRole = (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "").ToLower();
+    bool isAdmin = userRole == "admin" || userRole == "administrator";
+
+    // Fetch permissions from the SP you provided (backend)
+    var permissions = userId > 0 ? await _rightsService.GetPermissionsAsync(userId) : new List<Airmax_Payroll_System.Models.Master.UserPagePermission>();
+
+    // Helper to check if user has view right for a page name
+    bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
+
+    // Current page permissions for the CSS Shield
+    var currentPageTitle = ViewBag.Title as string ?? "";
+    var currentRight = permissions.FirstOrDefault(p => p.PageName.Trim().Equals(currentPageTitle, StringComparison.OrdinalIgnoreCase));
+}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -52,6 +70,22 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <link href="vendor/bootstrap-datepicker-master/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    
+    <!-- 🛡️ SERVER-INJECTED CSS GUARD (PROFESSIONAL FIX) -->
+    <style id="server-security-shield">
+        @if (!isAdmin && currentRight != null)
+        {
+            if (!currentRight.CanCreate) {
+                @:.btn-add, #btnAdd, .add-new, .btn-create, .btn-primary[data-bs-target*="add"], [onclick*="add"], [onclick*="Create"] { display: none !important; }
+            }
+            if (!currentRight.CanEdit) {
+                @:.btn-edit, .fa-pencil, .sharp.me-1, #btnEdit, .btn-info.sharp, [onclick*="edit"], [onclick*="Edit"], #btnSave, .btn-save, .btn-update { display: none !important; }
+            }
+            if (!currentRight.CanDelete) {
+                @:.btn-delete, .fa-trash, .btn-danger.sharp, .fa-trash-o, #btnDelete, [onclick*="delete"], [onclick*="Delete"], [onclick*="remove"] { display: none !important; }
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -333,62 +367,70 @@
                         </a>
                     </li>
 
-                    <!-- MASTER SECTION -->
-                    <!-- MASTER SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-project"></i>
-                            <span class="nav-text">Master</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li data-menu="Company Master"><a href="/Master/Company">Company</a></li>
-                            <li data-menu="Location Master"><a href="/Master/Location">Location</a></li>
-                            <li data-menu="Department Master"><a href="/Master/Department">Department</a></li>
-                            <li data-menu="Designation Master"><a href="/Master/Designation">Designation</a></li>
-                            <li data-menu="Shift Master"><a href="/Master/Shift">Shift</a></li>
-                            <li data-menu="Page Master"><a href="/Master/PageMaster">Page</a></li>
-                            @* <li data-menu="User Master"><a href="/Master/User">User List</a></li>
-                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li> *@
-                           
-                        </ul>
-                    </li>
+                    <!-- MASTER SECTION (SERVER-FILTERED) -->
+                    @if (HasRight("Company Master") || HasRight("Location Master") || HasRight("Department Master") || HasRight("Designation Master") || HasRight("Shift Master") || HasRight("Page Master"))
+                    {
+                        <li>
+                            <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                                <i class="flaticon-project"></i>
+                                <span class="nav-text">Master</span>
+                            </a>
+                            <ul aria-expanded="false">
+                                @if (HasRight("Company Master")) { <li data-menu="Company Master"><a href="/Master/Company">Company</a></li> }
+                                @if (HasRight("Location Master")) { <li data-menu="Location Master"><a href="/Master/Location">Location</a></li> }
+                                @if (HasRight("Department Master")) { <li data-menu="Department Master"><a href="/Master/Department">Department</a></li> }
+                                @if (HasRight("Designation Master")) { <li data-menu="Designation Master"><a href="/Master/Designation">Designation</a></li> }
+                                @if (HasRight("Shift Master")) { <li data-menu="Shift Master"><a href="/Master/Shift">Shift</a></li> }
+                                @if (HasRight("Page Master")) { <li data-menu="Page Master"><a href="/Master/PageMaster">Page</a></li> }
+                            </ul>
+                        </li>
+                    }
 
-                    <!-- Emloyees Related Details SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-user"></i>
-                            <span class="nav-text">Employee</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li data-menu="Employee Master"><a href="/Master/Employee">Employee List</a></li>
-                            <li data-menu="Employee Master"><a href="/Master/EmployeeEntry">Employee Entry</a></li>
-                            <li data-menu="Employee Group"><a href="/Master/EmployeeGroup">Employee Group</a></li>
-                            <li data-menu="Group Bonus Details"><a href="/Master/employeegroupbonusdetails">Emp Group Bonus</a></li>
-                        </ul>
-                    </li>
-                    <!-- TRANSACTION SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-notes"></i>
-                            <span class="nav-text">Transaction</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li data-menu="Employee Kharchi"><a href="/Transaction/TransactionEmployeeKharchi">Employee Kharchi</a></li>
-                            <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li>
-                        </ul>
-                    </li>
+                    <!-- Emloyees SECTION (SERVER-FILTERED) -->
+                    @if (HasRight("Employee Master") || HasRight("Employee Group") || HasRight("Group Bonus Details"))
+                    {
+                        <li>
+                            <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                                <i class="flaticon-user"></i>
+                                <span class="nav-text">Employee</span>
+                            </a>
+                            <ul aria-expanded="false">
+                                @if (HasRight("Employee Master")) { <li data-menu="Employee Master"><a href="/Master/Employee">Employee List</a></li> }
+                                @if (HasRight("Employee Master")) { <li data-menu="Employee Master"><a href="/Master/EmployeeEntry">Employee Entry</a></li> }
+                                @if (HasRight("Employee Group")) { <li data-menu="Employee Group"><a href="/Master/EmployeeGroup">Employee Group</a></li> }
+                                @if (HasRight("Group Bonus Details")) { <li data-menu="Group Bonus Details"><a href="/Master/employeegroupbonusdetails">Emp Group Bonus</a></li> }
+                            </ul>
+                        </li>
+                    }
+                    <!-- TRANSACTION SECTION (SERVER-FILTERED) -->
+                    @if (HasRight("Employee Kharchi") || HasRight("Employee Loan"))
+                    {
+                        <li>
+                            <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                                <i class="flaticon-notes"></i>
+                                <span class="nav-text">Transaction</span>
+                            </a>
+                            <ul aria-expanded="false">
+                                @if (HasRight("Employee Kharchi")) { <li data-menu="Employee Kharchi"><a href="/Transaction/TransactionEmployeeKharchi">Employee Kharchi</a></li> }
+                                @if (HasRight("Employee Loan")) { <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li> }
+                            </ul>
+                        </li>
+                    }
 
-                    <!-- USER Configuration SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-filter"></i>
-                            <span class="nav-text">User Configuration</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li data-menu="User Master"><a href="/Master/User">User List</a></li>
-                            <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li>
-                        </ul>
-                    </li>
+                    <!-- USER Configuration SECTION (SERVER-FILTERED) -->
+                    @if (HasRight("User Master") || HasRight("User Access Management"))
+                    {
+                        <li>
+                            <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+                                <i class="flaticon-filter"></i>
+                                <span class="nav-text">User Configuration</span>
+                            </a>
+                            <ul aria-expanded="false">
+                                @if (HasRight("User Master")) { <li data-menu="User Master"><a href="/Master/User">User List</a></li> }
+                                @if (HasRight("User Access Management")) { <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li> }
+                            </ul>
+                        </li>
+                    }
 
 
                     

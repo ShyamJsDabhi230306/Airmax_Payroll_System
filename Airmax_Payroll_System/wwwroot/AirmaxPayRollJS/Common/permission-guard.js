@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ============================================================
  *  PERMISSION GUARD  —  Airmax Payroll System
  * ============================================================
@@ -136,6 +136,7 @@ function show403(customMessage) {
 //         403 → show 403 overlay, return null
 // ============================================================
 async function apiFetch(url, options = {}) {
+    // Standardized token name: auth_token
     const token = localStorage.getItem("auth_token");
 
     options.headers = {
@@ -146,9 +147,9 @@ async function apiFetch(url, options = {}) {
 
     const response = await fetch(url, options);
 
-    // ── 401: Token expired → go to login ──────────────────
+    // ── 401: Token expired or invalid → go to login ─────────
     if (response.status === 401) {
-        localStorage.clear();
+        clearAuthData();
         window.location.href = "/Account/Login";
         return null;
     }
@@ -163,6 +164,56 @@ async function apiFetch(url, options = {}) {
     }
 
     return response;
+}
+
+
+// ============================================================
+// STEP 4: Helper to CLEAR ALL auth data (LocalStorage & Cookie)
+// ============================================================
+function clearAuthData() {
+    // Clear LocalStorage (handle all known naming variations)
+    localStorage.removeItem("auth_token");
+    localStorage.removeItem("jwtToken"); 
+    localStorage.removeItem("UserData");
+    localStorage.removeItem("Username");
+    localStorage.clear();
+
+    // Clear Cookies (handle all known naming variations)
+    document.cookie = "jwt_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    document.cookie = "jwtToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+
+// ============================================================
+// STEP 5: logoutUser — The global sign-out function
+// ============================================================
+function logoutUser() {
+    if (typeof Swal === 'undefined') {
+        if (confirm("Are you sure you want to sign out?")) {
+            clearAuthData();
+            window.location.href = "/Account/Login";
+        }
+        return;
+    }
+
+    Swal.fire({
+        icon: "warning",
+        title: "Logout?",
+        text: "Are you sure you want to sign out?",
+        showCancelButton: true,
+        confirmButtonText: "Yes, Logout",
+        cancelButtonColor: "#d33",
+        cancelButtonText: "Cancel"
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        clearAuthData();
+        
+        showToast("info", "Logged out successfully!");
+        setTimeout(() => {
+            window.location.href = "/Account/Login";
+        }, 700);
+    });
 }
 
 

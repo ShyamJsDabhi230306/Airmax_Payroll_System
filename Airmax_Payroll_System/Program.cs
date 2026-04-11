@@ -33,7 +33,16 @@ builder.Services.AddSession(options =>
 
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+//builder.Services.AddControllersWithViews();
+// 🔒 GLOBAL LOCK: Every page now requires a login by default
+builder.Services.AddControllersWithViews(options =>
+{
+    var policy = new Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+    options.Filters.Add(new Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter(policy));
+});
+
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddScoped<IDapperHelper, DapperHelper>();
 // this is the Repo layer

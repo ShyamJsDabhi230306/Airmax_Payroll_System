@@ -1,68 +1,64 @@
-﻿document.addEventListener("DOMContentLoaded", async function () {
+/* 🛡️ AIRMAX SECONDARY DATA-TABLE SHIELD */
+document.addEventListener("DOMContentLoaded", async function () {
     const token = localStorage.getItem("auth_token");
     const storedUser = localStorage.getItem("UserData");
 
     if (!token || !storedUser) return;
     const user = JSON.parse(storedUser);
 
-    // 🛡️ 1. ADMIN BYPASS (Case Insensitive)
-    const role = (user.roleName || user.RoleName || user.role || "").toLowerCase();
-    if (role === "admin" || role === "administrator") {
-        console.log("🔓 Administrator Mode Active");
-        return;
-    }
+    // Helper to get property regardless of casing
+    const getProp = (obj, key) => {
+        if (!obj) return null;
+        return obj[key] ?? obj[key.charAt(0).toLowerCase() + key.slice(1)] ?? obj[key.toUpperCase()];
+    };
 
     try {
-        const userId = user.IDUser || user.idUser;
+        const userId = getProp(user, "IDUser");
+        if (!userId) return;
+
         const response = await fetch(`/api/master/userrights/get-permissions/${userId}`, {
             headers: { "Authorization": "Bearer " + token }
         });
-        if (!response.ok) throw new Error("Security Error");
         const res = await response.json();
 
         if (res.success && res.data) {
-            const currentURL = window.location.pathname.toLowerCase();
-
-            // 🛡️ 2. Identify Current Page Rights
-            const myRight = res.data.find(p => {
-                const pname = p.pageName.toLowerCase();
-                if (pname === "company master") return currentURL.includes("/company");
-                if (pname === "location master") return currentURL.includes("/location");
-                if (pname === "department master") return currentURL.includes("/department");
-                if (pname === "designation master") return currentURL.includes("/designation");
-                if (pname === "shift master") return currentURL.includes("/shift");
-                if (pname === "page master") return currentURL.includes("/page");
-                if (pname === "employee master") return currentURL.includes("/employee") && !currentURL.includes("loan") && !currentURL.includes("kharchi") && !currentURL.includes("group");
-                if (pname === "employee group") return currentURL.includes("employeegroup") && !currentURL.includes("bonus");
-                if (pname === "group bonus details") return currentURL.includes("employeegroupbonusdetails");
-                if (pname === "user master") return currentURL.includes("/user") && !currentURL.includes("rights");
-                if (pname === "user access management") return currentURL.includes("userrights");
-                if (pname === "employee kharchi") return currentURL.includes("kharchi");
-                if (pname === "employee loan") return currentURL.includes("loan");
-                return false;
+            const permissions = res.data;
+            
+            // we only need current page rights for dynamic table button cleanup
+            const myRight = permissions.find(p => {
+                const pageName = getProp(p, "PageName");
+                if (!pageName) return false;
+                const normalizedPath = window.location.pathname.toLowerCase().replace(/-/g, "").replace(/\s+/g, "");
+                const normalizedDBName = pageName.toLowerCase().replace(" master", "").trim().replace(/\s+/g, "");
+                return normalizedPath.includes(normalizedDBName);
             });
 
-            // 🛡️ 3. Redirect if Unauthorized View
-            if (myRight && !myRight.canView) {
-                window.location.href = "/Account/AccessDenied";
-                return;
-            }
-
-            // 🛡️ 4. Show/Hide Menu Items
-            const restrictedRaw = res.data.filter(p => !p.canView).map(p => p.pageName.trim().toLowerCase());
-            document.querySelectorAll("[data-menu]").forEach(li => {
-                const name = li.getAttribute("data-menu").trim().toLowerCase();
-                if (restrictedRaw.includes(name)) { li.style.display = 'none'; li.remove(); }
-            });
-
-            // 🛡️ 5. Hide Action Buttons
             if (myRight) {
-                if (!myRight.canCreate) document.querySelectorAll("#btnAdd, .btn-add, .add-new").forEach(e => e.remove());
-                if (!myRight.canEdit) document.querySelectorAll("#btnSave, .btn-edit, .sharp.me-1").forEach(e => e.remove());
-                if (!myRight.canDelete) document.querySelectorAll(".btn-delete, .sharp.btn-danger, .btn-del").forEach(e => e.remove());
+                // Secondary Guardian (Cleanup buttons in DataTables after they load)
+                const cleanupDynamicButtons = () => {
+                    const canCreate = getProp(myRight, "CanCreate");
+                    const canEdit = getProp(myRight, "CanEdit");
+                    const canDelete = getProp(myRight, "CanDelete");
+
+                    document.querySelectorAll("a, button").forEach(el => {
+                        const txt = el.textContent.toLowerCase().trim();
+                        if ((canCreate === false || canCreate === 0) && (txt.includes("add ") || txt === "add" || txt.includes("create"))) {
+                            el.style.setProperty("display", "none", "important");
+                        }
+                        if ((canEdit === false || canEdit === 0) && (txt === "edit" || txt === "update" || txt === "save")) {
+                            el.style.setProperty("display", "none", "important");
+                        }
+                        if ((canDelete === false || canDelete === 0) && (txt === "delete" || txt === "remove")) {
+                            el.style.setProperty("display", "none", "important");
+                        }
+                    });
+                };
+
+                cleanupDynamicButtons();
+                new MutationObserver(cleanupDynamicButtons).observe(document.body, { childList: true, subtree: true });
             }
         }
     } catch (e) {
-        console.error("Security Shield Error:", e);
+        console.error("Shield Secondary Layer Error:", e);
     }
 });

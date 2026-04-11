@@ -1,4 +1,4 @@
-﻿@{
+@* @{
     ViewData["Title"] = "Access Denied";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -26,4 +26,46 @@
             </div>
         </div>
     </div>
-</div>
+</div> *@
+
+
+
+@{
+    Layout = null; // No sidebar, no header
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Access Denied | Airmax</title>
+    <link href="~/css/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="card shadow border-0 text-center p-5" style="max-width: 500px; border-radius: 20px;">
+            <div class="mb-4">
+                <i class="fa fa-lock text-danger" style="font-size: 100px;"></i>
+            </div>
+            <h2 class="fw-bold mb-3">Access Denied</h2>
+            <p class="text-muted mb-4" style="font-size: 18px;" id="denial-message">
+                You don't have right to see/watch the pages. <br />
+                <b>Connect with your admin to give you rights.</b>
+            </p>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const params = new URLSearchParams(window.location.search);
+                    const msg = params.get("message");
+                    if (msg) {
+                        document.getElementById("denial-message").innerHTML = decodeURIComponent(msg);
+                    }
+                });
+            </script>
+            <a href="/Account/Login" class="btn btn-primary btn-lg w-100 py-3" onclick="localStorage.clear()">
+                <i class="fa fa-arrow-left me-2"></i> Back to Login
+            </a>
+        </div>
+    </div>
+</body>
+</html>
+
