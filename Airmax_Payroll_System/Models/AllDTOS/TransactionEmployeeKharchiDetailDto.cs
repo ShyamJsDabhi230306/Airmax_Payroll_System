@@ -10,6 +10,7 @@
 
         public decimal? Amount { get; set; }
         public string? EmployeeCode { get; set; }
+        public string? Remarks { get; set; }
         public bool? AllowForCalculate { get; set; }
     }
 }
