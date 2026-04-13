@@ -11,11 +11,31 @@
     var permissions = userId > 0 ? await _rightsService.GetPermissionsAsync(userId) : new List<Airmax_Payroll_System.Models.Master.UserPagePermission>();
 
     // Helper to check if user has view right for a page name
-    bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
+    // bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
 
     // Current page permissions for the CSS Shield
+    // var currentPageTitle = ViewBag.Title as string ?? "";
+    // var currentRight = permissions.FirstOrDefault(p => p.PageName.Trim().Equals(currentPageTitle, StringComparison.OrdinalIgnoreCase));
+
+    // 🛡️ Helper to check rights by Page Name (used for Sidebar)
+bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
+
+// 🛡️ PERFECT MATCH: Instead of Title, we use the URL to find permissions
+// This ensures Add/Edit/Delete buttons are hidden even if you mistype the Title.
+var currentUrl = Context.Request.Path.Value?.ToLower().TrimEnd('/') ?? "";
+var currentRight = permissions.FirstOrDefault(p => 
+    !string.IsNullOrEmpty(p.PageUrl) && 
+    (currentUrl.EndsWith(p.PageUrl.ToLower().TrimEnd('/')) || p.PageUrl.ToLower().Contains(currentUrl))
+);
+
+// Fallback: If URL match fails, try Title as a backup
+if (currentRight == null) {
     var currentPageTitle = ViewBag.Title as string ?? "";
-    var currentRight = permissions.FirstOrDefault(p => p.PageName.Trim().Equals(currentPageTitle, StringComparison.OrdinalIgnoreCase));
+    currentRight = permissions.FirstOrDefault(p => p.PageName.Trim().Equals(currentPageTitle, StringComparison.OrdinalIgnoreCase));
+}
+
+
+
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -123,12 +143,20 @@
                 </div>
 
             </a>
+
             <div class="nav-control">
+
                 <div class="hamburger">
+               
                     <span class="line"></span><span class="line"></span><span class="line"></span>
+
+                    
+
                 </div>
             </div>
         </div>
+
+
         <!--**********************************
             Nav header end
         ***********************************-->
@@ -191,7 +219,7 @@
                                             <i class="fa fa-sign-out-alt me-2"></i> Logout
                                         </a>
                                     </li>
-                                    <li class="nav-item dropdown notification_dropdown">
+                                    <li class="nav-item dropdown notification_dropdown" style="padding:10px;">
                                         <button class="ic-theme-mode" type="button">
                                             <span class="light">Light</span>
                                             <span class="dark">Dark</span>
@@ -411,7 +439,21 @@
                                 <span class="nav-text">Transaction</span>
                             </a>
                             <ul aria-expanded="false">
-                                @if (HasRight("Employee Kharchi")) { <li data-menu="Employee Kharchi"><a href="/Transaction/TransactionEmployeeKharchi">Employee Kharchi</a></li> }
+                               @if (HasRight("Employee Kharchi")) 
+                                { 
+                                    <!-- 📄 1. Link to the List -->
+                                    <li data-menu="Employee Kharchi">
+                                        <a href="/Transaction/EmployeeKharchiList">
+                                            <i class="fa fa-list me-2"></i> Employee Kharchi List
+                                        </a>
+                                    </li> 
+                                    <!-- 📄 2. Link directly to the Add/Entry page -->
+                                    <li data-menu="Employee Kharchi">
+                                        <a href="/Transaction/EmployeeKharchiEntry">
+                                            <i class="fa fa-plus-circle me-2"></i> Employee Kharchi Entry
+                                        </a>
+                                    </li> 
+                                }
                                 @if (HasRight("Employee Loan")) { <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li> }
                             </ul>
                         </li>

@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Employee Kharchi List";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title">Employee Kharchi List</h4>
+        <a href="/Transaction/EmployeeKharchiEntry" class="btn btn-primary btn-sm btn-add">
+            <i class="fa fa-plus me-1"></i> Add Kharchi
+        </a>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="kharchiList" class="table table-hover w-100">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th class="text-center" style="width:40px">#</th>
+                        <th class="text-center">Voucher No</th>
+                        <th>Department Name</th>
+                        <th class="text-center">Expense Month</th>
+                        <th class="text-end" style="padding-right: 25px;">Total Amount (₹)</th>
+                        <th class="text-center" style="width:100px">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tblBody">
+                    <!-- Data loaded by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Transaction/employee_kharchi_list.js" asp-append-version="true"></script>
+}

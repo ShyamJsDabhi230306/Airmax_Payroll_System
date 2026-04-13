@@ -24,6 +24,9 @@ namespace Airmax_Payroll_System.Models.Transaction
 
         public string? Amount { get; set; }
 
+        public decimal? TotalAmount { get; set; }
+        public int? TotalEmployees { get; set; }
+
 
     }
 

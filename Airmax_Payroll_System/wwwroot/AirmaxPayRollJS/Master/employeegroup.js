@@ -241,7 +241,8 @@ async function saveData() {
         if (!json.success)
             throw new Error(json.message);
 
-        alert(json.message);
+        //alert(json.message);
+        showToast("success", json.message,);
 
         entryModal.hide();
         clearForm();

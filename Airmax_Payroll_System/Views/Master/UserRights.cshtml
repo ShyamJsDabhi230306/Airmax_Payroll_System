@@ -137,8 +137,22 @@
         </div>
 
         <!-- Empty State -->
-        <div id="noUserSelectedState" class="text-center py-5">
+        @* <div id="noUserSelectedState" class="text-center py-5">
             <h5 class="text-muted"><i class="fa fa-mouse-pointer me-2"></i>Please select a user to load permissions</h5>
+        </div> *@
+
+        <div id="noUserSelectedState" class="text-center py-5">
+            <div class="mb-3">
+                <i class="fa fa-user-circle text-primary" style="font-size: 48px;"></i>
+            </div>
+
+            <h5 class="text-muted fw-semibold">
+                No User Selected
+            </h5>
+
+            <p class="text-secondary mb-0">
+                Please select a user to load permissions
+            </p>
         </div>
     </div>
 </div>

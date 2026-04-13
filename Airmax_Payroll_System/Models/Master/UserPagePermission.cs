@@ -4,6 +4,7 @@
     {
         public int PageId { get; set; }
         public string PageName { get; set; } = string.Empty;
+        public string PageUrl { get; set; } = string.Empty;
         public bool CanView { get; set; }
         public bool CanCreate { get; set; }
         public bool CanEdit { get; set; }

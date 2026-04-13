@@ -51,11 +51,11 @@ async function bindTable() {
             <td class="text-center">
                 <div class="d-flex">
                     <a onclick="editEntry(${d.idEmployee})"
-                       class="btn btn-primary btn-xs sharp me-1">
+                       class="btn btn-primary btn-xs sharp me-1  btn-edit">
                        <i class="fa fa-pencil"></i>
                     </a>
                     <a onclick="deleteEntry(${d.idEmployee})"
-                       class="btn btn-danger btn-xs sharp">
+                       class="btn btn-danger btn-xs sharp btn-delete">
                        <i class="fa fa-trash"></i>
                     </a>
                 </div>

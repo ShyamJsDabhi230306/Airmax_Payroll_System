@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = "Employee Kharchi Entry";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <h4 class="card-title">Employee Kharchi Bulk Entry</h4>
+        <a href="/Transaction/EmployeeKharchiList" class="btn btn-light btn-sm">
+            <i class="fa fa-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+
+    <div class="card-body">
+        <form id="entryForm">
+            <input type="hidden" id="IDEmployeeKharchi" value="0" />
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Kharchi No</label>
+                    <input type="text" id="KharchiNo" class="form-control" readonly />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Kharchi Month</label>
+                    <input type="month" id="KharchiDate" class="form-control" />
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Department</label>
+                    <!-- ✅ Selecting this will now trigger the 'Bulk Load' -->
+                    <select id="IDDepartment" class="form-control" onchange="onDepartmentChange()">
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- 🔥 THE DYNAMIC TABLE -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-primary text-center">
+                        <tr>
+                            <th style="width:50px">#</th>
+                            <th>Emp Code</th>
+                            <th>Employee Name</th>
+                            <th style="width:250px">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblEmployeeBody">
+                        <!-- All employees for the department will appear here automatically -->
+                    </tbody>
+                    <!-- ✅ ADD THIS FOOTER -->
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="3" class="text-end">Monthly Total Expense:</th>
+                            <!-- ✅ This ID must match DOM.totalLabel() -->
+                            <th class="text-end text-primary">₹ <span id="lblTotalExpense">0.00</span></th>
+                        </tr>
+                    </tfoot>
+
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <div class="card-footer text-end">
+        <button type="button" class="btn btn-primary btn-lg px-5" id="btnSave">
+            <i class="fa fa-save me-1"></i> Save Kharchi
+        </button>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Transaction/employee_kharchi_entry.js" asp-append-version="true"></script>
+}
