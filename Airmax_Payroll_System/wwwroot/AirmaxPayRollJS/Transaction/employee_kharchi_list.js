@@ -32,11 +32,11 @@ async function bindTable() {
                 <td class="text-center">
                     <div class="d-flex justify-content-center">
                         <a href="/Transaction/EmployeeKharchiEntry?id=${d.idEmployeeKharchi}"
-                           class="btn btn-primary btn-xs sharp me-1">
+                           class="btn btn-primary btn-xs sharp me-1 btn-edit">
                            <i class="fa fa-pencil"></i>
                         </a>
                         <button onclick="deleteEntry(${d.idEmployeeKharchi})"
-                           class="btn btn-danger btn-xs sharp">
+                           class="btn btn-danger btn-xs sharp btn-delete">
                            <i class="fa fa-trash"></i>
                         </button>
                     </div>
@@ -50,8 +50,8 @@ async function bindTable() {
         responsive: true,
         language: {
             paginate: {
-                next: '<i class="fa fa-chevron-right"></i>',
-                previous: '<i class="fa fa-chevron-left"></i>'
+                next: '<i class="fa fa-angle-double-right"></i>',
+                previous: '<i class="fa fa-angle-double-left"></i>'
             }
         }
     });

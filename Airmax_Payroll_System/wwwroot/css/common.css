@@ -335,4 +335,92 @@ input[readonly] {
         /* Icons spacing */
         .dt-buttons .dt-button i {
             margin-right: 6px;
-        }
+    
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Path: wwwroot/css/common.css */
+
+/* GLOBAL RESET FOR ALL TABLES */
+/* We target the wrapper to ensure everything inside follows the same theme */
+
+.dataTables_wrapper table.dataTable,
+.table-responsive table.table {
+    border-collapse: collapse !important;
+    border: none !important;
+    margin-bottom: 0 !important;
+}
+
+    /* 1. COMPULSORY HEADER STYLE - Matches Company Master Screenshot */
+    .dataTables_wrapper table.dataTable thead th,
+    .table-responsive table.table thead th {
+        background-color: #ebf1f5 !important; /* Specific light grey/blue */
+        color: #334155 !important;
+        font-weight: 700 !important;
+        padding: 15px 12px !important;
+        border: none !important;
+        border-bottom: 2px solid #e2e8f0 !important; /* Subtle bottom line */
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    /* 2. COMPULSORY ROW STYLE */
+    .dataTables_wrapper table.dataTable tbody td,
+    .table-responsive table.table tbody td {
+        padding: 12px 15px !important;
+        font-size: 13px;
+        color: #64748b !important; /* Clean secondary text color */
+        border-bottom: 1px solid #f1f5f9 !important;
+        background-color: transparent !important; /* Removes unwanted striping colors */
+        vertical-align: middle;
+    }
+
+    /* 3. ROW HOVER EFFECT */
+    .dataTables_wrapper table.dataTable tbody tr:hover td {
+        background-color: #f8fafc !important; /* Very subtle hover */
+    }
+
+/* 4. CIRCULAR PAGINATION RESET */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 50% !important;
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    margin: 0 4px !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: #fff !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #00334e !important; /* Target dark circle color */
+        color: #fff !important;
+        border-color: #00334e !important;
+    }
+
+/* 5. SEARCH BOX ROUNDED */
+.dataTables_filter input {
+    border-radius: 50px !important; /* Pill shaped like the image */
+    background: #fff !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 6px 15px !important;
+}

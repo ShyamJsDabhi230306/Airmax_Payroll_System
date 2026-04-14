@@ -83,14 +83,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 timer: 1000,
                 showConfirmButton: false
             }).then(() => {
+                //const params = new URLSearchParams(window.location.search);
+                //const returnUrl = params.get("ReturnUrl");
+
+                //if (returnUrl) {
+                //    window.location.href = returnUrl;
+                //} else {
+                //    redirectByRole(loginData.user.role);
+                //}
                 const params = new URLSearchParams(window.location.search);
                 const returnUrl = params.get("ReturnUrl");
-
-                if (returnUrl) {
-                    window.location.href = returnUrl;
-                } else {
-                    redirectByRole(loginData.user.role);
-                }
+                // 🛡️ SYNC FIX: Wait 150ms for the browser to save the cookie properly
+                setTimeout(() => {
+                    if (returnUrl) {
+                        window.location.href = returnUrl;
+                    } else {
+                        redirectByRole(loginData.user.role);
+                    }
+                }, 150);
             });
 
         } catch (err) {

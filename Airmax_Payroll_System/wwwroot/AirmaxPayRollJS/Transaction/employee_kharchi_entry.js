@@ -27,31 +27,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// ✅ APPROACH 1: Smart Load (Detect Existing Entry)
-//async function checkAutoLoad() {
-//    const deptId = DOM.department().value;
-//    const month = DOM.kharchiDate().value;
-
-//    if (!deptId || !month || getIdFromUrl() > 0) return;
-
-//    // Fetch all to see if this Dept+Month already has a voucher
-//    const res = await apiFetch(`${API}/get-all`);
-//    const json = await res.json();
-//    const existing = (json.data || []).find(x =>
-//        x.idDepartment == deptId &&
-//        x.kharchiDate && x.kharchiDate.startsWith(month)
-//    );
-
-//    if (existing) {
-//        // Rediect to edit mode for the found ID
-//        window.location.href = `/Transaction/EmployeeKharchiEntry?id=${existing.idEmployeeKharchi}`;
-//    } else {
-//        // If truly new, just load the blank employee list for this department
-//        await fetchAllEmployeesByDept(deptId);
-//    }
-//}
-
-
 // ✅ APPROACH 1: Smart Search with Confirmation Card
 async function checkAutoLoad() {
     const deptId = DOM.department().value;
@@ -156,48 +131,6 @@ function renderTable() {
     `).join("");
     calculateTotal();
 }
-
-
-
-//async function saveData() {
-//    const id = parseInt(DOM.id().value) || 0;
-//    const dto = {
-//        IDEmployeeKharchi: id,
-//        KharchiNo: DOM.kharchiNo().value,
-//        KharchiDate: DOM.kharchiDate().value + "-01",
-//        Date: new Date().toISOString().split('T')[0],
-//        IDDepartment: parseInt(DOM.department().value),
-//        Details: employeeRows
-//            .filter(x => x.amount > 0 || x.remarks.length > 0)
-//            .map(x => ({
-//                IDEmployee: parseInt(x.idEmployee),
-//                Amount: parseFloat(x.amount || 0),
-//                EmployeeCode: x.empCode,
-//                Remarks: x.remarks,
-//                AllowForCalculate: true
-//            }))
-//    };
-
-//    if (!DOM.kharchiDate().value) return showToast("error", "Select Month");
-//    if (!dto.IDDepartment) return showToast("error", "Select Department");
-//    if (dto.Details.length === 0) return showToast("error", "Enter at least one amount");
-
-//    const btn = DOM.save();
-//    btn.disabled = true;
-//    try {
-//        const res = await apiFetch(`${API}/save`, { method: "POST", body: JSON.stringify(dto) });
-//        const json = await res.json();
-//        if (json.success) {
-//            showToast("success", "Kharchi Saved Successfully");
-//            window.location.href = "/Transaction/EmployeeKharchiList";
-//        } else {
-//            showToast("danger", json.message);
-//        }
-//    } catch (e) { showToast("danger", "Failed to connect to server"); }
-//    finally { btn.disabled = false; }
-//}
-
-
 
 async function saveData() {
     const id = parseInt(DOM.id().value) || 0;

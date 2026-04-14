@@ -2,21 +2,23 @@
 @inject UserRightsService _rightsService
 @{
     // 🛡️ SERVER-SIDE SECURITY GUARD (PERMANENT FIX)
-    var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    int userId = int.TryParse(userIdClaim, out var id) ? id : 0;
-    var userRole = (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "").ToLower();
-    bool isAdmin = userRole == "admin" || userRole == "administrator";
+   var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+int userId = int.TryParse(userIdClaim, out var id) ? id : 0;
+
+// 🛡️ IMPROVED ROLE DETECTION
+// We check both "role" and the standard ClaimTypes.Role to be 100% sure
+var userRole = (User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value 
+             ?? User.FindFirst("role")?.Value 
+             ?? "").ToLower().Trim();
+
+// 🛡️ Recognize "Admin", "Administrator", and "HOD" as super-users who see everything
+bool isAdmin = userRole.Contains("admin") || userRole.Contains("administrator") || userRole == "super";
+
 
     // Fetch permissions from the SP you provided (backend)
     var permissions = userId > 0 ? await _rightsService.GetPermissionsAsync(userId) : new List<Airmax_Payroll_System.Models.Master.UserPagePermission>();
 
-    // Helper to check if user has view right for a page name
-    // bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
-
-    // Current page permissions for the CSS Shield
-    // var currentPageTitle = ViewBag.Title as string ?? "";
-    // var currentRight = permissions.FirstOrDefault(p => p.PageName.Trim().Equals(currentPageTitle, StringComparison.OrdinalIgnoreCase));
-
+   
     // 🛡️ Helper to check rights by Page Name (used for Sidebar)
 bool HasRight(string pageName) => isAdmin || permissions.Any(p => p.PageName.Trim().Equals(pageName, StringComparison.OrdinalIgnoreCase) && p.CanView);
 
@@ -233,158 +235,13 @@ if (currentRight == null) {
                 </nav>
             </div>
         </div>
-        <!--**********************************
-            Header end ti-comment-alt
-        ***********************************-->
-        <!--**********************************
-            Sidebar start
-        ***********************************-->
-        @* <div class="ic-sidenav">
-            <div class="ic-sidenav-scroll">
-                <ul class="metismenu" id="menu">
+       
+        
 
-                    <li id="menuTdrHodDashboard">
-                        <a class="ai-icon" href="/Master/Index">
-                            <i class="flaticon-home"></i>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-
-                    <!-- MASTER (ADMIN ONLY) -->
-                    <li class="menu-title">Master</li>
-
-                    <li>
-                        <a class="ai-icon" href="/Master/Company">
-                            <i class="flaticon-business-and-trade"></i>
-                            <span class="nav-text">Company</span>
-                        </a>
-                    </li>
-
-                    <li>
-                    <a class="ai-icon" href="/Master/Location">
-                        <i class="flaticon-location"></i>
-                        <span class="nav-text">Location</span>
-                    </a>
-                </li>
-                    <li>
-                    <a class="ai-icon" href="/Master/Department">
-                            <i class="flaticon-grid"></i>
-                            <span class="nav-text">Department</span>
-                    </a>
-                </li>
-                    <li>
-                    <a class="ai-icon" href="/Master/Designation">
-                            <i class="flaticon-file"></i>
-                            <span class="nav-text">Designation</span>
-                    </a>
-                </li>
-                    <li>
-                        <a class="ai-icon" href="/Master/Shift">
-                            <i class="flaticon-send"></i>
-                            <span class="nav-text">Shift</span>
-                        </a>
-                    </li>
-
-
-                    <li>
-                        <a class="ai-icon" href="/Master/User">
-                            <i class="flaticon-user"></i>
-                            <span class="nav-text">User</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="ai-icon" href="/Master/Employee">
-                            <i class="flaticon-registration "></i>
-                            <span class="nav-text">Employee List</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="ai-icon" href="/Master/EmployeeEntry">
-                            <i class="flaticon-behance"></i>
-                            <span class="nav-text">Employee Entry</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="ai-icon" href="/Master/EmployeeGroup">
-                            <i class="flaticon-shopping-cart"></i>
-                            <span class="nav-text">EmployeeGroup</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="ai-icon" href="/Master/employeegroupbonusdetails">
-                            <i class="flaticon-app"></i>
-                            <span class="nav-text">EmpGroupBonus</span>
-                        </a>
-                    </li>
-
-                    <!-- MASTER (ADMIN ONLY) -->
-                    <li class="menu-title">Transaction</li>
-
-                    <li>
-                        <a class="ai-icon" href="/Transaction/TransactionEmployeeKharchi">
-                            <i class="flaticon-rocket"></i>
-                            <span class="nav-text">EmployeeKharchi</span>
-                        </a>
-                    </li>
-
-                </ul>
-
-            </div>
-        </div> *@
-
-
-        <!--********************************** Sidebar start ***********************************-->
-        <!--********************************** Sidebar start ***********************************-->
-        <!--********************************** Sidebar start ***********************************-->
+       
         <div class="ic-sidenav">
             <div class="ic-sidenav-scroll">
-                @* <ul class="metismenu" id="menu">
-
-                    <!-- DASHBOARD -->
-                    <li id="menuTdrHodDashboard">
-                        <a class="ai-icon" href="/Master/Index">
-                            <i class="flaticon-home"></i>
-                            <span class="nav-text">Dashboard</span>
-                        </a>
-                    </li>
-
-                    <!-- EXPANDABLE MASTER SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-project"></i>
-                            <span class="nav-text">Master</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="/Master/Company"><i class="flaticon-business-and-trade"></i> Company</a></li>
-                            <li><a href="/Master/Location"><i class="flaticon-location"></i> Location</a></li>
-                            <li><a href="/Master/Department"><i class="flaticon-grid"></i> Department</a></li>
-                            <li><a href="/Master/Designation"><i class="flaticon-file"></i> Designation</a></li>
-                            <li><a href="/Master/Shift"><i class="flaticon-send"></i> Shift</a></li>
-                            <li><a href="/Master/User"><i class="flaticon-user"></i> User List</a></li>
-                            <li><a href="/Master/UserRights"> <i class="flaticon-user">User Rights</i> </a></li>
-                            <li><a href="/Master/Employee"><i class="flaticon-registration"></i> Employee List</a></li>
-                            <li><a href="/Master/EmployeeEntry"><i class="flaticon-behance"></i> Employee Entry</a></li>
-                            <li><a href="/Master/EmployeeGroup"><i class="flaticon-shopping-cart"></i> Employee Group</a></li>
-                            <li><a href="/Master/employeegroupbonusdetails"><i class="flaticon-app"></i> Emp Group Bonus</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- EXPANDABLE TRANSACTION SECTION -->
-                    <li>
-                        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                            <i class="flaticon-notes"></i>
-                            <span class="nav-text">Transaction</span>
-                        </a>
-                        <ul aria-expanded="false">
-                            <li><a href="/Transaction/TransactionEmployeeKharchi"><i class="flaticon-rocket"></i> Employee Kharchi</a></li>
-                            <li><a href="/Transaction/TransactionEmployeeLoan"><i class="flaticon-rocket"></i> Employee Loan</a></li>
-
-                        </ul>
-                    </li>
-
-                </ul> *@
-
-
+               
                 <ul class="metismenu" id="menu">
 
                     <!-- DASHBOARD (Always Visible) -->
@@ -431,7 +288,7 @@ if (currentRight == null) {
                         </li>
                     }
                     <!-- TRANSACTION SECTION (SERVER-FILTERED) -->
-                    @if (HasRight("Employee Kharchi") || HasRight("Employee Loan"))
+                   @if (HasRight("Kharchi List") || HasRight("Emloyee Loan List"))
                     {
                         <li>
                             <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
@@ -439,7 +296,7 @@ if (currentRight == null) {
                                 <span class="nav-text">Transaction</span>
                             </a>
                             <ul aria-expanded="false">
-                               @if (HasRight("Employee Kharchi")) 
+                               @if (HasRight("Kharchi List")) 
                                 { 
                                     <!-- 📄 1. Link to the List <i class="fa fa-list me-2"></i> -->
                                     <li data-menu="Employee Kharchi">
@@ -454,7 +311,18 @@ if (currentRight == null) {
                                         </a>
                                     </li> 
                                 }
-                                @if (HasRight("Employee Loan")) { <li data-menu="Employee Loan"><a href="/Transaction/TransactionEmployeeLoan">Employee Loan</a></li> }
+                                @if (HasRight("Emloyee Loan List")) 
+                                { <li data-menu="Employee Loan">
+                                    <a href="/Transaction/EmployeeLoanList">
+                                        Employee Loan list
+                                    </a>
+                                  </li>
+                                   <li data-menu="Employee Loan">
+                                    <a href="/Transaction/EmployeeLoanEntry">
+                                        Employee Loan Entry
+                                    </a>
+                                  </li>
+                                }
                             </ul>
                         </li>
                     }

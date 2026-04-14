@@ -1,0 +1,94 @@
+﻿@* Path: Airmax_Payroll_System/Views/Transaction/EmployeeLoanEntry.cshtml *@
+@{
+    ViewBag.Title = "Employee Loan Details";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title">@ViewBag.Title</h4>
+                <a href="/Transaction/EmployeeLoanList" class="btn btn-dark btn-sm">
+                    <i class="fa fa-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+
+            <div class="card-body">
+                <form id="entryForm">
+                    <input type="hidden" id="IDEmployeeLoan" value="0" />
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Sr. No (Loan No)</label>
+                            <input type="text" id="LoanNo" class="form-control" readonly />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Date</label>
+                            <input type="date" id="Date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Department</label>
+                            <select id="IDDepartment" class="form-control" onchange="loadEmployees()"></select>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Select Employee</label>
+                            <select id="IDEmployee" class="form-control">
+                                <option value="">Select Employee</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Loan Amount</label>
+                            <input type="number" id="LoanAmount" class="form-control text-end" placeholder="Please Enter Loan Amount" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Total Installments</label>
+                            <input type="number" id="TotalInstallments" class="form-control" placeholder="Please Enter Total Installments" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Starting Date</label>
+                            <div class="input-group">
+                                <input type="date" id="InstallmentStartingDate" class="form-control" />
+                                <button type="button" onclick="generateInstallments()" class="btn btn-info">Add Months</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+                    <h6 class="mb-3">Monthly Installment Details</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-secondary text-center">
+                                <tr>
+                                    <th style="width:70px">Sr No</th>
+                                    <th style="width:100px">Month</th>
+                                    <th style="width:100px">Year</th>
+                                    <th>Installment Amount</th>
+                                    <th style="width:60px">#</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblLoanBody" class="text-center"></tbody>
+                            <tfoot>
+                                <tr class="table-light">
+                                    <th colspan="3" class="text-end fw-bold">Total Planned Amount:</th>
+                                    <th id="lblTotalAmount" class="text-end fw-bold px-3 text-primary">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-footer text-end">
+                <a href="/Transaction/EmployeeLoanList" class="btn btn-light">Cancel</a>
+                <button class="btn btn-primary px-5" id="btnSave" onclick="saveData()">Save / Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Transaction/employee_loan_entry.js" asp-append-version="true"></script>
+}

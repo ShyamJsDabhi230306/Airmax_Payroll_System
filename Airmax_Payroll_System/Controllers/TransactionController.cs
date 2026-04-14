@@ -22,8 +22,19 @@ namespace Airmax_Payroll_System.Controllers
         }
 
         //[Route("transaction/employee-loan")]
-        public IActionResult TransactionEmployeeLoan()
+        //public IActionResult TransactionEmployeeLoan()
+        //{
+        //    return View();
+        //}
+
+        public IActionResult EmployeeLoanList()
         {
+            // Standalone list page
+            return View();
+        }
+        public IActionResult EmployeeLoanEntry()
+        {
+            // Full-page bulk entry form
             return View();
         }
     }
