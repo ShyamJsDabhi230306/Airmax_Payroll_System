@@ -16,22 +16,22 @@ namespace Airmax_Payroll_System.Repositories
             _dapper = dapper;
         }
 
-        public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync()
+        //public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync()
+        //{
+        //    return await _dapper.QueryAsync<TransactionEmployeeKharchi>(
+        //        "usp_Transaction_EmployeeKharchi_SelectAll");
+        //}
+        // Update line 19:
+        public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync(int idDepartment)
         {
+            var param = new DynamicParameters();
+            param.Add("@IDDepartment", idDepartment);
             return await _dapper.QueryAsync<TransactionEmployeeKharchi>(
-                "usp_Transaction_EmployeeKharchi_SelectAll");
+                "usp_Transaction_EmployeeKharchi_SelectAll",
+                param);
         }
 
-        //public async Task<TransactionEmployeeKharchi?> GetByIdAsync(int id)
-        //{
-        //    var param = new DynamicParameters();
-        //    param.Add("@IDEmployeeKharchi", id);
 
-        //    return await _dapper.QueryFirstOrDefaultAsync<TransactionEmployeeKharchi>(
-        //        "usp_Transaction_EmployeeKharchi_SelectById",
-        //        param);
-        //}
-        // 🔥 UPDATED: Returns a DTO containing the Master record + the Details list
         // 1. First, update your GetByIdAsync to handle JSON string deserialization
         public async Task<TransactionEmployeeKharchiSaveDto?> GetByIdAsync(int id)
         {

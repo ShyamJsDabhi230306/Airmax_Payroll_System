@@ -146,23 +146,22 @@ async function apiFetch(url, options = {}) {
     };
 
     const response = await fetch(url, options);
-
-    // ── 401: Token expired or invalid → go to login ─────────
+    // 🛡️ GLOBAL SAFE OBJECT: Prevents "null.json()" crashes
+    const safeObject = {
+        ok: false,
+        status: response.status,
+        json: async () => ({ success: false, data: [] }), // Returns empty data so it doesn't crash
+        text: async () => ""
+    };
     if (response.status === 401) {
         clearAuthData();
         window.location.href = "/Account/Login";
-        return null;
+        return safeObject; // ✅ Changed from null to safeObject
     }
-
-    // ── 403: No permission → show overlay, stop ───────────
     if (response.status === 403) {
-        show403(
-            "Oh Dear! You do not have the right to perform this action.<br/>" +
-            "Please contact your administrator."
-        );
-        return null;
+        show403("You do not have the right to perform this action.");
+        return safeObject; // ✅ Changed from null to safeObject
     }
-
     return response;
 }
 

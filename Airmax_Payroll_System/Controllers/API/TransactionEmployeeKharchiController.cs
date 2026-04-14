@@ -22,7 +22,13 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
-            var data = await _service.GetAllAsync();
+            // 1. Get user role and department from token
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value?.ToLower() ?? "";
+            var deptIdStr = User.FindFirst("IDDepartment")?.Value ?? "0";
+            int.TryParse(deptIdStr, out int deptId);
+            // 2. If user is Admin, we show EVERYTHING (deptId = 0)
+            if (role.Contains("admin") || role.Contains("super")) { deptId = 0; }
+            var data = await _service.GetAllAsync(deptId);
             return Ok(new { success = true, data });
         }
 

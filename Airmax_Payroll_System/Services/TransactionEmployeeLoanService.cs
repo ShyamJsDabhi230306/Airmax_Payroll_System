@@ -9,7 +9,8 @@ namespace Airmax_Payroll_System.Services
     {
         private readonly TransactionEmployeeLoanRepo _repo;
         public TransactionEmployeeLoanService(TransactionEmployeeLoanRepo repo) { _repo = repo; }
-        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetAllAsync() => await _repo.GetAllAsync();
+        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetAllAsync(int idDepartment)
+    => await _repo.GetAllAsync(idDepartment);
         public async Task<TransactionEmployeeLoanSaveDto?> GetByIdAsync(int id) => await _repo.GetByIdAsync(id);
         public async Task<SaveResult> SaveAsync(TransactionEmployeeLoanSaveDto model) => await _repo.SaveAsync(model);
         public async Task<SaveResult> DeleteAsync(int id,string deleteBy) => await _repo.DeleteAsync(id, deleteBy);

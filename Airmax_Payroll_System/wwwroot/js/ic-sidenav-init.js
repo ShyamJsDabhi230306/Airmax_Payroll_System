@@ -21,22 +21,36 @@ function getUrlParams(dParam) {
 
 	var direction = getUrlParams('dir');
 
-	icSettingsOptions = {
-		//typography: "poppins",
-		typography: "Robot",
+	//icSettingsOptions = {
+	//	//typography: "poppins",
+	//	typography: "Robot",
+	//	version: "light",
+	//	layout: "vertical",
+	//	primary: "color_15",
+	//	headerBg: "color_15",
+	//	navheaderBg: "color_15",
+	//	sidebarBg: "color_15",
+	//	sidebarStyle: "overlay",
+	//	sidebarPosition: "fixed",
+	//	headerPosition: "fixed",
+	//	containerLayout: "wide",
+	//};
+
+
+	var icThemeSet4 = {
+		typography: "poppins",
 		version: "light",
 		layout: "vertical",
 		primary: "color_15",
 		headerBg: "color_15",
 		navheaderBg: "color_15",
 		sidebarBg: "color_15",
-		sidebarStyle: "overlay",
+		sidebarStyle: "modern",
 		sidebarPosition: "fixed",
 		headerPosition: "fixed",
 		containerLayout: "wide",
 	};
-
-	new icSettings(icSettingsOptions);
+	new icSettings(icThemeSet4);
 
 	jQuery(window).on('resize', function () {
 		/*Check container layout on resize */

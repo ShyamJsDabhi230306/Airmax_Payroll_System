@@ -16,11 +16,13 @@ namespace Airmax_Payroll_System.Repositories
             _dapper = dapper;
         }
 
-        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetAllAsync()
+        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetAllAsync(int idDepartment)
         {
-            // Returns the list of all loans
+            var param = new DynamicParameters();
+            param.Add("@IDDepartment", idDepartment);
             return await _dapper.QueryAsync<Transaction_EmployeeLoan>(
-                "usp_Transaction_EmployeeLoan_SelectAll");
+                "usp_Transaction_EmployeeLoan_SelectAll",
+                param);
         }
 
         public async Task<TransactionEmployeeLoanSaveDto?> GetByIdAsync(int id)
