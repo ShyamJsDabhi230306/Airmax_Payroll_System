@@ -48,6 +48,7 @@ builder.Services.AddScoped<IDapperHelper, DapperHelper>();
 // this is the Repo layer
 builder.Services.AddScoped<MasterCompanyRepo>();
 builder.Services.AddScoped<MasterLocationRepo>();
+builder.Services.AddScoped<MasterDivisionRepo>();
 builder.Services.AddScoped<MasterDepartmentRepo>();
 builder.Services.AddScoped<MasterDesignationRepo>();
 builder.Services.AddScoped<MasterShiftRepo>();
@@ -69,6 +70,7 @@ builder.Services.AddScoped<TransactionEmployeeLoanRepo>();
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
+builder.Services.AddScoped<MasterDivisionService>();
 builder.Services.AddScoped<MasterDepartmentService>();
 builder.Services.AddScoped<MasterDesignationService>();
 builder.Services.AddScoped<MasterShiftService>();

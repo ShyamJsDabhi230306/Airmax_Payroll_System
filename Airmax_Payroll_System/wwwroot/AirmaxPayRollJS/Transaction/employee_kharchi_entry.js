@@ -47,7 +47,7 @@ async function checkAutoLoad() {
     if (existing) {
         // 🔥 SHOW THE CARD IMMEDIATELY
         const result = await Swal.fire({
-            title: "Record Already Exists!",
+            title: "Voucher For This Month Already Exists!",
             text: `A voucher already exists for this department in ${month}. Would you like to edit it?`,
             icon: "warning",
             showCancelButton: true,
@@ -93,6 +93,9 @@ async function loadExistingData(id) {
         if (d.kharchiDate) DOM.kharchiDate().value = d.kharchiDate.split("T")[0].substring(0, 7);
         DOM.department().value = d.idDepartment;
 
+
+        DOM.kharchiDate().disabled = true;
+        DOM.department().disabled = true;
         // Load the merged data from SQL (Approach 1)
         employeeRows = (d.details || []).map(x => ({
             idEmployee: x.idEmployee,
@@ -109,8 +112,8 @@ async function loadExistingData(id) {
 function renderTable() {
     const tbody = document.getElementById("tblBody");
     tbody.innerHTML = employeeRows.map((row, index) => `
-        <tr class="${row.amount > 0 ? 'table-success light' : ''}">
-            <td class="text-center text-muted">${index + 1}</td>
+        <tr class="${row.amount > 0 ? 'bg-dark text-white fw-bold' : ''}">
+             <td class="text-center ${row.amount > 0 ? 'text-white' : 'text-muted'}">${index + 1}</td>
             <td class="text-center">${row.empCode}</td>
             <td>
                 ${row.empName} 

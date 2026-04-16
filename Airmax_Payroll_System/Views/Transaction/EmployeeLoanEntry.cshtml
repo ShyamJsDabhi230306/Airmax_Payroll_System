@@ -1,89 +1,109 @@
-﻿@* Path: Airmax_Payroll_System/Views/Transaction/EmployeeLoanEntry.cshtml *@
+@* Path: Airmax_Payroll_System/Views/Transaction/EmployeeLoanEntry.cshtml *@
 @{
     ViewBag.Title = "Employee Loan Details";
 }
 
+<input type="hidden" id="IDEmployeeLoan" value="0" />
+
 <div class="row">
-    <div class="col-12">
+    <!-- ====== CARD HEADER (Full Width) ====== -->
+    <div class="col-12 mb-3">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title">@ViewBag.Title</h4>
+                <h4 class="card-title mb-0">Employee Loan Details</h4>
                 <a href="/Transaction/EmployeeLoanList" class="btn btn-dark btn-sm">
                     <i class="fa fa-arrow-left me-1"></i> Back to List
                 </a>
             </div>
+        </div>
+    </div>
 
-            <div class="card-body">
-                <form id="entryForm">
-                    <input type="hidden" id="IDEmployeeLoan" value="0" />
-
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Sr. No (Loan No)</label>
-                            <input type="text" id="LoanNo" class="form-control" readonly />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Date</label>
-                            <input type="date" id="Date" class="form-control" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Department</label>
-                            <select id="IDDepartment" class="form-control" onchange="loadEmployees()"></select>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Select Employee</label>
-                            <select id="IDEmployee" class="form-control">
-                                <option value="">Select Employee</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Loan Amount</label>
-                            <input type="number" id="LoanAmount" class="form-control text-end" placeholder="Please Enter Loan Amount" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Total Installments</label>
-                            <input type="number" id="TotalInstallments" class="form-control" placeholder="Please Enter Total Installments" />
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Starting Date</label>
-                            <div class="input-group">
-                                <input type="date" id="InstallmentStartingDate" class="form-control" />
-                                <button type="button" onclick="generateInstallments()" class="btn btn-info">Add Months</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr />
-                    <h6 class="mb-3">Monthly Installment Details</h6>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-sm">
-                            <thead class="table-secondary text-center">
-                                <tr>
-                                    <th style="width:70px">Sr No</th>
-                                    <th style="width:100px">Month</th>
-                                    <th style="width:100px">Year</th>
-                                    <th>Installment Amount</th>
-                                    <th style="width:60px">#</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tblLoanBody" class="text-center"></tbody>
-                            <tfoot>
-                                <tr class="table-light">
-                                    <th colspan="3" class="text-end fw-bold">Total Planned Amount:</th>
-                                    <th id="lblTotalAmount" class="text-end fw-bold px-3 text-primary">0.00</th>
-                                    <th></th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </form>
+    <!-- ====== LEFT: Employee Loan Form (Vertical Fields) ====== -->
+    <div class="col-md-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa fa-user me-2"></i> Loan Information</h5>
             </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <label class="form-label fw-semibold">Sr. No (Loan No)</label>
+                    <input type="text" id="LoanNo" class="form-control" readonly />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Date</label>
+                    <input type="date" id="Date" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Department</label>
+                    <select id="IDDepartment" class="form-control" onchange="loadEmployees()"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Select Employee</label>
+                    <select id="IDEmployee" class="form-control">
+                        <option value="">Select Employee</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Loan Amount</label>
+                    <input type="number" id="LoanAmount" class="form-control text-end" placeholder="Enter Loan Amount" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Total Installments</label>
+                    <input type="number" id="TotalInstallments" class="form-control" placeholder="Enter Total Installments" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Installment Starting Date</label>
+                    <div class="input-group">
+                        <input type="date" id="InstallmentStartingDate" class="form-control" />
+                        <button type="button" onclick="generateInstallments()" class="btn btn-info">Add Months</button>
+                    </div>
+                </div>
+            </div>
+            @* <div class="card-footer text-end">
+                <a href="/Transaction/EmployeeLoanList" class="btn btn-light me-2">Cancel</a>
+                <button class="btn btn-primary px-4" id="btnSave" onclick="saveData()">
+                    <i class="fa fa-save me-1"></i> Save / Update
+                </button>
+            </div> *@
+        </div>
+    </div>
 
+    <!-- ====== RIGHT: Monthly Installment Details ====== -->
+    <div class="col-md-7">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa fa-list me-2"></i> Monthly Installment Details</h5>
+            </div>
+            <div class="card-body p-0" style="max-height: 520px; overflow-y: auto;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm mb-0">
+                        <thead class="table-secondary text-center">
+                            <tr>
+                                <th style="width:60px">Sr No</th>
+                                <th style="width:90px">Month</th>
+                                <th style="width:90px">Year</th>
+                                <th>Installment Amount</th>
+                                <th style="width:55px">#</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblLoanBody" class="text-center"></tbody>
+                        <tfoot>
+                            <tr class="table-light">
+                                <th colspan="3" class="text-end fw-bold">Total Planned Amount:</th>
+                                <th id="lblTotalAmount" class="text-end fw-bold px-3 text-primary">0.00</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                  
+                </div>
+            </div>
             <div class="card-footer text-end">
-                <a href="/Transaction/EmployeeLoanList" class="btn btn-light">Cancel</a>
-                <button class="btn btn-primary px-5" id="btnSave" onclick="saveData()">Save / Update</button>
+                <a href="/Transaction/EmployeeLoanList" class="btn btn-light me-2">Cancel</a>
+                <button class="btn btn-primary px-4" id="btnSave" onclick="saveData()">
+                    <i class="fa fa-save me-1"></i> Save / Update
+                </button>
             </div>
         </div>
     </div>
