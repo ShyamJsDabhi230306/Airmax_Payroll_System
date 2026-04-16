@@ -20,21 +20,11 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
-            int compId = User.GetIDCompany();
-            int locId = User.GetIDLocation();
-            int divId = User.GetIDDepartment(); // Using common helper for ID filter
-
-            if (!User.IsAdmin())
-            {
-                var filteredData = await _service.GetAllAsync(compId, locId, divId);
-                return Ok(ApiResponse<IEnumerable<MasterDivision>>.SuccessResponse("Divisions loaded safely", filteredData));
-            }
-            else
-            {
-                var allData = await _service.GetAllAsync(0, 0, 0);
-                return Ok(ApiResponse<IEnumerable<MasterDivision>>.SuccessResponse("All Divisions loaded (Admin view)", allData));
-            }
+            // Simplified: No longer checking for IDs or Admin status for filtering
+            var data = await _service.GetAllAsync();
+            return Ok(ApiResponse<IEnumerable<MasterDivision>>.SuccessResponse("Divisions loaded successfully", data));
         }
+
 
         [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetById(int id)
