@@ -16,5 +16,8 @@ namespace Airmax_Payroll_System.Helpers
         // 🛂 Check if the current user is an Admin
         public static bool IsAdmin(this ClaimsPrincipal user) =>
             (user.FindFirstValue(ClaimTypes.Role) ?? "").Equals("Admin", StringComparison.OrdinalIgnoreCase);
+
+        public static int GetIDDivision(this ClaimsPrincipal user) =>
+    int.Parse(user.FindFirst("IDDivision")?.Value ?? "0");
     }
 }

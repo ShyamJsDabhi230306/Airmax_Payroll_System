@@ -4,6 +4,7 @@ using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction;
 using Dapper;
 using Newtonsoft.Json;
+using System.Data;
 
 namespace Airmax_Payroll_System.Repositories
 {
@@ -69,15 +70,15 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@IDEmployeeKharchi", model.IDEmployeeKharchi);
             param.Add("@KharchiNo", model.KharchiNo);
             param.Add("@KharchiDate", model.KharchiDate);
-            param.Add("@Date", model.Date);
-            param.Add("@IDDepartment", model.IDDepartment);
+            param.Add("@Date", DateTime.Now); // Use current system date for Entry Date
+            param.Add("@IDDivision", model.IDDivision);
             param.Add("@UserFullName", model.E_By);
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
-
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Transaction_EmployeeKharchi_Save",
                 param);
         }
+
 
         public async Task<SaveResult> DeleteAsync(int id,string deleteBy)
         {
@@ -99,6 +100,31 @@ namespace Airmax_Payroll_System.Repositories
             // Returns the number padded to 3 digits (e.g., 001, 002)
             return nextId.ToString("D3");
         }
+
+
+
+        // 1. Get Divisions with employee counts
+        public async Task<IEnumerable<dynamic>> GetDivisionsWithCountAsync(int idDivision)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDDivision", idDivision);
+
+            return await _dapper.QueryAsync<dynamic>(
+                "usp_Transaction_Kharchi_GetDivisionsWithCount",
+                param);
+        }
+
+        // 2. Load all employees for a specific division
+        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDDivision", idDivision);
+
+            return await _dapper.QueryAsync<dynamic>(
+                "usp_Transaction_EmployeeKharchi_LoadEmployees",
+                param);
+        }
+
 
 
     }

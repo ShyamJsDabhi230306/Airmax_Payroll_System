@@ -17,6 +17,8 @@ const DOM = {
 
     company: () => document.getElementById("IDCompany"),
     location: () => document.getElementById("IDLocation"),
+    // this is new add division 
+    division: () => document.getElementById("IDDivision"),
     department: () => document.getElementById("IDDepartment"),
     shift: () => document.getElementById("IDShift"),
     designation: () => document.getElementById("IDDesignation"),
@@ -41,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ✅ LOAD DROPDOWNS (same as your old JS)
     await loadCompany();
+    await loadDepartment();
     await loadShift();
     await loadDesignation();
     await loadGroup();
@@ -54,7 +57,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const id = DOM.company().value;
 
         DOM.location().innerHTML = `<option value="">Select Location</option>`;
-        DOM.department().innerHTML = `<option value="">Select Department</option>`;
+        DOM.division().innerHTML = `<option value="">Select division</option>`;
 
         loadLocation(id);
     });
@@ -63,10 +66,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const id = DOM.location().value;
 
-        DOM.department().innerHTML = `<option value="">Select Department</option>`;
-
-        loadDepartment(id);
-    });
+        DOM.division().innerHTML = `<option value="">Select Division</option>`;
+        loadDivision(id);
+      
+    });  
 
     // ==================================================
     // EDIT MODE
@@ -116,9 +119,13 @@ async function editEntry(id) {
     await loadLocation(d.idCompany);
     $('#IDLocation').val(String(d.idLocation || "")).selectpicker('refresh');
 
-    await loadDepartment(d.idLocation);
+
+    await loadDivision(d.idLocation); // Load divisions based on location
+    $('#IDDivision').val(String(d.idDivision || "")).selectpicker('refresh');
+
+    
     $('#IDDepartment').val(String(d.idDepartment || "")).selectpicker('refresh');
-    await loadGroup();
+   // await loadGroup();
     // 🔥 INDEPENDENT
     $('#IDShift').val(String(d.idShift || "")).selectpicker('refresh');
     $('#IDDesignation').val(String(d.idDesignation || "")).selectpicker('refresh');
@@ -196,23 +203,35 @@ async function loadLocation(companyId) {
     $(DOM.location()).selectpicker('refresh');
 }
 
-async function loadDepartment(locationId) {
 
+
+async function loadDivision(locationId) {
+    const res = await apiFetch("/api/master/division/get-all");
+    const json = await safeJson(res);
+    if (!json || !json.success) return;
+    // Filter divisions by the selected Location
+    const filtered = json.data.filter(d => d.idLocation == locationId);
+    document.getElementById("IDDivision").innerHTML =
+        `<option value="">Select Division</option>` +
+        filtered.map(d =>
+            `<option value="${d.idDivision}">${d.divisionName}</option>`
+        ).join("");
+    $("#IDDivision").selectpicker('refresh');
+}
+
+async function loadDepartment() { // 1. Remove the parameter
     const res = await apiFetch("/api/master/department/get-all");
     const json = await safeJson(res);
-
     if (!json || !json.success) return;
-
-    const filtered = json.data.filter(d => d.idLocation == locationId);
-
+    // 2. Remove the filter line completely
     DOM.department().innerHTML =
         `<option value="">Select Department</option>` +
-        filtered.map(d =>
+        json.data.map(d => // 3. Use 'json.data' directly
             `<option value="${d.idDepartment}">${d.departmentName}</option>`
         ).join("");
-
     $(DOM.department()).selectpicker('refresh');
 }
+
 
 async function loadShift() {
 
@@ -314,6 +333,7 @@ async function saveData() {
         // 🔹 DROPDOWNS
         idCompany: DOM.company().value ? Number(DOM.company().value) : null,
         idLocation: DOM.location().value ? Number(DOM.location().value) : null,
+        idDivision: DOM.division().value ? Number(DOM.division().value) : null, 
         idDepartment: DOM.department().value ? Number(DOM.department().value) : null,
         idShift: DOM.shift().value ? Number(DOM.shift().value) : null,
         idDesignation: DOM.designation().value ? Number(DOM.designation().value) : null,

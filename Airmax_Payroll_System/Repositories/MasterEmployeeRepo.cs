@@ -84,6 +84,7 @@ namespace Airmax_Payroll_System.Repositories
                 param.Add("@EmployeeCode", emp.EmployeeCode);
                 param.Add("@IDCompany", emp.IDCompany);
                 param.Add("@IDLocation", emp.IDLocation);
+                param.Add("@IDDivision", emp.IDDivision);
                 param.Add("@IDDepartment", emp.IDDepartment);
                 param.Add("@IDEmployeeGroup", emp.IDEmployeeGroup);
                 param.Add("@IDShift", emp.IDShift);

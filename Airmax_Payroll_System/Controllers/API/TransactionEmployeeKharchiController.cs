@@ -1,4 +1,5 @@
-﻿using Airmax_Payroll_System.Models.AllDTOS;
+﻿using Airmax_Payroll_System.Helpers;
+using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Models.Transaction;
 using Airmax_Payroll_System.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -80,8 +81,20 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
 
-
-       
+        [HttpGet("get-divisions-with-count")]
+        public async Task<IActionResult> GetDivisionsWithCount()
+        {
+            // If Admin, pass 0 to see all divisions. Otherwise pass user's Division ID.
+            int divId = User.IsAdmin() ? 0 : User.GetIDDivision();
+            var data = await _service.GetDivisionsWithCountAsync(divId);
+            return Ok(new { success = true, data });
+        }
+        [HttpGet("load-employees/{divId:int}")]
+        public async Task<IActionResult> LoadEmployees(int divId)
+        {
+            var data = await _service.LoadEmployeesForKharchiAsync(divId);
+            return Ok(new { success = true, data });
+        }
 
     }
 }

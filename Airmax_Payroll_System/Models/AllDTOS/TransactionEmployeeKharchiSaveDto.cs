@@ -14,7 +14,7 @@ namespace Airmax_Payroll_System.Models.AllDTOS
             public DateTime? Date { get; set; } // Entry date
 
             public int IDDepartment { get; set; }
-
+            public int IDDivision { get; set; }
             public List<TransactionEmployeeKharchiDetailDto>? Details { get; set; }
         }
     

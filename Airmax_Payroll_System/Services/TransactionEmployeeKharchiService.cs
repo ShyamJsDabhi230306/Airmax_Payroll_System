@@ -35,5 +35,18 @@ namespace Airmax_Payroll_System.Services
         public async Task<string> GenerateKharchiNoAsync()
             => await _repo.GenerateKharchiNoAsync();
 
+
+        // Add these methods to your Service class
+        public async Task<IEnumerable<dynamic>> GetDivisionsWithCountAsync(int idDivision)
+        {
+            return await _repo.GetDivisionsWithCountAsync(idDivision);
+        }
+
+        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision)
+        {
+            return await _repo.LoadEmployeesForKharchiAsync(idDivision);
+        }
+
+
     }
 }

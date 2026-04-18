@@ -54,7 +54,8 @@ namespace Airmax_Payroll_System.Models.Master
         public string? CompanyName { get; set; }
         public int? IDLocation { get; set; }
         public string? LocationName { get; set; }
-
+        public int? IDDivision { get; set; }
+        public string? DivisionName { get; set; }
         public string? UserName { get; set; }
         public string? Password { get; set; }
 

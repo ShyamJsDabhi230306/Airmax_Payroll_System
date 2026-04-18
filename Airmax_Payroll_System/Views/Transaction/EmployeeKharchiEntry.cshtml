@@ -1,60 +1,107 @@
 ﻿@{
-    ViewBag.Title = "Employee Kharchi Bulk Entry";
+    ViewBag.Title = "Division Kharchi Entry";
 }
 
-<input type="hidden" id="txtID" value="0" />
-
-<div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <h4 class="card-title">@ViewBag.Title</h4>
-        <a href="/Transaction/EmployeeKharchiList" class="btn btn-dark btn-sm">
-            <i class="fa fa-arrow-left me-1"></i> Back to List
-        </a>
+<div class="card shadow-sm">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 text-primary fw-bold">Division Kharchi Entry</h5>
+            <p class="text-muted small mb-0">Apply bulk kharchi/allowance division-wise</p>
+        </div>
+        <a href="/Transaction/EmployeeKharchiList" class="btn btn-outline-secondary btn-sm">View History</a>
     </div>
+
     <div class="card-body">
-        <div class="row mb-4">
-            <div class="col-md-2">
-                <label class="form-label">Voucher No</label>
-                <input type="text" id="txtKharchiNo" class="form-control" readonly />
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Kharchi Month</label>
-                <input type="month" id="txtKharchiDate" class="form-control" onchange="checkAutoLoad()" />
-            </div>
-            <div class="col-md-4">
-                <label class="form-label">Department</label>
-                <select id="ddlDepartment" class="form-control select2" onchange="checkAutoLoad()"></select>
+        <!-- Step 1: Selection Section (Premium Design) -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px; overflow: hidden;">
+            <div class="card-body bg-light p-4">
+                <div class="row g-4 align-items-end">
+                    <!-- Voucher Number -->
+                    <div class="col-md-2">
+                        <label class="form-label small fw-bold text-secondary mb-2 text-uppercase tracking-wider">
+                            <i class="fas fa-file-invoice me-1 opacity-75"></i> Voucher No
+                        </label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="txtKharchiNo"
+                                   class="form-control form-control-sm bg-white border-0 shadow-none fw-bold text-primary"
+                                   readonly placeholder="Auto-Generated"
+                                   style="border-bottom: 2px solid #e9ecef !important; font-size: 0.95rem;" />
+                        </div>
+                    </div>
+
+                    <!-- Month & Year -->
+                    <div class="col-md-3">
+                        <label class="form-label small fw-bold text-secondary mb-2 text-uppercase tracking-wider">
+                            <i class="fas fa-calendar-alt me-1 opacity-75"></i> Month & Year
+                        </label>
+                        <input type="month" id="txtKharchiDate"
+                               class="form-control form-control-sm border-0 shadow-sm px-3"
+                               style="height: 38px; border-radius: 8px; font-weight: 500;" />
+                    </div>
+
+                    <!-- Division Selection -->
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold text-secondary mb-2 text-uppercase tracking-wider">
+                            <i class="fas fa-building me-1 opacity-75"></i> Select Division
+                        </label>
+                        <select id="ddlDivision" class="form-select form-select-sm border-0 shadow-sm px-3"
+                                style="height: 38px; border-radius: 8px; font-weight: 500; cursor: pointer;">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-sm w-100 fw-bold shadow-sm d-flex align-items-center justify-content-center"
+                                onclick="btnLoadEmployees()"
+                                style="height: 38px; border-radius: 8px; transition: all 0.3s ease; letter-spacing: 0.5px;">
+                            <i class="fas fa-sync-alt me-2"></i> LOAD EMPLOYEES
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead class="bg-primary text-white">
-                    <tr>
-                        <th style="width:50px">#</th>
-                        <th>Emp Code</th>
-                        <th>Employee Name</th>
-                        <th style="width:180px">Amount (₹)</th>
-                        <th style="display:flex;justify-content:start;">Remarks </th>
+
+        <!-- Bulk Apply Bar -->
+        <div id="bulkApplyBar" class="alert alert-primary py-2 px-3 mb-3 align-items-center justify-content-center gap-3" style="display:none !important;">
+            <span class="small fw-bold">Bulk Apply Amount:</span>
+            <div class="input-group input-group-sm" style="width:140px">
+                <span class="input-group-text bg-white">₹</span>
+                <input type="number" id="txtBulkAmount" class="form-control" placeholder="0" />
+            </div>
+            <button type="button" class="btn btn-primary btn-sm px-3" onclick="applyAmountToAll()">Apply to All</button>
+        </div>
+
+        <!-- Employee Table -->
+        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-sm table-hover border">
+                <thead class="bg-light sticky-top">
+                    <tr class="small fw-bold text-muted">
+                        <th>#</th>
+                        <th>EMPLOYEE</th>
+                        <th>DEPARTMENT</th>
+                        <th>DESIGNATION</th>
+                        <th>SHIFT</th>
+                        <th style="width:140px">AMOUNT (₹)</th>
+                        <th>REMARK</th>
                     </tr>
                 </thead>
                 <tbody id="tblBody">
-                    <tr><td colspan="5" class="text-center">Select a department to load employees</td></tr>
+                    <tr><td colspan="7" class="text-center py-5 text-muted">Select Division and click Load</td></tr>
                 </tbody>
-                <tfoot>
-                    <tr class="table-light fs-16">
-                        <td colspan="3" class="text-end">Monthly Total Expense:</td>
-                        <td id="lblTotalAmount" class="text-end">₹ 0.00</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
             </table>
         </div>
+    </div>
 
-        <div class="text-end mt-4">
-            <button type="button" id="btnSave" onclick="saveData()" class="btn btn-success px-5">
-                <i class="fa fa-save me-1"></i> Save Kharchi
-            </button>
+    <div class="card-footer bg-light p-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex gap-4">
+                <div><small class="text-muted d-block">TOTAL EMPLOYEES</small><h6 id="lblCount" class="mb-0">0</h6></div>
+                <div><small class="text-muted d-block text-primary">SELECTED</small><h6 id="lblSelected" class="mb-0 text-primary">0</h6></div>
+                <div><small class="text-muted d-block text-success">TOTAL AMOUNT</small><h6 id="lblTotal" class="mb-0 text-success">₹ 0.00</h6></div>
+            </div>
+            <button type="button" class="btn btn-success px-5 fw-bold" onclick="saveData()">SAVE KHARCHI</button>
         </div>
     </div>
 </div>
