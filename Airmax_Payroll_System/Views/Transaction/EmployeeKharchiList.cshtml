@@ -1,30 +1,45 @@
 ﻿@{
-    ViewBag.Title = "Employee Kharchi Master List";
+    ViewBag.Title = "Division Kharchi History";
 }
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <h4 class="card-title">@ViewBag.Title</h4>
-        <a href="/Transaction/EmployeeKharchiEntry" class="btn btn-primary btn-sm btn-add">
-            <i class="fa fa-plus-circle me-1"></i> Add New Kharchi
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 text-primary fw-bold">Division Kharchi History</h5>
+        </div>
+        <a href="/Transaction/EmployeeKharchiEntry" class="btn btn-primary btn-sm px-4 fw-bold">
+            <i class="fas fa-plus-circle me-1"></i> ADD NEW
         </a>
     </div>
+
     <div class="card-body">
+        <div class="row g-3 mb-4 bg-light p-3 rounded mx-0">
+            <div class="col-md-4">
+                <label class="form-label small fw-bold text-muted text-uppercase">Division Filter</label>
+                <select id="ddlDivisionFilter" class="form-select border-0" onchange="loadHistory()"></select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-secondary btn-sm" style="margin-top:28px" onclick="loadHistory()">
+                    REFRESH LIST
+                </button>
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table id="kharchiList" class="table table-hover w-100">
-                <thead class="table-primary">
-                    <tr>
-                        <th class="text-center">#</th>
-                        <th class="text-center">Code</th>
-                        <th>Employee Name</th>
-                        <th>Department</th>
-                        <th class="text-center">Month</th>
-                        <th class="text-end">Amount (₹)</th>
-                        <th style="width:200px">Remarks</th>
-                        <th class="text-center">Action</th>
+            <table class="table table-hover align-middle">
+                <thead class="bg-light">
+                    <tr class="small text-muted text-uppercase">
+                        <th width="40" class="text-center">EXP</th>
+                        <th>Voucher No</th>
+                        <th>Departments</th>
+                        <th class="text-center">Total Employees</th>
+                        <th class="text-end">Total Amount</th>
+                        <th class="text-end pe-4">Month / Year</th>
                     </tr>
                 </thead>
-                <tbody id="tblBody"></tbody>
+                <tbody id="tblBody">
+                    <!-- History rows will be injected here -->
+                </tbody>
             </table>
         </div>
     </div>

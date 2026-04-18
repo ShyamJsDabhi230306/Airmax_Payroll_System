@@ -15,8 +15,13 @@ namespace Airmax_Payroll_System.Services
         }
 
 
-        public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync(int idDepartment)
-    => await _repo.GetAllAsync(idDepartment);
+        // Updated to support Division, Month, and Year filtering
+        public async Task<IEnumerable<dynamic>> GetAllAsync(int idDivision, int month = 0, int year = 0)
+        {
+            // Simply passes the parameters to the specialized repository method
+            return await _repo.GetAllAsync(idDivision, month, year);
+        }
+
         //public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync()
         //    => await _repo.GetAllAsync();
 
@@ -48,5 +53,14 @@ namespace Airmax_Payroll_System.Services
         }
 
 
+       
+        // 2. NEW: Method to get departments for the expandable list
+        public async Task<IEnumerable<dynamic>> GetDepartmentsWithCountAsync(int idDivision)
+        {
+            return await _repo.GetDepartmentsWithCountAsync(idDivision);
+        }
+
+        public async Task<TransactionEmployeeKharchiSaveDto?> GetPrintDataAsync(int id)
+    => await _repo.GetPrintDataAsync(id);
     }
 }

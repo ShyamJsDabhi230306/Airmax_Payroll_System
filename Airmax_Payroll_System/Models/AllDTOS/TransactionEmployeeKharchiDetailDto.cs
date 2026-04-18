@@ -7,7 +7,7 @@
         public string? EmployeeName { get; set; }
 
         public int IDEmployee { get; set; }
-
+        public string? DepartmentName { get; set; }
         public decimal? Amount { get; set; }
         public string? EmployeeCode { get; set; }
         public string? Remarks { get; set; }

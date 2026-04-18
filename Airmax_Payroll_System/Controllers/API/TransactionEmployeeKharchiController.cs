@@ -21,17 +21,21 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
         [HttpGet("get-all")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int idDivision = 0, int month = 0, int year = 0)
         {
-            // 1. Get user role and department from token
-            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value?.ToLower() ?? "";
-            var deptIdStr = User.FindFirst("IDDepartment")?.Value ?? "0";
-            int.TryParse(deptIdStr, out int deptId);
-            // 2. If user is Admin, we show EVERYTHING (deptId = 0)
-            if (role.Contains("admin") || role.Contains("super")) { deptId = 0; }
-            var data = await _service.GetAllAsync(deptId);
+            // 1. Get user status
+            bool isAdmin = User.IsAdmin();
+
+            // 2. Security: If user is Admin, they can filter by any Division. 
+            // If not, we FORCE the filter to be their own Division.
+            int filterDivId = isAdmin ? idDivision : User.GetIDDivision();
+
+            // 3. Fetch summary data (Division-wise) using the new SP
+            var data = await _service.GetAllAsync(filterDivId, month, year);
+
             return Ok(new { success = true, data });
         }
+
 
         [HttpGet("get-by-id/{id:int}")]
         public async Task<IActionResult> GetById(int id)
@@ -96,5 +100,17 @@ namespace Airmax_Payroll_System.Controllers.API
             return Ok(new { success = true, data });
         }
 
+
+        [HttpGet("get-departments/{divId:int}")]
+        public async Task<IActionResult> GetDepartmentsByDivision(int divId)
+        {
+            // If divId is 0, we fetch based on user's authorized division
+            int targetDivId = divId == 0 ? (User.IsAdmin() ? 0 : User.GetIDDivision()) : divId;
+
+            var data = await _service.GetDepartmentsWithCountAsync(targetDivId);
+            return Ok(new { success = true, data });
+        }
+
+        
     }
 }
