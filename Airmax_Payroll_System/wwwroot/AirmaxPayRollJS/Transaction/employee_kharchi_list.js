@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 📜 HISTORY LIST - (Single Expandable View like Entry Form)
  */
 const API = "/api/transaction/kharchi";
@@ -36,15 +36,25 @@ async function loadHistory() {
                     <i class="fas ${isExp ? 'fa-minus-circle text-danger' : 'fa-plus-circle text-primary'}" style="cursor:pointer"></i>
                 </td>
                 <td class="fw-bold">${v.kharchiNo || v.KharchiNo}</td>
-                <td><span class="badge bg-soft-primary text-primary">${v.totalDepartments || v.TotalDepartments} Depts</span></td>
+                <td>
+                    <div class="d-flex flex-column align-items-start">
+                        <span class="badge bg-soft-primary text-primary mb-1">${v.totalDepartments || v.TotalDepartments} Department</span>
+                        <small class="text-muted text-wrap" style="max-width: 15vw; font-size: 0.75rem;">${v.departmentNames || v.DepartmentNames || ''}</small>
+                    </div>
+                </td>
                 <td class="text-center">${v.totalEmployees || v.TotalEmployees} Employees</td>
                 <td class="text-end fw-bold text-success pe-4">₹ ${(v.totalAmount || v.TotalAmount).toLocaleString('en-IN')}</td>
                 <td class="text-end pe-4 text-muted">
                     ${new Date(v.kharchiDate || v.KharchiDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
                 </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-info border-0" onclick="printVoucher(${id})" title="Print Report">
+                        <i class="fas fa-print"></i>
+                    </button>
+                </td>
             </tr>
             <tr id="exp-${id}" class="${isExp ? '' : 'd-none'}">
-                <td colspan="6" class="p-0 border-0 bg-white">
+                <td colspan="7" class="p-0 border-0 bg-white">
                     <div id="container-${id}">
                         ${isExp && voucherDetails[id] ? '' : '<div class="p-4 text-center"><i class="fas fa-spinner fa-spin me-2"></i> Loading details...</div>'}
                     </div>
@@ -94,7 +104,24 @@ function renderVoucherDetails(vId) {
     if (!depts) return;
     const cont = document.getElementById(`container-${vId}`);
 
-    cont.innerHTML = depts.map(d => {
+    cont.innerHTML = `
+        <div class="bg-light border-bottom p-2 px-4 d-flex justify-content-between align-items-center shadow-sm">
+            <div class="small text-muted">
+                <i class="fas fa-info-circle me-1"></i> Actions for Voucher <b>${vId}</b>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary btn-sm px-3 fw-bold" onclick="editVoucher(${vId})">
+                    <i class="fas fa-edit me-1"></i> EDIT
+                </button>
+                <button class="btn btn-outline-danger btn-sm px-3 fw-bold" onclick="deleteVoucher(${vId})">
+                    <i class="fas fa-trash-alt me-1"></i> DELETE
+                </button>
+                <button class="btn btn-info btn-sm px-3 fw-bold text-white" onclick="printVoucher(${vId})">
+                    <i class="fas fa-print me-1"></i> PRINT
+                </button>
+            </div>
+        </div>
+    ` + depts.map(d => {
         return `
         <div class="bg-white border-bottom border-secondary border-1">
             <!-- DEPARTMENT HEADER ROW -->
@@ -122,7 +149,7 @@ function renderVoucherDetails(vId) {
                             <td class="text-center text-muted small">${j + 1}</td>
                             <td><span class="fw-bold">${emp.employeeName}</span></td>
                             <td class="text-muted">${emp.employeeCode}</td>
-                            <td><small>${emp.DesignationName || '-'}</small></td>
+                            <td><small>${emp.designationName || '-'}</small></td>
                             <td class="text-end fw-bold">₹ ${emp.amount.toLocaleString('en-IN')}</td>
                             <td><span class="text-muted small">${emp.remarks || ''}</span></td>
                         </tr>`).join("")}
@@ -131,4 +158,38 @@ function renderVoucherDetails(vId) {
             </div>
         </div>`;
     }).join("");
+}
+
+/**
+ * 🛠️ ACTION FUNCTIONS
+ */
+function editVoucher(id) {
+    window.location.href = `/Transaction/EmployeeKharchiEntry?id=${id}`;
+}
+
+async function deleteVoucher(id) {
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (result.isConfirmed) {
+        const res = await apiFetch(`${API}/delete/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+            Swal.fire('Deleted!', 'Voucher has been deleted.', 'success');
+            loadHistory();
+        } else {
+            Swal.fire('Error!', json.message || 'Could not delete.', 'error');
+        }
+    }
+}
+
+function printVoucher(id) {
+    window.open(`/Transaction/KharchiPrintReport?id=${id}`, '_blank');
 }

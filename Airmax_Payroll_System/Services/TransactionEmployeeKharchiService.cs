@@ -53,14 +53,18 @@ namespace Airmax_Payroll_System.Services
         }
 
 
-       
+
         // 2. NEW: Method to get departments for the expandable list
-        public async Task<IEnumerable<dynamic>> GetDepartmentsWithCountAsync(int idDivision)
+        public async Task<IEnumerable<dynamic>> GetDepartmentsWithCountAsync(int idDivision, int month, int year)
         {
-            return await _repo.GetDepartmentsWithCountAsync(idDivision);
+            return await _repo.GetDepartmentsWithCountAsync(idDivision, month, year);
         }
 
-        public async Task<TransactionEmployeeKharchiSaveDto?> GetPrintDataAsync(int id)
-    => await _repo.GetPrintDataAsync(id);
+        public async Task<IEnumerable<KharchiPrintReportDto>> GetPrintReportAsync(int month, int year, string divIdList)
+        {
+            // 🔥 Change the parameter from 'int' to 'string' here
+            return await _repo.GetPrintReportAsync(month, year, divIdList);
+        }
+
     }
 }

@@ -27,6 +27,8 @@ namespace Airmax_Payroll_System.Models.Transaction
         public decimal? TotalAmount { get; set; }
         public int? TotalEmployees { get; set; }
 
+        public int? IDDesination { get; set; }
+        public string? Desination { get; set; }
         // ✅ ADD THIS LINE
         
 

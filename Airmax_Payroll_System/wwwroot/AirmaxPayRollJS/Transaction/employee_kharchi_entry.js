@@ -1,39 +1,20 @@
 ﻿/**
- * 📝 EMPLOYEE KHARCHI ENTRY - (COMPLETE & FIXED)
+ * 📝 EMPLOYEE KHARCHI ENTRY - (Division -> Department -> Popup Flow)
  */
 const API = "/api/transaction/kharchi";
-let allDepartments = [];
-let employeeData = {};
-let expandedDepts = new Set();
+let currentDivisionId = 0;
+let currentDepartmentId = 0;
+let currentEmployees = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await loadDivisions();
     initDate();
-
-    const id = new URLSearchParams(window.location.search).get("id") || 0;
-    if (id > 0) {
-        await loadForEdit(id);
-    } else {
-        // 🔥 FIX: Generate Voucher No on page load
-        generateNewVoucherNo();
-    }
+    generateNewVoucherNo();
+    loadDivisionsForMonth(); // Initial load for current month
 });
 
 function initDate() {
     const now = new Date();
     document.getElementById("txtKharchiDate").value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-}
-
-async function loadDivisions() {
-    const res = await apiFetch(`${API}/get-divisions-with-count`);
-    const json = await res.json();
-    if (json.success) {
-        const ddl = document.getElementById("ddlDivision");
-        if (ddl) {
-            ddl.innerHTML = `<option value="">-- Select Division --</option>` +
-                json.data.map(d => `<option value="${d.idDivision || d.IDDivision}">${d.divisionName || d.DivisionName}</option>`).join("");
-        }
-    }
 }
 
 async function generateNewVoucherNo() {
@@ -44,161 +25,279 @@ async function generateNewVoucherNo() {
     }
 }
 
-async function btnLoadEmployees() {
-    const divId = document.getElementById("ddlDivision").value;
-    if (!divId) return;
+// 1. Load All Divisions based on selected month
+async function loadDivisionsForMonth() {
+    const tbody = document.getElementById("tblDivisionBody");
+    // 🔥 Updated to colspan="5"
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i> Loading Divisions...</td></tr>`;
 
-    const deptRes = await apiFetch(`${API}/get-departments/${divId}`);
-    const deptJson = await deptRes.json();
-    if (deptJson.success) {
-        allDepartments = deptJson.data.map(d => ({
-            idDepartment: d.idDepartment || d.IDDepartment,
-            departmentName: d.departmentName || d.DepartmentName,
-            selected: false
-        }));
+    const res = await apiFetch(`${API}/get-divisions-with-count`);
+    const json = await res.json();
+
+    if (json.success && json.data.length > 0) {
+        tbody.innerHTML = json.data.map(d => `
+            <tr class="border-bottom">
+                <td class="text-center">
+                    <input type="checkbox" class="form-check-input chk-division" data-id="${d.idDivision || d.IDDivision}">
+                </td>
+                <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary border-0 rounded-circle" onclick="toggleDivision(${d.idDivision || d.IDDivision}, this)">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                </td>
+                <td>
+                    <span class="fw-bold text-dark fs-6">${d.divisionName || d.DivisionName}</span>
+                </td>
+                <td class="text-center">
+                    <span class="badge bg-soft-primary text-primary px-3">
+                        ${d.totalDepartments || d.TotalDepartments || 0} Departments
+                    </span>
+                </td>
+                <td class="text-end pe-4">
+                    <small class="text-muted me-3">Month: ${document.getElementById("txtKharchiDate").value}</small>
+                    <i class="fas fa-chevron-right text-light"></i>
+                </td>
+            </tr>
+            <!-- 🔥 Updated to colspan="5" -->
+            <tr id="div-child-${d.idDivision || d.IDDivision}" class="d-none bg-light shadow-inner">
+                <td colspan="5" class="p-3">
+                    <div id="dept-container-${d.idDivision || d.IDDivision}" class="ps-5 py-2">
+                        <div class="text-center text-muted"><i class="fas fa-spinner fa-spin me-1"></i> Loading Departments...</div>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+    } else {
+        // 🔥 Updated to colspan="5"
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-5">No Divisions found.</td></tr>`;
     }
+}
 
-    const empRes = await apiFetch(`${API}/load-employees/${divId}`);
-    const empJson = await empRes.json();
-    if (empJson.success) {
-        employeeData = {};
-        empJson.data.forEach(emp => {
-            const dId = emp.idDepartment || emp.IDDepartment;
-            if (!employeeData[dId]) employeeData[dId] = [];
-            employeeData[dId].push({
-                idEmployee: emp.idEmployee || emp.IDEmployee,
-                employeeCode: emp.employeeCode || emp.EmployeeCode,
-                employeeName: emp.employeeName || emp.EmployeeName,
-                designationName: emp.designationName || emp.DesignationName,
-                amount: emp.amount || emp.Amount || 0,
-                remarks: emp.remarks || emp.Remarks || ""
-            });
-        });
+
+
+async function toggleDivision(divId, btn) {
+    const row = document.getElementById(`div-child-${divId}`);
+    const icon = btn.querySelector("i");
+
+    // Get current selected month/year
+    const dateVal = document.getElementById("txtKharchiDate").value; // e.g. "2026-04"
+    const [year, month] = dateVal.split("-");
+
+    if (row.classList.contains("d-none")) {
+        row.classList.remove("d-none");
+        icon.className = "fas fa-minus-circle text-danger";
+
+        // 🔥 Updated URL to pass month and year
+        const res = await apiFetch(`${API}/get-departments/${divId}?month=${month}&year=${year}`);
+        const json = await res.json();
+
+        if (json.success) {
+            const container = document.getElementById(`dept-container-${divId}`);
+            container.innerHTML = `
+                <div class="card border-0 shadow-sm">
+                    <table class="table table-sm table-hover mb-0 border">
+                        <thead class="bg-soft-primary small">
+                            <tr><th>DEPARTMENT NAME</th><th class="text-center">EMPLOYEE</th><th class="text-end pe-4">ACTION</th></tr>
+                        </thead>
+                        <tbody>
+                            ${json.data.map(dept => `
+                                <tr>
+
+                                    <td class="ps-3 border-end">
+                                        <b>${dept.DepartmentName}</b>
+                                        ${dept.IsSaved == 1 ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i> SAVED</span>' : ''}
+                                    </td>
+                                    <td class="text-center border-end small">${dept.EmployeeCount || 0}</td>
+                                    <td class="text-end pe-3">
+                                        <button class="btn btn-sm ${dept.IsSaved == 1 ? 'btn-outline-success' : 'btn-primary'} py-1 px-3 fw-bold" 
+                                                onclick="openKharchiPopup(${divId}, ${dept.IDDepartment}, '${dept.DepartmentName}')">
+                                            <i class="fas ${dept.IsSaved == 1 ? 'fa-eye' : 'fa-pencil-alt'} me-1"></i> 
+                                            ${dept.IsSaved == 1 ? 'View List' : 'Kharchi List'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join("")}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+    } else {
+        row.classList.add("d-none");
+        icon.className = "fas fa-plus-circle text-primary";
     }
-    renderTable();
 }
 
-function renderTable() {
-    const tbody = document.getElementById("tblBody");
-    tbody.innerHTML = allDepartments.map(dept => {
-        const dId = dept.idDepartment;
-        const isExp = expandedDepts.has(dId);
-        const emps = employeeData[dId] || [];
-        const deptTotal = emps.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
 
-        return `
-        <tr class="table-light align-middle" style="cursor:pointer">
-            <td class="text-center" onclick="toggleDept(${dId})"><i class="fas ${isExp ? 'fa-minus-circle text-danger' : 'fa-plus-circle text-primary'}"></i></td>
-            <td class="text-center"><input type="checkbox" class="form-check-input" ${dept.selected ? 'checked' : ''} onchange="toggleDeptSelection(${dId}, this.checked)" /></td>
-            <td onclick="toggleDept(${dId})"><b>${dept.departmentName}</b></td>
-            <td colspan="2"></td>
-            <td class="text-end pe-4 fw-bold text-primary">₹ ${deptTotal.toLocaleString('en-IN')}</td>
-            <td></td>
-        </tr>
-        ${isExp ? `<tr><td colspan="7" class="p-0 border-0"><div class="px-5 py-2 bg-white border-start border-primary border-4">
-            <table class="table table-sm table-bordered">
-                <thead><tr class="bg-light small"><th>#</th><th>Employee</th><th>Designation</th><th>Amount</th><th>Remarks</th></tr></thead>
-                <tbody>${emps.map((e, i) => `<tr>
-                    <td>${i + 1}</td>
-                    <td><b>${e.employeeName}</b><br><small>${e.employeeCode}</small></td>
-                    <td><small>${e.designationName}</small></td>
-                    <td><input type="number" class="form-control form-control-sm text-end" value="${e.amount}" oninput="updateEmpAmt(${dId}, ${i}, this.value)" /></td>
-                    <td><input type="text" class="form-control form-control-sm" value="${e.remarks}" onchange="updateEmpRem(${dId}, ${i}, this.value)" /></td>
-                </tr>`).join("")}</tbody>
-            </table></div></td></tr>` : ''}`;
-    }).join("");
-    updateStats();
-}
+// 3. Open Modal and Load Employees
+async function openKharchiPopup(divId, deptId, deptName) {
+    currentDivisionId = divId;
+    currentDepartmentId = deptId;
+    document.getElementById("modalTitle").innerText = `Kharchi List: ${deptName}`;
+    document.getElementById("modalSubTitle").innerText = `Updating kharchi for ${deptName}`;
 
-function updateEmpAmt(dId, i, val) { employeeData[dId][i].amount = parseFloat(val) || 0; updateStats(); }
-function updateEmpRem(dId, i, val) { employeeData[dId][i].remarks = val; }
-function toggleDept(id) { expandedDepts.has(id) ? expandedDepts.delete(id) : expandedDepts.add(id); renderTable(); }
-function toggleDeptSelection(id, val) { const d = allDepartments.find(x => x.idDepartment == id); d.selected = val; renderTable(); }
+    const tbody = document.getElementById("tblEmployeeBody");
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Loading Employees...</td></tr>`;
 
-function updateStats() {
-    let total = 0, selected = 0;
-    Object.values(employeeData).forEach(deptEmps => {
-        deptEmps.forEach(e => {
-            const amt = parseFloat(e.amount) || 0;
-            if (amt > 0) { total += amt; selected++; }
-        });
-    });
-    document.getElementById("lblTotal").innerText = `₹ ${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
-    document.getElementById("lblSelected").innerText = selected;
-}
+    const myModal = new bootstrap.Modal(document.getElementById('kharchiModal'));
+    myModal.show();
 
-/**
- * 🔥 FIXED SAVE: This actualy calls the API now
- */
-async function saveData() {
-    const id = new URLSearchParams(window.location.search).get("id") || 0;
-    const divId = document.getElementById("ddlDivision").value;
-    const kharchiDate = document.getElementById("txtKharchiDate").value;
-
-    if (!divId || !kharchiDate) return showToast("error", "Fill Division and Month");
-
-    const details = [];
-    Object.keys(employeeData).forEach(dId => {
-        employeeData[dId].forEach(e => {
-            if (parseFloat(e.amount) > 0) {
-                details.push({
-                    IDEmployee: e.idEmployee,
-                    Amount: parseFloat(e.amount),
-                    Remarks: e.remarks,
-                    EmployeeCode: e.employeeCode
-                });
-            }
-        });
-    });
-
-    if (details.length === 0) return Swal.fire("Required", "No amounts entered.", "warning");
-
-    const dto = {
-        IDEmployeeKharchi: parseInt(id),
-        KharchiNo: document.getElementById("txtKharchiNo").value,
-        KharchiDate: kharchiDate + "-01",
-        IDDivision: parseInt(divId),
-        Details: details
-    };
-
-    // --- Start Save Call ---
-    const res = await apiFetch(`${API}/save`, {
-        method: "POST",
-        body: JSON.stringify(dto)
-    });
+    // Fetch all employees for division and filter by department
+    const res = await apiFetch(`${API}/load-employees/${divId}`);
     const json = await res.json();
 
     if (json.success) {
-        Swal.fire("Success", "Voucher saved successfully!", "success")
-            .then(() => window.location.href = "/Transaction/EmployeeKharchiList");
+        currentEmployees = json.data.filter(e => (e.idDepartment || e.IDDepartment) == deptId);
+        document.getElementById("lblCount").innerText = `${currentEmployees.length} Employees`;
+        renderEmployeeTable();
+    }
+}
+
+
+
+
+function renderEmployeeTable() {
+    const tbody = document.getElementById("tblEmployeeBody");
+    if (currentEmployees.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">No employees found.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = currentEmployees.map((e, i) => `
+        <tr class="border-bottom">
+            <td class="ps-3 py-3">
+                <div class="fw-bold text-dark" style="font-size: 0.95rem;">${e.employeeName || e.EmployeeName}</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Code: ${e.employeeCode || e.EmployeeCode}</div>
+            </td>
+            <td class="small text-muted">${e.designationName || e.DesignationName || '-'}</td>
+            <td>
+                <!-- Clean Amount Input (Just like Remark) -->
+                <input type="number" class="form-control border-light bg-light fw-bold text-end" 
+                       style="font-size: 1rem; width: 140px;"
+                       placeholder="0"
+                       value="${e.Amount || 0}" 
+                       onfocus="if(this.value=='0') this.value='';" 
+                       onblur="if(this.value=='') this.value='0';"
+                       oninput="updateEmployeeData(${i}, 'Amount', this.value)" />
+            </td>
+            <td class="pe-3">
+                <!-- Remark Input -->
+                <input type="text" class="form-control border-light bg-light" 
+                       placeholder="Add a remark..."
+                       value="${e.Remarks || ''}" 
+                       oninput="updateEmployeeData(${i}, 'Remarks', this.value)" />
+            </td>
+        </tr>
+    `).join("");
+    calculateDeptTotal();
+}
+
+
+function updateEmployeeData(index, field, value) {
+    if (field === 'Amount') {
+        currentEmployees[index].Amount = parseFloat(value) || 0;
+        calculateDeptTotal();
     } else {
-        Swal.fire("Error", json.message || "Could not save.", "error");
+        currentEmployees[index].Remarks = value;
     }
 }
 
-function printKharchi() {
-    const id = new URLSearchParams(window.location.search).get("id") || 0;
-    KharchiPrintService.print(id, allDepartments, employeeData);
+function calculateDeptTotal() {
+    const total = currentEmployees.reduce((sum, e) => sum + (parseFloat(e.Amount) || 0), 0);
+    document.getElementById("lblDeptTotal").innerText = `₹ ${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 }
 
-async function loadForEdit(id) {
-    const res = await apiFetch(`${API}/get-by-id/${id}`);
-    const json = await res.json();
-    if (json.success && json.data) {
-        const d = json.data;
-        document.getElementById("txtKharchiNo").value = d.kharchiNo;
-        document.getElementById("txtKharchiDate").value = d.kharchiDate.split("T")[0].substring(0, 7);
-        document.getElementById("ddlDivision").value = d.idDivision;
-        await btnLoadEmployees();
-        d.details.forEach(saved => {
-            const list = employeeData[saved.idDepartment] || [];
-            const emp = list.find(e => e.idEmployee === saved.idEmployee);
-            if (emp) {
-                emp.amount = saved.amount;
-                emp.remarks = saved.remarks;
-                expandedDepts.add(saved.idDepartment);
-            }
+// 4. Save Logic (Using Voucher Reuse Logic in SP)
+async function saveDepartmentData() {
+    const details = currentEmployees.filter(e => (parseFloat(e.Amount) || 0) > 0).map(e => ({
+        IDEmployee: e.idEmployee || e.IDEmployee,
+        Amount: parseFloat(e.Amount),
+        Remarks: e.Remarks || "",
+        EmployeeCode: e.employeeCode || e.EmployeeCode
+    }));
+
+    if (details.length === 0) {
+        return Swal.fire("Required", "Please enter amount for at least one employee.", "warning");
+    }
+
+    const dto = {
+        IDEmployeeKharchi: 0, // SP will automatically reuse or create voucher ID based on Month
+        KharchiNo: document.getElementById("txtKharchiNo").value,
+        KharchiDate: document.getElementById("txtKharchiDate").value + "-01", // The Month
+        IDDivision: currentDivisionId,
+        IDDepartment: currentDepartmentId, // Critical for selective delete in SP
+        Details: details
+    };
+
+    try {
+        const res = await apiFetch(`${API}/save`, {
+            method: "POST",
+            body: JSON.stringify(dto)
         });
-        renderTable();
+        const json = await res.json();
+
+        if (json.success) {
+            Swal.fire("Success", `Data for this department saved successfully!`, "success");
+            const modalEl = document.getElementById('kharchiModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+            modalInstance.hide();
+        } else {
+            Swal.fire("Error", json.message || "Failed to save data.", "error");
+        }
+    } catch (err) {
+        Swal.fire("Error", "An unexpected error occurred while saving.", "error");
     }
+}
+
+
+
+// Function to Apply Bulk Amount to every employee in the list
+function applyBulkAmount() {
+    const bulkAmt = parseFloat(document.getElementById("txtBulkAmount").value) || 0;
+
+    if (bulkAmt <= 0) {
+        return Swal.fire("Required", "Please enter a valid amount to apply.", "warning");
+    }
+
+    // Update the data array
+    currentEmployees.forEach(emp => {
+        emp.Amount = bulkAmt;
+    });
+
+    // Refresh the table UI
+    renderEmployeeTable();
+
+    // Success Toast
+    showToast("success", `Applied ₹${bulkAmt} to all employees`);
+}
+
+// Function to Reset all amounts to 0
+function clearAllAmounts() {
+    Swal.fire({
+        title: 'Clear All?',
+        text: "This will reset all amounts in this list to zero.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Yes, clear all'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            currentEmployees.forEach(emp => {
+                emp.Amount = 0;
+            });
+            renderEmployeeTable();
+            document.getElementById("txtBulkAmount").value = "";
+        }
+    });
+}
+
+
+
+function selectAllDivs(chk) {
+    // Find all checkboxes with the class 'chk-division'
+    const checkboxes = document.querySelectorAll('.chk-division');
+
+    // Set their checked status to match the main checkbox
+    checkboxes.forEach(c => {
+        c.checked = chk.checked;
+    });
 }

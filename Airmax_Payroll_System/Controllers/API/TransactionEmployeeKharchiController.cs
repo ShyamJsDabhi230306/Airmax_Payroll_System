@@ -101,16 +101,20 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
 
-        [HttpGet("get-departments/{divId:int}")]
-        public async Task<IActionResult> GetDepartmentsByDivision(int divId)
+        [HttpGet("get-departments/{id}")]
+        public async Task<IActionResult> GetDepartments(int id, [FromQuery] int month, [FromQuery] int year)
         {
-            // If divId is 0, we fetch based on user's authorized division
-            int targetDivId = divId == 0 ? (User.IsAdmin() ? 0 : User.GetIDDivision()) : divId;
-
-            var data = await _service.GetDepartmentsWithCountAsync(targetDivId);
+            // Make sure you pass month and year to the service!
+            var data = await _service.GetDepartmentsWithCountAsync(id, month, year);
             return Ok(new { success = true, data });
         }
 
-        
+        [HttpGet("get-print-data")]
+        public async Task<IActionResult> GetPrintData([FromQuery] int month, [FromQuery] int year, [FromQuery] string divIds)
+        {
+            // 🔥 Ensure 'divIds' is passed as a string
+            var data = await _service.GetPrintReportAsync(month, year, divIds);
+            return Ok(new { success = true, data });
+        }
     }
 }

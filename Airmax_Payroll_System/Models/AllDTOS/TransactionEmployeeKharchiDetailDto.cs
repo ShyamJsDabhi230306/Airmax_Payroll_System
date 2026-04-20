@@ -1,4 +1,4 @@
-﻿namespace Airmax_Payroll_System.Models.AllDTOS
+namespace Airmax_Payroll_System.Models.AllDTOS
 {
     public class TransactionEmployeeKharchiDetailDto
     {
@@ -10,7 +10,11 @@
         public string? DepartmentName { get; set; }
         public decimal? Amount { get; set; }
         public string? EmployeeCode { get; set; }
+        public string? DesignationName { get; set; }
         public string? Remarks { get; set; }
         public bool? AllowForCalculate { get; set; }
+
+        public int? IDDesination { get; set; }
+        public string? Desination { get; set; }
     }
 }

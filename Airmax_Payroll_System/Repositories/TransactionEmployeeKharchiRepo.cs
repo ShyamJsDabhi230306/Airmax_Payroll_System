@@ -73,9 +73,13 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@KharchiDate", model.KharchiDate); // The month selected (e.g., 2026-04-01)
             param.Add("@Date", DateTime.Now);             // The actual entry date (today)
             param.Add("@IDDivision", model.IDDivision);
+            param.Add("@IDDepartment", model.IDDepartment); // 🔥 Added to support popup-based saving
             param.Add("@UserFullName", model.E_By);
-            // Details Parameter (The SP will extract IDDepartment from Master_Employee automatically)
+            // 🔥 ADD THIS LINE: Pass the Department ID from the DTO
+            param.Add("@IDDepartment", model.IDDepartment);
+            // Details Parameter
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
+
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Transaction_EmployeeKharchi_Save",
                 param);
@@ -132,14 +136,15 @@ namespace Airmax_Payroll_System.Repositories
 
         // new thing are add for my department and division
         // 1. Update LoadEmployees to use the Typed DTO
- 
+
 
         // 2. Add this method to fetch the Expandable Department List
-        public async Task<IEnumerable<dynamic>> GetDepartmentsWithCountAsync(int idDivision)
+        public async Task<IEnumerable<dynamic>> GetDepartmentsWithCountAsync(int idDivision, int month = 0, int year = 0)
         {
             var param = new DynamicParameters();
             param.Add("@IDDivision", idDivision);
-
+            param.Add("@Month", month); // 🔥 Added
+            param.Add("@Year", year);   // 🔥 Added
             return await _dapper.QueryAsync<dynamic>(
                 "usp_Transaction_Kharchi_GetDepartmentsWithCount",
                 param);
@@ -147,26 +152,19 @@ namespace Airmax_Payroll_System.Repositories
 
         // 3. Ensure GetById matches the new SP name if you renamed it
 
-        public async Task<TransactionEmployeeKharchiSaveDto?> GetPrintDataAsync(int id)
+        public async Task<IEnumerable<KharchiPrintReportDto>> GetPrintReportAsync(int month, int year, string divIdList)
         {
             var param = new DynamicParameters();
-            param.Add("@IDEmployeeKharchi", id);
-            var row = await _dapper.QueryFirstOrDefaultAsync<dynamic>(
-                "usp_Transaction_EmployeeKharchi_GetById",
-                param);
-            if (row == null) return null;
-            string detailsJson = row.details;
-            var detailsList = string.IsNullOrEmpty(detailsJson)
-                ? new List<TransactionEmployeeKharchiDetailDto>()
-                : JsonConvert.DeserializeObject<List<TransactionEmployeeKharchiDetailDto>>(detailsJson);
-            return new TransactionEmployeeKharchiSaveDto
-            {
-                IDEmployeeKharchi = (int)row.IDEmployeeKharchi,
-                KharchiNo = (string)row.KharchiNo,
-                KharchiDate = (DateTime?)row.KharchiDate,
-                E_By = (string)row.E_By, // To show who prepared the report
-                Details = detailsList
-            };
+            param.Add("@Month", month);
+            param.Add("@Year", year);
+            param.Add("@IDDivisionList", divIdList); // 🔥 Must be string to handle '1,2,3'
+
+            return await _dapper.QueryAsync<KharchiPrintReportDto>(
+                "usp_Transaction_EmployeeKharchi_PrintReport",
+                param,
+                commandType: CommandType.StoredProcedure);
         }
+
+
     }
 }
