@@ -47,9 +47,9 @@ namespace Airmax_Payroll_System.Services
             return await _repo.GetDivisionsWithCountAsync(idDivision);
         }
 
-        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision)
+        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision, int month, int year)
         {
-            return await _repo.LoadEmployeesForKharchiAsync(idDivision);
+            return await _repo.LoadEmployeesForKharchiAsync(idDivision, month, year);
         }
 
 

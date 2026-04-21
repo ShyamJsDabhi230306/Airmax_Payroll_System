@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 📝 EMPLOYEE KHARCHI ENTRY - (Division -> Department -> Popup Flow)
  */
 const API = "/api/transaction/kharchi";
@@ -79,70 +79,82 @@ async function toggleDivision(divId, btn) {
     const row = document.getElementById(`div-child-${divId}`);
     const icon = btn.querySelector("i");
 
-    // Get current selected month/year
-    const dateVal = document.getElementById("txtKharchiDate").value; // e.g. "2026-04"
-    const [year, month] = dateVal.split("-");
-
     if (row.classList.contains("d-none")) {
         row.classList.remove("d-none");
         icon.className = "fas fa-minus-circle text-danger";
-
-        // 🔥 Updated URL to pass month and year
-        const res = await apiFetch(`${API}/get-departments/${divId}?month=${month}&year=${year}`);
-        const json = await res.json();
-
-        if (json.success) {
-            const container = document.getElementById(`dept-container-${divId}`);
-            container.innerHTML = `
-                <div class="card border-0 shadow-sm">
-                    <table class="table table-sm table-hover mb-0 border">
-                        <thead class="bg-soft-primary small">
-                            <tr><th>DEPARTMENT NAME</th><th class="text-center">EMPLOYEE</th><th class="text-end pe-4">ACTION</th></tr>
-                        </thead>
-                        <tbody>
-                            ${json.data.map(dept => `
-                                <tr>
-
-                                    <td class="ps-3 border-end">
-                                        <b>${dept.DepartmentName}</b>
-                                        ${dept.IsSaved == 1 ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i> SAVED</span>' : ''}
-                                    </td>
-                                    <td class="text-center border-end small">${dept.EmployeeCount || 0}</td>
-                                    <td class="text-end pe-3">
-                                        <button class="btn btn-sm ${dept.IsSaved == 1 ? 'btn-outline-success' : 'btn-primary'} py-1 px-3 fw-bold" 
-                                                onclick="openKharchiPopup(${divId}, ${dept.IDDepartment}, '${dept.DepartmentName}')">
-                                            <i class="fas ${dept.IsSaved == 1 ? 'fa-eye' : 'fa-pencil-alt'} me-1"></i> 
-                                            ${dept.IsSaved == 1 ? 'View List' : 'Kharchi List'}
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join("")}
-                        </tbody>
-                    </table>
-                </div>`;
-        }
+        await loadDepartments(divId);
     } else {
         row.classList.add("d-none");
         icon.className = "fas fa-plus-circle text-primary";
     }
 }
 
+async function loadDepartments(divId) {
+    const container = document.getElementById(`dept-container-${divId}`);
+    // Show spinner if empty
+    if (!container.innerHTML || container.innerHTML.includes("Loading")) {
+        container.innerHTML = `<div class="text-center text-muted py-2"><i class="fas fa-spinner fa-spin me-1"></i> Loading Departments...</div>`;
+    }
+
+    const dateVal = document.getElementById("txtKharchiDate").value;
+    const [year, month] = dateVal.split("-");
+
+    const res = await apiFetch(`${API}/get-departments/${divId}?month=${month}&year=${year}`);
+    const json = await res.json();
+
+    if (json.success) {
+        container.innerHTML = `
+            <div class="card border-0 shadow-sm">
+                <table class="table table-sm table-hover mb-0 border">
+                    <thead class="bg-soft-primary small">
+                        <tr><th>DEPARTMENT NAME</th><th class="text-center">EMPLOYEE</th><th class="text-end pe-4">ACTION</th></tr>
+                    </thead>
+                    <tbody>
+                        ${json.data.map(dept => `
+                            <tr>
+                                <td class="ps-3 border-end">
+                                    <b>${dept.DepartmentName}</b>
+                                    ${dept.IsSaved == 1 ? '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i> SAVED</span>' : ''}
+                                </td>
+                                <td class="text-center border-end small">${dept.EmployeeCount || 0}</td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-sm ${dept.IsSaved == 1 ? 'btn-outline-success' : 'btn-primary'} py-1 px-3 fw-bold" 
+                                            onclick="openKharchiPopup(${divId}, ${dept.IDDepartment}, '${dept.DepartmentName}')">
+                                        <i class="fas ${dept.IsSaved == 1 ? 'fa-eye' : 'fa-pencil-alt'} me-1"></i> 
+                                        ${dept.IsSaved == 1 ? 'View List' : 'Kharchi List'}
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            </div>`;
+    } else {
+        container.innerHTML = `<div class="text-center text-danger py-2">Failed to load departments.</div>`;
+    }
+}
+
 
 // 3. Open Modal and Load Employees
 async function openKharchiPopup(divId, deptId, deptName) {
+    // 1. Keep these ID assignments
     currentDivisionId = divId;
     currentDepartmentId = deptId;
     document.getElementById("modalTitle").innerText = `Kharchi List: ${deptName}`;
     document.getElementById("modalSubTitle").innerText = `Updating kharchi for ${deptName}`;
 
+    // 2. Get the current month/year from the UI
+    const dateVal = document.getElementById("txtKharchiDate").value;
+    const [year, month] = dateVal.split("-");
+
     const tbody = document.getElementById("tblEmployeeBody");
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Loading Employees...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="3" class="text-center py-5"><i class="fas fa-spinner fa-spin me-2"></i> Checking monthly status...</td></tr>`;
 
     const myModal = new bootstrap.Modal(document.getElementById('kharchiModal'));
     myModal.show();
 
-    // Fetch all employees for division and filter by department
-    const res = await apiFetch(`${API}/load-employees/${divId}`);
+    // 3. Send month and year to the API
+    const res = await apiFetch(`${API}/load-employees/${divId}?month=${month}&year=${year}`);
     const json = await res.json();
 
     if (json.success) {
@@ -157,37 +169,32 @@ async function openKharchiPopup(divId, deptId, deptName) {
 
 function renderEmployeeTable() {
     const tbody = document.getElementById("tblEmployeeBody");
-    if (currentEmployees.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4">No employees found.</td></tr>`;
-        return;
-    }
 
-    tbody.innerHTML = currentEmployees.map((e, i) => `
-        <tr class="border-bottom">
-            <td class="ps-3 py-3">
-                <div class="fw-bold text-dark" style="font-size: 0.95rem;">${e.employeeName || e.EmployeeName}</div>
-                <div class="text-muted" style="font-size: 0.75rem;">Code: ${e.employeeCode || e.EmployeeCode}</div>
+    tbody.innerHTML = currentEmployees.map((e, i) => {
+        const isGiven = (parseFloat(e.Amount || e.amount) || 0) > 0;
+        // Format the payment date if it exists
+        const payDate = e.PaymentDate || e.paymentDate;
+        const formattedDate = payDate ? new Date(payDate).toLocaleDateString('en-GB') : '';
+
+        return `
+        <tr class="border-bottom ${isGiven ? 'bg-light' : ''}">
+            <td class="ps-3 py-2">
+                <div class="fw-bold ${isGiven ? 'text-success' : 'text-dark'}">${e.EmployeeName || e.employeeName}</div>
+                <div class="text-muted small">Code: ${e.EmployeeCode || e.employeeCode}</div>
             </td>
-            <td class="small text-muted">${e.designationName || e.DesignationName || '-'}</td>
             <td>
-                <!-- Clean Amount Input (Just like Remark) -->
-                <input type="number" class="form-control border-light bg-light fw-bold text-end" 
-                       style="font-size: 1rem; width: 140px;"
-                       placeholder="0"
-                       value="${e.Amount || 0}" 
-                       onfocus="if(this.value=='0') this.value='';" 
-                       onblur="if(this.value=='') this.value='0';"
-                       oninput="updateEmployeeData(${i}, 'Amount', this.value)" />
+                ${isGiven
+                ? `<span class="badge bg-success">PAID ON ${formattedDate}</span>`
+                : '<span class="badge bg-warning text-dark">PENDING</span>'}
             </td>
             <td class="pe-3">
-                <!-- Remark Input -->
-                <input type="text" class="form-control border-light bg-light" 
-                       placeholder="Add a remark..."
-                       value="${e.Remarks || ''}" 
-                       oninput="updateEmployeeData(${i}, 'Remarks', this.value)" />
+                <input type="number" class="form-control text-end fw-bold" 
+                       value="${e.Amount || e.amount || 0}" 
+                       ${isGiven ? 'disabled' : ''} 
+                       oninput="updateEmployeeData(${i}, 'Amount', this.value)" />
             </td>
-        </tr>
-    `).join("");
+        </tr>`;
+    }).join("");
     calculateDeptTotal();
 }
 
@@ -207,12 +214,64 @@ function calculateDeptTotal() {
 }
 
 // 4. Save Logic (Using Voucher Reuse Logic in SP)
+//async function saveDepartmentData() {
+//    const details = currentEmployees.filter(e => (parseFloat(e.Amount) || 0) > 0).map(e => ({
+//        IDEmployee: e.idEmployee || e.IDEmployee,
+//        Amount: parseFloat(e.Amount),
+//        Remarks: e.Remarks || "",
+//        EmployeeCode: e.employeeCode || e.EmployeeCode,
+//        IDDepartment: e.idDepartment || e.IDDepartment,
+//        AllowForCalculate: e.allowForCalculate || e.AllowForCalculate || false,
+//    }));
+
+//    if (details.length === 0) {
+//        return Swal.fire("Required", "Please enter amount for at least one employee.", "warning");
+//    }
+
+//    const dto = {
+//        IDEmployeeKharchi: 0, // SP will automatically reuse or create voucher ID based on Month
+//        KharchiNo: document.getElementById("txtKharchiNo").value,
+//        KharchiDate: document.getElementById("txtKharchiDate").value + "-01", // The Month
+//        IDDivision: currentDivisionId,
+//        IDDepartment: currentDepartmentId, // Critical for selective delete in SP
+//        Details: details
+//    };
+
+//    try {
+//        const res = await apiFetch(`${API}/save`, {
+//            method: "POST",
+//            body: JSON.stringify(dto)
+//        });
+//        const json = await res.json();
+
+//        if (json.success) {
+//            Swal.fire("Success", `Data for this department saved successfully!`, "success");
+//            const modalEl = document.getElementById('kharchiModal');
+//            const modalInstance = bootstrap.Modal.getInstance(modalEl);
+//            modalInstance.hide();
+
+//            // 🔥 Refresh the department list to show "SAVED" badge
+//            loadDepartments(currentDivisionId);
+//        } else {
+//            Swal.fire("Error", json.message || "Failed to save data.", "error");
+//        }
+//    } catch (err) {
+//        Swal.fire("Error", "An unexpected error occurred while saving.", "error");
+//    }
+//}
+
+
+
+// Function to Apply Bulk Amount to every employee in the list
+
 async function saveDepartmentData() {
-    const details = currentEmployees.filter(e => (parseFloat(e.Amount) || 0) > 0).map(e => ({
+    const details = currentEmployees.filter(e => (parseFloat(e.Amount || e.amount) || 0) > 0).map(e => ({
         IDEmployee: e.idEmployee || e.IDEmployee,
-        Amount: parseFloat(e.Amount),
-        Remarks: e.Remarks || "",
-        EmployeeCode: e.employeeCode || e.EmployeeCode
+        Amount: parseFloat(e.Amount || e.amount),
+        Remarks: e.Remarks || e.remarks || "",
+        // ✅ ENSURE THESE ARE SENT:
+        IDDepartment: e.idDepartment || e.IDDepartment,
+        AllowForCalculate: e.allowForCalculate || e.AllowForCalculate || false
     }));
 
     if (details.length === 0) {
@@ -220,11 +279,11 @@ async function saveDepartmentData() {
     }
 
     const dto = {
-        IDEmployeeKharchi: 0, // SP will automatically reuse or create voucher ID based on Month
+        IDEmployeeKharchi: 0,
         KharchiNo: document.getElementById("txtKharchiNo").value,
-        KharchiDate: document.getElementById("txtKharchiDate").value + "-01", // The Month
+        KharchiDate: document.getElementById("txtKharchiDate").value + "-01",
         IDDivision: currentDivisionId,
-        IDDepartment: currentDepartmentId, // Critical for selective delete in SP
+        IDDepartment: currentDepartmentId,
         Details: details
     };
 
@@ -234,23 +293,16 @@ async function saveDepartmentData() {
             body: JSON.stringify(dto)
         });
         const json = await res.json();
-
         if (json.success) {
-            Swal.fire("Success", `Data for this department saved successfully!`, "success");
-            const modalEl = document.getElementById('kharchiModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalEl);
-            modalInstance.hide();
-        } else {
-            Swal.fire("Error", json.message || "Failed to save data.", "error");
+            Swal.fire("Success", "Saved successfully!", "success");
+            bootstrap.Modal.getInstance(document.getElementById('kharchiModal')).hide();
+            loadDepartments(currentDivisionId);
         }
     } catch (err) {
-        Swal.fire("Error", "An unexpected error occurred while saving.", "error");
+        console.error(err);
     }
 }
 
-
-
-// Function to Apply Bulk Amount to every employee in the list
 function applyBulkAmount() {
     const bulkAmt = parseFloat(document.getElementById("txtBulkAmount").value) || 0;
 

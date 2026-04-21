@@ -93,12 +93,15 @@ namespace Airmax_Payroll_System.Controllers.API
             var data = await _service.GetDivisionsWithCountAsync(divId);
             return Ok(new { success = true, data });
         }
-        [HttpGet("load-employees/{divId:int}")]
-        public async Task<IActionResult> LoadEmployees(int divId)
+
+        [HttpGet("load-employees/{idDivision}")]
+        public async Task<IActionResult> LoadEmployees(int idDivision, int month = 0, int year = 0)
         {
-            var data = await _service.LoadEmployeesForKharchiAsync(divId);
+            // Pass month and year to the service
+            var data = await _service.LoadEmployeesForKharchiAsync(idDivision, month, year);
             return Ok(new { success = true, data });
         }
+
 
 
         [HttpGet("get-departments/{id}")]

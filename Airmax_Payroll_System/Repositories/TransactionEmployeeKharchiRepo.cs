@@ -75,8 +75,6 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@IDDivision", model.IDDivision);
             param.Add("@IDDepartment", model.IDDepartment); // 🔥 Added to support popup-based saving
             param.Add("@UserFullName", model.E_By);
-            // 🔥 ADD THIS LINE: Pass the Department ID from the DTO
-            param.Add("@IDDepartment", model.IDDepartment);
             // Details Parameter
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
 
@@ -120,15 +118,19 @@ namespace Airmax_Payroll_System.Repositories
         }
 
         // 2. Load all employees for a specific division
-        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision)
+        // Update this method to accept month and year
+        public async Task<IEnumerable<dynamic>> LoadEmployeesForKharchiAsync(int idDivision, int month, int year)
         {
             var param = new DynamicParameters();
             param.Add("@IDDivision", idDivision);
+            param.Add("@Month", month);
+            param.Add("@Year", year);
 
             return await _dapper.QueryAsync<dynamic>(
                 "usp_Transaction_EmployeeKharchi_LoadEmployees",
                 param);
         }
+
 
 
 
