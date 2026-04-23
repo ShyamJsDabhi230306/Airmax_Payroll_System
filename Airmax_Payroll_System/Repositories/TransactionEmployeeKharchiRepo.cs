@@ -23,16 +23,20 @@ namespace Airmax_Payroll_System.Repositories
         //        "usp_Transaction_EmployeeKharchi_SelectAll");
         //}
         // Update line 19:
-        public async Task<IEnumerable<dynamic>> GetAllAsync(int idDivision, int month = 0, int year = 0)
+        public async Task<IEnumerable<dynamic>> GetAllAsync(int idDivision, int month = 0, int year = 0, string search = "")
         {
             var param = new DynamicParameters();
             param.Add("@IDDivision", idDivision);
             param.Add("@Month", month);
             param.Add("@Year", year);
+            param.Add("@Search", search); // The Stored Procedure will handle everything
+
+            // 🔥 JUST RETURN THE DATA. Do NOT filter it again in C#.
             return await _dapper.QueryAsync<dynamic>(
                 "usp_Transaction_EmployeeKharchi_SelectAll",
                 param);
         }
+
 
 
         // 1. First, update your GetByIdAsync to handle JSON string deserialization

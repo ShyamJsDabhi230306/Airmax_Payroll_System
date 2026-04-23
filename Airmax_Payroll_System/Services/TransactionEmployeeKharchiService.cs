@@ -16,10 +16,9 @@ namespace Airmax_Payroll_System.Services
 
 
         // Updated to support Division, Month, and Year filtering
-        public async Task<IEnumerable<dynamic>> GetAllAsync(int idDivision, int month = 0, int year = 0)
+        public async Task<IEnumerable<dynamic>> GetAllAsync(int idDivision, int month = 0, int year = 0, string search = "")
         {
-            // Simply passes the parameters to the specialized repository method
-            return await _repo.GetAllAsync(idDivision, month, year);
+            return await _repo.GetAllAsync(idDivision, month, year, search);
         }
 
         //public async Task<IEnumerable<TransactionEmployeeKharchi>> GetAllAsync()
