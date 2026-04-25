@@ -99,17 +99,26 @@ namespace Airmax_Payroll_System.Controllers.API
 
 
         [HttpGet("by-employee/{id:int}")]
-        public async Task<IActionResult> GetByEmployee(int id)
+        public async Task<IActionResult> GetByEmployee(int id, int idDivision = 0, string search = "")
         {
-            var data = await _service.GetByEmployeeAsync(id);
+            // The service now accepts division and search for the smart dropdown
+            var data = await _service.GetByEmployeeAsync(id, idDivision, search);
+
             return Ok(new { success = true, data });
         }
-
         [HttpGet("get-schedule/{id:int}")]
         public async Task<IActionResult> GetSchedule(int id)
         {
+            // This method returns the header info (which contains E_By, U_By from the database)
+            // and the list of monthly installments
             var result = await _service.GetScheduleAsync(id);
-            return Ok(new { success = true, header = result.Header, details = result.Details });
+
+            return Ok(new
+            {
+                success = true,
+                header = result.Header,
+                details = result.Details
+            });
         }
 
 

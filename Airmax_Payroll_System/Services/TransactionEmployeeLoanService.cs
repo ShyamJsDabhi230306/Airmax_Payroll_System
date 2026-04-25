@@ -51,8 +51,10 @@ namespace Airmax_Payroll_System.Services
         }
 
 
-        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetByEmployeeAsync(int id)
-    => await _repo.GetByEmployeeAsync(id);
+        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetByEmployeeAsync(int id, int idDivision, string search)
+        {
+            return await _repo.GetByEmployeeAsync(id, idDivision, search);
+        }
 
         public async Task<dynamic> GetScheduleAsync(int id)
             => await _repo.GetScheduleAsync(id);

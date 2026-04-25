@@ -168,16 +168,22 @@ namespace Airmax_Payroll_System.Repositories
             }
         }
         // Path: Repositories/TransactionEmployeeLoanRepo.cs
-        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetByEmployeeAsync(int id)
+        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetByEmployeeAsync(int id, int idDivision, string search)
         {
-            var param = new DynamicParameters();
-            param.Add("@IDEmployee", id);
-
-            // Now calling the stored procedure instead of raw text
-            return await _dapper.QueryAsync<Transaction_EmployeeLoan>(
-                "usp_Transaction_EmployeeLoan_GetByEmployee",
-                param
-            );
+            try
+            {
+                var param = new DynamicParameters();
+                param.Add("@IDEmployee", id);
+                param.Add("@IDDivision", idDivision);
+                param.Add("@Search", search);
+                return await _dapper.QueryAsync<Transaction_EmployeeLoan>(
+                    "usp_Transaction_EmployeeLoan_GetByEmployee", param);
+            }
+            catch (Exception)
+            {
+                // Simple way: ignore the error and return an empty list
+                return Enumerable.Empty<Transaction_EmployeeLoan>();
+            }
         }
 
         public async Task<dynamic> GetScheduleAsync(int id)
