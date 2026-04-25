@@ -1,0 +1,114 @@
+Text                                                                                                                                                                                                                                                           
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE   PROCEDURE [dbo].[usp_Transaction_EmployeeLoan_Reschedule]
+                                                                                                                                                                                           
+    @IDEmployeeLoan INT,
+                                                                                                                                                                                                                                     
+    @NewRemainingMonths INT
+                                                                                                                                                                                                                                  
+AS
+                                                                                                                                                                                                                                                           
+BEGIN
+                                                                                                                                                                                                                                                        
+    SET NOCOUNT ON;
+                                                                                                                                                                                                                                          
+    BEGIN TRY
+                                                                                                                                                                                                                                                
+        DECLARE @TotalLoanAmount DECIMAL(18,2), @PaidAmount DECIMAL(18,2), @RemainingBalance DECIMAL(18,2);
+                                                                                                                                                  
+        DECLARE @StartMonth INT, @StartYear INT, @NewEMI DECIMAL(18,2);
+                                                                                                                                                                                      
+
+                                                                                                                                                                                                                                                             
+        -- 1. Get total loan amount
+                                                                                                                                                                                                                          
+        SELECT @TotalLoanAmount = LoanAmount FROM Transaction_EmployeeLoan WHERE IDEmployeeLoan = @IDEmployeeLoan;
+                                                                                                                                           
+
+                                                                                                                                                                                                                                                             
+        -- 2. Calculate already PAID amount
+                                                                                                                                                                                                                  
+        SELECT @PaidAmount = SUM(ISNULL(InstallmentAmount, 0)) 
+                                                                                                                                                                                              
+        FROM Transaction_EmployeeLoanDetails 
+                                                                                                                                                                                                                
+        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Paid';
+                                                                                                                                                                                          
+
+                                                                                                                                                                                                                                                             
+        SET @RemainingBalance = @TotalLoanAmount - ISNULL(@PaidAmount, 0);
+                                                                                                                                                                                   
+        SET @NewEMI = @RemainingBalance / @NewRemainingMonths;
+                                                                                                                                                                                               
+
+                                                                                                                                                                                                                                                             
+        -- 3. Get the starting point (the first month that is currently Pending)
+                                                                                                                                                                             
+        SELECT TOP 1 @StartMonth = Month, @StartYear = Year 
+                                                                                                                                                                                                 
+        FROM Transaction_EmployeeLoanDetails 
+                                                                                                                                                                                                                
+        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Pending'
+                                                                                                                                                                                        
+        ORDER BY Year ASC, Month ASC;
+                                                                                                                                                                                                                        
+
+                                                                                                                                                                                                                                                             
+        -- 4. Delete all future PENDING installments (Keep Paid and Skipped)
+                                                                                                                                                                                 
+        DELETE FROM Transaction_EmployeeLoanDetails 
+                                                                                                                                                                                                         
+        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Pending';
+                                                                                                                                                                                       
+
+                                                                                                                                                                                                                                                             
+        -- 5. Regenerate new schedule for the remaining months
+                                                                                                                                                                                               
+        DECLARE @i INT = 0;
+                                                                                                                                                                                                                                  
+        WHILE @i < @NewRemainingMonths
+                                                                                                                                                                                                                       
+        BEGIN
+                                                                                                                                                                                                                                                
+            INSERT INTO Transaction_EmployeeLoanDetails (IDEmployeeLoan, Month, Year, Date, InstallmentAmount, Status)
+                                                                                                                                       
+            VALUES (
+                                                                                                                                                                                                                                         
+                @IDEmployeeLoan, 
+                                                                                                                                                                                                                            
+                @StartMonth, 
+                                                                                                                                                                                                                                
+                @StartYear, 
+                                                                                                                                                                                                                                 
+                CAST(CAST(@StartYear AS VARCHAR) + '-' + CAST(@StartMonth AS VARCHAR) + '-01' AS DATE),
+                                                                                                                                                      
+                CASE WHEN @i = @NewRemainingMonths - 1 THEN @RemainingBalance - (@NewEMI * (@NewRemainingMonths - 1)) ELSE @NewEMI END, -- Adjust last EMI for rounding
+                                                                                      
+                'Pending'
+                                                                                                                                                                                                                                    
+            );
+                                                                                                                                                                                                                                               
+
+                                                                                                                                                                                                                                                             
+            SET @StartMonth = @StartMonth + 1;
+                                                                                                                                                                                                               
+            IF (@StartMonth > 12) BEGIN SET @StartMonth = 1; SET @StartYear = @StartYear + 1; END
+                                                                                                                                                            
+            SET @i = @i + 1;
+                                                                                                                                                                                                                                 
+        END
+                                                                                                                                                                                                                                                  
+
+                                                                                                                                                                                                                                                             
+        SELECT 1 AS Result, 'Schedule recalculated successfully' AS Message;
+                                                                                                                                                                                 
+    END TRY
+                                                                                                                                                                                                                                                  
+    BEGIN CATCH
+                                                                                                                                                                                                                                              
+        SELECT 0 AS Result, ERROR_MESSAGE() AS Message;
+                                                                                                                                                                                                      
+    END CATCH
+                                                                                                                                                                                                                                                
+END
+                                                                                                                                                                                                                                                          

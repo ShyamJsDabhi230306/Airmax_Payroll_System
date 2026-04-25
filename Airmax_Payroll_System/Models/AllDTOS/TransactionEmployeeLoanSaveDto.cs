@@ -1,4 +1,4 @@
-﻿using Airmax_Payroll_System.Models.Common;
+using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction;
 
 namespace Airmax_Payroll_System.Models.AllDTOS
@@ -10,6 +10,7 @@ namespace Airmax_Payroll_System.Models.AllDTOS
         public DateTime? Date { get; set; }
         public int? IDEmployee { get; set; }
         public int? IDDepartment { get; set; }
+        public int? IDDivision { get; set; }
         public decimal? LoanAmount { get; set; }
         public int? TotalInstallments { get; set; }
         public decimal? InstallmentAmount { get; set; }

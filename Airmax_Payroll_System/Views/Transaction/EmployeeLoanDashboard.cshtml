@@ -1,0 +1,65 @@
+﻿@* Path: Views/Transaction/EmployeeLoanDashboard.cshtml *@
+@{
+    ViewBag.Title = "Employee Loan Dashboard";
+}
+
+<style>
+    .loan-scroll-container {
+        max-height: 65vh;
+        overflow-y: auto;
+        padding-right: 8px;
+    }
+
+        .loan-scroll-container::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .loan-scroll-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+    .x-small {
+        font-size: 11px;
+    }
+</style>
+
+<div class="container-fluid py-3" style="background: #f8fafc; min-height: 100vh;">
+    <div class="d-flex justify-content-between mb-3">
+        <h4 class="fw-bold">Loan Analytics Dashboard</h4>
+        <a href="/Transaction/EmployeeLoanList" class="btn btn-sm btn-outline-secondary">Back to List</a>
+    </div>
+
+    <!-- Stats Container -->
+    <div class="row g-3 mb-3" id="statsContainer"></div>
+
+    <!-- Filter Card -->
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-md-3">
+                    <select id="filterDiv" class="form-select border-0 shadow-none" onchange="loadDashboard()"></select>
+                </div>
+                <div class="col-md-2">
+                    <select id="filterStatus" class="form-select border-0 shadow-none" onchange="loadDashboard()">
+                        <option value="All">All Status</option>
+                        <option value="Active">Active</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-7">
+                    <input type="text" id="searchEmp" class="form-control border-0 shadow-none" placeholder="Search employee or loan no..." onkeyup="loadDashboard()">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scrolling List -->
+    <div class="loan-scroll-container" id="loanCards">
+        <div class="text-center py-5 text-muted">Fetching records...</div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Transaction/employee_loan_dashboard.js" asp-append-version="true"></script>
+}

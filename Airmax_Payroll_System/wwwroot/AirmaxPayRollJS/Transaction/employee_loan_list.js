@@ -21,7 +21,8 @@ async function bindTable() {
             <td class="text-center">${index + 1}</td>
             <td class="text-center fw-bold text-primary">${d.loanNo}</td>
             <td>${d.employeeName}</td>
-            <td class="text-center fw-bold">${d.loanAmount.toFixed(2)}</td>
+           <td class="text-center fw-bold">${Number(d.loanAmount || 0).toLocaleString('en-IN')}</td>
+
             <td class="text-center">${d.totalInstallments}</td>
             <td class="text-center">
                 <span class="badge ${d.isClose ? 'bg-danger' : 'bg-success'}">

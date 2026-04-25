@@ -1,0 +1,92 @@
+Text                                                                                                                                                                                                                                                           
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+CREATE   PROCEDURE [dbo].[usp_Transaction_EmployeeLoan_SkipMonth]
+                                                                                                                                                                                            
+    @IDEmployeeLoanDetails INT
+                                                                                                                                                                                                                               
+AS
+                                                                                                                                                                                                                                                           
+BEGIN
+                                                                                                                                                                                                                                                        
+    SET NOCOUNT ON;
+                                                                                                                                                                                                                                          
+    BEGIN TRY
+                                                                                                                                                                                                                                                
+        DECLARE @IDEmployeeLoan INT, @LastMonth INT, @LastYear INT, @BaseAmount DECIMAL(18,2);
+                                                                                                                                                               
+
+                                                                                                                                                                                                                                                             
+        -- 1. Get loan ID and the original installment amount
+                                                                                                                                                                                                
+        SELECT @IDEmployeeLoan = IDEmployeeLoan FROM Transaction_EmployeeLoanDetails WHERE IDEmployeeLoanDetails = @IDEmployeeLoanDetails;
+                                                                                                                   
+        SELECT @BaseAmount = InstallmentAmount FROM Transaction_EmployeeLoan WHERE IDEmployeeLoan = @IDEmployeeLoan;
+                                                                                                                                         
+
+                                                                                                                                                                                                                                                             
+        -- 2. Mark current record as Skipped and set amount to 0
+                                                                                                                                                                                             
+        UPDATE Transaction_EmployeeLoanDetails
+                                                                                                                                                                                                               
+        SET Status = 'Skipped', 
+                                                                                                                                                                                                                             
+            InstallmentAmount = 0
+                                                                                                                                                                                                                            
+        WHERE IDEmployeeLoanDetails = @IDEmployeeLoanDetails;
+                                                                                                                                                                                                
+
+                                                                                                                                                                                                                                                             
+        -- 3. Find the current last installment to extend the date
+                                                                                                                                                                                           
+        SELECT TOP 1 @LastMonth = Month, @LastYear = Year 
+                                                                                                                                                                                                   
+        FROM Transaction_EmployeeLoanDetails 
+                                                                                                                                                                                                                
+        WHERE IDEmployeeLoan = @IDEmployeeLoan 
+                                                                                                                                                                                                              
+        ORDER BY Year DESC, Month DESC;
+                                                                                                                                                                                                                      
+
+                                                                                                                                                                                                                                                             
+        -- 4. Calculate next month and year
+                                                                                                                                                                                                                  
+        SET @LastMonth = @LastMonth + 1;
+                                                                                                                                                                                                                     
+        IF (@LastMonth > 12) BEGIN SET @LastMonth = 1; SET @LastYear = @LastYear + 1; END
+                                                                                                                                                                    
+
+                                                                                                                                                                                                                                                             
+        -- 5. Insert the extra month at the end of the schedule
+                                                                                                                                                                                              
+        INSERT INTO Transaction_EmployeeLoanDetails (IDEmployeeLoan, Month, Year, Date, InstallmentAmount, Status)
+                                                                                                                                           
+        VALUES (
+                                                                                                                                                                                                                                             
+            @IDEmployeeLoan, 
+                                                                                                                                                                                                                                
+            @LastMonth, 
+                                                                                                                                                                                                                                     
+            @LastYear, 
+                                                                                                                                                                                                                                      
+            CAST(CAST(@LastYear AS VARCHAR) + '-' + CAST(@LastMonth AS VARCHAR) + '-01' AS DATE),
+                                                                                                                                                            
+            @BaseAmount, 
+                                                                                                                                                                                                                                    
+            'Pending'
+                                                                                                                                                                                                                                        
+        );
+                                                                                                                                                                                                                                                   
+
+                                                                                                                                                                                                                                                             
+        SELECT 1 AS Result, 'Month skipped and schedule extended successfully' AS Message;
+                                                                                                                                                                   
+    END TRY
+                                                                                                                                                                                                                                                  
+    BEGIN CATCH
+                                                                                                                                                                                                                                              
+        SELECT 0 AS Result, ERROR_MESSAGE() AS Message;
+                                                                                                                                                                                                      
+    END CATCH
+                                                                                                                                                                                                                                                
+END
+                                                                                                                                                                                                                                                          

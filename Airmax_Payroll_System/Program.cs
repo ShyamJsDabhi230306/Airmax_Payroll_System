@@ -58,7 +58,9 @@ builder.Services.AddScoped<MasterEmployeeGroupRepo>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
 builder.Services.AddScoped<UserRightsRepo>();
 builder.Services.AddScoped<MasterPageRepo>();
+builder.Services.AddScoped<MasterConfigurationRepo>();
 
+// Master Configuration Module
 
 // In your Program.cs, add these lines:
 // FOR TRANSACTION REPOSITORY
@@ -80,6 +82,7 @@ builder.Services.AddScoped<MasterEmployeeGroupService>();
 builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
 builder.Services.AddScoped<UserRightsService>();
 builder.Services.AddScoped<MasterPageService>();
+builder.Services.AddScoped<MasterConfigurationService>();
 
 
 // FOR TRANSACTION SERVICE

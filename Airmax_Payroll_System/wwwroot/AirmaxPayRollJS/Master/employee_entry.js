@@ -43,6 +43,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ✅ LOAD DROPDOWNS (same as your old JS)
     await loadCompany();
+    await loadLocation();
+    await loadDivision();
     await loadDepartment();
     await loadShift();
     await loadDesignation();
@@ -216,7 +218,7 @@ async function loadDivision(locationId) {
         filtered.map(d =>
             `<option value="${d.idDivision}">${d.divisionName}</option>`
         ).join("");
-    $("#IDDivision").selectpicker('refresh');
+    $(DOM.division()).selectpicker('refresh');
 }
 
 async function loadDepartment() { // 1. Remove the parameter

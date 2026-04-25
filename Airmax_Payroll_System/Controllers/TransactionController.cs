@@ -28,12 +28,6 @@ namespace Airmax_Payroll_System.Controllers
             return View();
         }
 
-        //[Route("transaction/employee-loan")]
-        //public IActionResult TransactionEmployeeLoan()
-        //{
-        //    return View();
-        //}
-
         public IActionResult EmployeeLoanList()
         {
             // Standalone list page
@@ -45,7 +39,19 @@ namespace Airmax_Payroll_System.Controllers
             return View();
         }
 
-        
+        public IActionResult EmployeeLoanDashboard()
+        {
+            // This tells MVC to look for a file named "EmployeeLoanDashboard.cshtml"
+            return View();
+        }
+
+        // Path: Controllers/TransactionController.cs
+
+        public IActionResult EmployeeLoanSchedule()
+        {
+            // This looks for Views/Transaction/EmployeeLoanSchedule.cshtml
+            return View();
+        }
 
 
     }

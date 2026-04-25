@@ -34,22 +34,31 @@
                     <input type="date" id="Date" class="form-control" />
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold">Division</label>
+                    <select id="IDDivision" class="form-control selectpicker" data-live-search="true" data-container="body" onchange="loadDepartments()"></select>
+                </div>
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Department</label>
-                    <select id="IDDepartment" class="form-control" onchange="loadEmployees()"></select>
+                    <select id="IDDepartment" class="form-control selectpicker" data-live-search="true" data-container="body" onchange="loadEmployees()"></select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Select Employee</label>
-                    <select id="IDEmployee" class="form-control">
-                        <option value="">Select Employee</option>
+                    <select id="IDEmployee" class="form-control selectpicker" data-live-search="true" data-container="body" onchange="onEmployeeChange()">
+                       
                     </select>
+
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Loan Amount</label>
-                    <input type="number" id="LoanAmount" class="form-control text-end" placeholder="Enter Loan Amount" />
+                    <input type="text" inputmode="numeric" id="LoanAmount" class="form-control" placeholder="Enter Loan Amount" onchange="onLoanAmountChange()" />
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Total Installments</label>
-                    <input type="number" id="TotalInstallments" class="form-control" placeholder="Enter Total Installments" />
+                    <input type="text" inputmode="numeric" id="TotalInstallments" class="form-control" placeholder="Enter Total Installments" onchange="updateInstallmentAmount()" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Installment Amount</label>
+                    <input type="text" id="InstallmentAmount" class="form-control" placeholder="0.00" readonly />
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Installment Starting Date</label>
@@ -104,6 +113,11 @@
                 <button class="btn btn-primary px-4" id="btnSave" onclick="saveData()">
                     <i class="fa fa-save me-1"></i> Save / Update
                 </button>
+                <!-- Only show in Edit mode (when loan already saved) -->
+                <button type="button" class="btn btn-warning d-none" onclick="rescheduleLoan()" id="btnReschedule">
+                    <i class="fa fa-calendar-alt"></i> Reschedule Loan
+                </button>
+
             </div>
         </div>
     </div>

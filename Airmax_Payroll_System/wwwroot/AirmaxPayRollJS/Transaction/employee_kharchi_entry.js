@@ -25,6 +25,8 @@ async function generateNewVoucherNo() {
     if (json.success) document.getElementById("txtKharchiNo").value = json.data;
 }
 
+
+
 // 1. Division List
 async function loadDivisionsForMonth() {
     const tbody = document.getElementById("tblDivisionBody");

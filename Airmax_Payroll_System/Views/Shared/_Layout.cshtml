@@ -328,6 +328,8 @@ if (currentRight == null) {
                             <ul aria-expanded="false">
                                 @if (HasRight("User Master")) { <li data-menu="User Master"><a href="/Master/User">User List</a></li> }
                                 @if (HasRight("User Access Management")) { <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li> }
+                                @if (HasRight("Master Configuration")) { <li data-menu="Master Configuration"><a href="/Master/Configuration">Configuration Master</a></li> }
+
                             </ul>
                         </li>
                     }

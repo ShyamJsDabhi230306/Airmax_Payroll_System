@@ -51,6 +51,7 @@ namespace Airmax_Payroll_System.Repositories
                 Date = (DateTime?)row.Date,
                 IDEmployee = (int?)row.IDEmployee,
                 IDDepartment = (int?)row.IDDepartment,
+                IDDivision = (int?)row.IDDivision,
                 LoanAmount = (decimal?)row.LoanAmount,
                 TotalInstallments = (int?)row.TotalInstallments,
                 InstallmentAmount = (decimal?)row.InstallmentAmount,
@@ -65,11 +66,12 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@IDEmployeeLoan", model.IDEmployeeLoan);
             param.Add("@LoanNo", model.LoanNo);
             param.Add("@Date", model.Date);
-            param.Add("@IDEmployee", model.IDEmployee);
+            param.Add("@IDDivision", model.IDDivision);
             param.Add("@IDDepartment", model.IDDepartment);
+            param.Add("@IDEmployee", model.IDEmployee);
             param.Add("@LoanAmount", model.LoanAmount);
-            param.Add("@TotalInstallments", model.TotalInstallments);
             param.Add("@InstallmentAmount", model.InstallmentAmount);
+            param.Add("@TotalInstallments", model.TotalInstallments);
             param.Add("@InstallmentStartingDate", model.InstallmentStartingDate);
 
             // Serialize list to JSON just like Kharchi
@@ -109,6 +111,92 @@ namespace Airmax_Payroll_System.Repositories
             }
         }
 
-        
+
+        public async Task<SaveResult> SkipMonthAsync(int idLoanDetail)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployeeLoanDetails", idLoanDetail);
+
+            return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
+                "usp_Transaction_EmployeeLoan_SkipMonth",
+                param);
+        }
+
+        public async Task<SaveResult> RescheduleAsync(EmployeeLoanRescheduleDto model)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployeeLoan", model.IDEmployeeLoan);
+            param.Add("@NewRemainingMonths", model.NewRemainingMonths);
+
+            return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
+                "usp_Transaction_EmployeeLoan_Reschedule",
+                param);
+        }
+
+        public async Task<bool> HasActiveLoanAsync(int employeeId)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployee", employeeId);
+
+            int count = await _dapper.ExecuteScalarAsync<int>(
+                "usp_Transaction_EmployeeLoan_CheckActive",
+                param,
+                System.Data.CommandType.StoredProcedure
+            );
+
+            return count > 0;
+        }
+
+
+        // Path: Repositories/TransactionEmployeeLoanRepo.cs
+        public async Task<dynamic> GetDashboardDataAsync(int idDivision, int idDepartment, string status)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDDivision", idDivision);
+            param.Add("@IDDepartment", idDepartment);
+            param.Add("@Status", status);
+
+            // returns (Reader, Conn) tuple
+            var result = await _dapper.QueryMultipleAsync("usp_Transaction_EmployeeLoan_Dashboard", param);
+
+            using (result.Conn)
+            using (result.Reader)
+            {
+                var stats = await result.Reader.ReadFirstOrDefaultAsync<dynamic>();
+                var loans = await result.Reader.ReadAsync<dynamic>();
+                return new { Stats = stats, Loans = loans };
+            }
+        }
+        // Path: Repositories/TransactionEmployeeLoanRepo.cs
+        public async Task<IEnumerable<Transaction_EmployeeLoan>> GetByEmployeeAsync(int id)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployee", id);
+
+            // Now calling the stored procedure instead of raw text
+            return await _dapper.QueryAsync<Transaction_EmployeeLoan>(
+                "usp_Transaction_EmployeeLoan_GetByEmployee",
+                param
+            );
+        }
+
+        public async Task<dynamic> GetScheduleAsync(int id)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployeeLoan", id);
+            var result = await _dapper.QueryMultipleAsync("usp_Transaction_EmployeeLoan_GetSchedule", param);
+            using (result.Conn)
+            using (result.Reader)
+            {
+                return new
+                {
+                    Header = await result.Reader.ReadFirstOrDefaultAsync<dynamic>(),
+                    Details = await result.Reader.ReadAsync<dynamic>()
+                };
+            }
+        }
+
+
+
     }
 }

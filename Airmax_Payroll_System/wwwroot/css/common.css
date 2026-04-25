@@ -1,6 +1,7 @@
-﻿.ic-sidenav
+.ic-sidenav
 {
     height:100% !important;
+    position:fixed !important
 }
 
 input[readonly] {

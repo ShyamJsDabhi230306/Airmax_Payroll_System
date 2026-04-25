@@ -9,5 +9,7 @@
         public int? Year { get; set; }
         public decimal? InstallmentAmount { get; set; }
         public string? Status { get; set; }
+
+        public bool? IsExtended { get; set; }  // ✅ Add this
     }
 }
