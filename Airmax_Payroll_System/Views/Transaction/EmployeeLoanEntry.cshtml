@@ -31,7 +31,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Date</label>
-                    <input type="date" id="Date" class="form-control" />
+                    <input type="date" id="Date" class="form-control" readonly />
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Division</label>
@@ -48,6 +48,12 @@
                     </select>
 
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Select Guarantors (Max 3)</label>
+                    <select id="IDGuarantors" class="form-control selectpicker" multiple data-max-options="3" data-live-search="true" data-container="body" onchange="onGuarantorChange()">
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Loan Amount</label>
                     <input type="text" inputmode="numeric" id="LoanAmount" class="form-control" placeholder="Enter Loan Amount" onchange="onLoanAmountChange()" />
@@ -83,7 +89,7 @@
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fa fa-list me-2"></i> Monthly Installment Details</h5>
             </div>
-            <div class="card-body p-0" style="max-height: 520px; overflow-y: auto;">
+            <div class="card-body p-0" style="max-height: 750px; overflow-y: auto;">
                 <div class="table-responsive">
                     <table class="table table-bordered table-sm mb-0">
                         <thead class="table-secondary text-center">
@@ -108,7 +114,7 @@
                   
                 </div>
             </div>
-            <div class="card-footer text-end">
+            <div class="card-footer text-end mt-auto">
                 <a href="/Transaction/EmployeeLoanList" class="btn btn-light me-2">Cancel</a>
                 <button class="btn btn-primary px-4" id="btnSave" onclick="saveData()">
                     <i class="fa fa-save me-1"></i> Save / Update

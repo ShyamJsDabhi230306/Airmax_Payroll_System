@@ -1,9 +1,29 @@
 ﻿// Path: wwwroot/AirmaxPayRollJS/Transaction/employee_loan_schedule.js
 
-$(document).ready(function () {
-    loadDivisions();
-    loadEmployeesWithLoans(); // Loads everyone immediately
+$(document).ready(async function () {
+    await loadDivisions();
+
+    // 1. Check if we have a Division ID from the Dashboard
+    const urlParams = new URLSearchParams(window.location.search);
+    const divId = urlParams.get('divId');
+    if (divId) {
+        $("#IDDivision").val(divId);
+        $("#IDDivision").selectpicker('refresh'); // Update UI
+    }
+
+    // 2. Load the employees for that specific division
+    await loadEmployeesWithLoans();
+
+    // 3. Select the specific employee and show the grid
+    const loanId = urlParams.get('id');
+    if (loanId) {
+        $("#IDEmployeeLoan").val(loanId);
+        $("#IDEmployeeLoan").selectpicker('refresh'); // Update UI
+
+        showSchedule(); // Automatically load the grid
+    }
 });
+
 
 // 1. Load the Divisions
 async function loadDivisions() {
@@ -16,37 +36,80 @@ async function loadDivisions() {
                 html += `<option value="${d.idDivision || d.IDDivision}">${d.divisionName || d.DivisionName}</option>`;
             });
             $("#IDDivision").html(html);
+            $('#IDDivision').selectpicker('refresh');
         }
     } catch (e) { console.error(e); }
 }
 
 // 2. Load the Employees (Only those with loans)
+//async function loadEmployeesWithLoans() {
+//    const divId = $("#IDDivision").val() || 0;
+//    const search = $("#txtSearch").val() || "";
+//    const empDdl = $("#IDEmployeeLoan");
+
+//    empDdl.html('<option value="">Searching...</option>');
+
+//    try {
+//        // We call the API with id=0 to get the searchable list
+//        const res = await apiFetch(`/api/transaction/employee-loan/by-employee/0?idDivision=${divId}&search=${search}`);
+//        const json = await res.json();
+
+//        if (json.success && json.data && json.data.length > 0) {
+//            let html = '<option value="">-- Select Employee Record --</option>';
+//            json.data.forEach(l => {
+//                html += `<option value="${l.idEmployeeLoan || l.IDEmployeeLoan}">${l.loanNo || l.LoanNo}</option>`;
+//            });
+
+//            empDdl.html(html);
+
+//        } else {
+//            empDdl.html('<option value="">No loan records found</option>');
+
+//        }
+//    } catch (e) {
+//        empDdl.html('<option value="">Error loading data</option>');
+//    }
+//}
+
+
 async function loadEmployeesWithLoans() {
     const divId = $("#IDDivision").val() || 0;
     const search = $("#txtSearch").val() || "";
     const empDdl = $("#IDEmployeeLoan");
 
     empDdl.html('<option value="">Searching...</option>');
+    empDdl.selectpicker('refresh');
 
     try {
-        // We call the API with id=0 to get the searchable list
         const res = await apiFetch(`/api/transaction/employee-loan/by-employee/0?idDivision=${divId}&search=${search}`);
         const json = await res.json();
 
         if (json.success && json.data && json.data.length > 0) {
+
             let html = '<option value="">-- Select Employee Record --</option>';
+
             json.data.forEach(l => {
-                html += `<option value="${l.idEmployeeLoan || l.IDEmployeeLoan}">${l.loanNo || l.LoanNo}</option>`;
+                html += `
+                    <option value="${l.idEmployeeLoan || l.IDEmployeeLoan}">
+                        ${l.loanNo || l.LoanNo}
+                    </option>`;
             });
+
             empDdl.html(html);
+            empDdl.selectpicker('refresh');
+
         } else {
+
             empDdl.html('<option value="">No loan records found</option>');
+            empDdl.selectpicker('refresh');
         }
+
     } catch (e) {
+
         empDdl.html('<option value="">Error loading data</option>');
+        empDdl.selectpicker('refresh');
     }
 }
-
 // 3. Show the Schedule Table
 async function showSchedule() {
     const loanId = $("#IDEmployeeLoan").val();
@@ -72,7 +135,9 @@ function renderGrid(h, list) {
     // Support both Capital/Small casing from DB
     $("#lblLoanNo").text(h.LoanNo || h.loanNo || "--");
     $("#lblPrincipal").text("₹" + Number(h.LoanAmount || h.loanAmount || 0).toLocaleString());
-    $("#lblPaid").text(`${h.EmisPaid || h.emisPaid || 0}/${h.TotalInstallments || h.totalInstallments || 0} Paid`);
+    //$("#lblPaid").text(`${h.EmisPaid || h.emisPaid || 0}/${h.TotalInstallments || h.totalInstallments || 0} Paid`);
+    const totalInst = list ? list.length : 0;
+    $("#lblPaid").text(`${h.EmisPaid || h.emisPaid || 0}/${totalInst} Paid`);
     $("#lblOutstanding").text("₹" + Number(h.OutstandingAmount || h.outstandingAmount || 0).toLocaleString());
 
     let html = "";

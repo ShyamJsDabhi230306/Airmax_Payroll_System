@@ -10,6 +10,7 @@ const DOM = {
     division: () => document.getElementById("IDDivision"),
     department: () => document.getElementById("IDDepartment"),
     employee: () => document.getElementById("IDEmployee"),
+    guarantors: () => document.getElementById("IDGuarantors"),
     loanAmount: () => document.getElementById("LoanAmount"),
     totalInstallments: () => document.getElementById("TotalInstallments"),
     installmentAmount: () => document.getElementById("InstallmentAmount"),
@@ -40,6 +41,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         companyLoanLimit = parseFloat(limitJson.limit);
         myCompanyName = limitJson.companyName;
     }
+    
+    // for select date only from today or future
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("InstallmentStartingDate").setAttribute("min", today);
 });
 
 window.updateInstallmentAmount = function () {
@@ -93,6 +98,13 @@ async function loadExistingData(id) {
     DOM.employee().value = m.idEmployee;
     $(DOM.employee()).selectpicker('refresh');
 
+    // this is the select employeee using checkbox 
+    const selectedGuarantors = [];
+    if (m.idGuarantor1 && m.idGuarantor1 > 0) selectedGuarantors.push(m.idGuarantor1);
+    if (m.idGuarantor2 && m.idGuarantor2 > 0) selectedGuarantors.push(m.idGuarantor2);
+    if (m.idGuarantor3 && m.idGuarantor3 > 0) selectedGuarantors.push(m.idGuarantor3);
+
+    $(DOM.guarantors()).selectpicker('val', selectedGuarantors);
 
 
     const btnReschedule = document.getElementById('btnReschedule');
@@ -179,31 +191,140 @@ async function loadDivisions() {
     }
 }
 
+//window.loadDepartments = async function () {
+//    const divId = DOM.division().value;
+//    const ddl = DOM.department();
+//    ddl.innerHTML = '<option value="">Select Department</option>';
+//    DOM.employee().innerHTML = '<option value="">Select Employee</option>';
+//    if (!divId) return;
+
+//    const res = await apiFetch(`/api/transaction/kharchi/get-departments/${divId}?month=0&year=0`);
+//    const json = await res.json();
+//    if (json.success) {
+//        ddl.innerHTML += json.data.map(d => `<option value="${d.idDepartment || d.IDDepartment}">${d.departmentName || d.DepartmentName}</option>`).join("");
+//        $(DOM.department()).selectpicker('refresh');
+
+//    }
+//}
+
+
 window.loadDepartments = async function () {
     const divId = DOM.division().value;
     const ddl = DOM.department();
+
+    // Clear everything when division changes
     ddl.innerHTML = '<option value="">Select Department</option>';
     DOM.employee().innerHTML = '<option value="">Select Employee</option>';
-    if (!divId) return;
+    DOM.guarantors().innerHTML = '';
+    if (!divId) {
+        $(ddl).selectpicker('refresh');
+        $(DOM.employee()).selectpicker('refresh');
+        $(DOM.guarantors()).selectpicker('refresh');
+        return;
+    }
+    // A. Load Departments normally
+    const resDept = await apiFetch(`/api/transaction/kharchi/get-departments/${divId}?month=0&year=0`);
+    const jsonDept = await resDept.json();
+    if (jsonDept.success) {
+        ddl.innerHTML += jsonDept.data.map(d => `<option value="${d.idDepartment || d.IDDepartment}">${d.departmentName || d.DepartmentName}</option>`).join("");
+        $(ddl).selectpicker('refresh');
+    }
+    // B. Load Guarantors (Location-wise)
+    const resEmp = await apiFetch(`/api/master/employee/get-all`);
+    const jsonEmp = await resEmp.json();
 
-    const res = await apiFetch(`/api/transaction/kharchi/get-departments/${divId}?month=0&year=0`);
-    const json = await res.json();
-    if (json.success) {
-        ddl.innerHTML += json.data.map(d => `<option value="${d.idDepartment || d.IDDepartment}">${d.departmentName || d.DepartmentName}</option>`).join("");
-        $(DOM.department()).selectpicker('refresh');
+    if (jsonEmp.success) {
+        const sampleEmp = jsonEmp.data.find(e => (e.idDivision || e.IDDivision) == divId);
+        let html = '';
+        if (sampleEmp) {
+            const locId = sampleEmp.idLocation || sampleEmp.IDLocation;
+            // Grab everyone in this Location
+            const locationEmps = jsonEmp.data.filter(e => (e.idLocation || e.IDLocation) == locId);
 
+            html += locationEmps.map(emp => {
+                const name = emp.employeeName || emp.EmployeeName;
+                const code = emp.employeeCode || emp.EmployeeCode;
+                const id = emp.idEmployee || emp.IDEmployee;
+                const content = `<div class='row m-0 align-items-center' style='min-width: 320px;'>
+                                    <div class='col-8 text-start fw-bold text-truncate px-1'>${name}</div>
+                                    <div class='col-4 text-end px-1'><span class='badge bg-light text-dark border'>${code}</span></div>
+                                 </div>`;
+                return `<option value="${id}" title="${name}" data-content="${content}">${name}</option>`;
+            }).join("");
+        }
+        DOM.guarantors().innerHTML = html;
+        $(DOM.guarantors()).selectpicker('refresh');
     }
 }
+//window.loadEmployees = async function () {
+//    const deptId = DOM.department().value;
+//    const divId = DOM.division().value || 0; // Get the selected Division ID
+//    const ddl = DOM.employee();
 
+//    // Default starting HTML
+//    let html = '<option value="">Select Employee</option>';
+
+//    // If no department is selected, just clear it and stop
+//    if (!deptId) {
+//        ddl.innerHTML = html;
+//        $(ddl).selectpicker('refresh');
+//        return;
+//    }
+
+//    const res = await apiFetch(`/api/master/employee/by-department/${deptId}?divId=${divId}`);
+//    const json = await res.json();
+
+//    if (json.success) {
+//        // 👉 Apply the two-column formatting here!
+//        html += json.data.map(emp => {
+//            const content = `<div class='d-flex justify-content-between w-100 pe-3'>
+//                                <span class='fw-bold'>${emp.employeeName}</span>
+//                                <span class='badge bg-light text-dark border'>${emp.employeeCode}</span>
+//                             </div>`;
+
+//            return `<option value="${emp.idEmployee}" title="${emp.employeeName}" data-content="${content}">
+//                        ${emp.employeeName}
+//                    </option>`;
+//        }).join("");
+
+//        ddl.innerHTML = html;
+//        $(ddl).selectpicker('refresh'); // Update the UI!
+//        DOM.guarantors().innerHTML = html;
+//        $(DOM.guarantors()).selectpicker('refresh');
+//    }
+//}
+
+
+// 2. 👉 Runs when DEPARTMENT changes (Loads Main Employee Division+Dept wise)
 window.loadEmployees = async function () {
     const deptId = DOM.department().value;
+    const divId = DOM.division().value || 0;
     const ddl = DOM.employee();
-    ddl.innerHTML = '<option value="">Select Employee</option>';
-    if (!deptId) return;
+    let html = '<option value="">Select Employee</option>';
+    if (!deptId) {
+        ddl.innerHTML = html;
+        $(ddl).selectpicker('refresh');
+        return;
+    }
+    // Calls your exact API that strictly filters by Division AND Department
+    const res = await apiFetch(`/api/master/employee/by-department/${deptId}?divId=${divId}`);
+    const json = await res.json();
+    if (json.success) {
+        html += json.data.map(emp => {
+            const content = `<div class='row m-0 align-items-center' style='min-width: 320px;'>
+                                <div class='col-8 text-start fw-bold text-truncate px-1'>${emp.employeeName}</div>
+                                <div class='col-4 text-end px-1'><span class='badge bg-light text-dark border'>${emp.employeeCode}</span></div>
+                             </div>`;
 
-
-    // ✅ Called when employee dropdown changes — checks for existing active loan
-    window.onEmployeeChange = async function () {
+            return `<option value="${emp.idEmployee}" title="${emp.employeeName}" data-content="${content}">${emp.employeeName}</option>`;
+        }).join("");
+        ddl.innerHTML = html;
+        $(ddl).selectpicker('refresh');
+    }
+}
+// ✅ 2. On Employee Change Function (Must be outside!)
+window.onEmployeeChange = async function () {
+    try {
         const loanId = parseInt(DOM.id().value) || 0;
         if (loanId > 0) return; // Edit mode — skip check
 
@@ -214,24 +335,25 @@ window.loadEmployees = async function () {
         const json = await res.json();
 
         if (!json.success) {
-            // ✅ Warn user immediately on selection
+            // Warn user immediately on selection
             Swal.fire({
                 icon: 'warning',
                 title: 'Active Loan Exists',
                 text: json.message,
                 confirmButtonColor: '#d33'
             });
-            DOM.employee().value = ""; // reset selection
+
+            // 👉 Properly reset the Bootstrap Selectpicker!
+            $(DOM.employee()).val('');
+            $(DOM.employee()).selectpicker('refresh');
         }
-    }
-// get the employee deparment wise 
-    const res = await apiFetch(`/api/master/employee/by-department/${deptId}`);
-    const json = await res.json();
-    if (json.success) {
-        ddl.innerHTML += json.data.map(emp => `<option value="${emp.idEmployee}">${emp.employeeName}</option>`).join("");
-        $(DOM.employee()).selectpicker('refresh');
+    } catch (e) {
+        console.error(e);
     }
 }
+
+
+
 
 window.generateInstallments = function () {
     const totalAmount = parseFloat(DOM.loanAmount().value) || 0;
@@ -311,7 +433,7 @@ window.saveData = async function () {
     });
 
     if (details.length === 0) { showToast("warning", "Generate installments first!"); return; }
-
+    const gList = $(DOM.guarantors()).val() || [];
     const dto = {
         IDEmployeeLoan: parseInt(DOM.id().value) || 0,
         LoanNo: DOM.loanNo().value,
@@ -323,6 +445,11 @@ window.saveData = async function () {
         TotalInstallments: parseInt(DOM.totalInstallments().value),
         InstallmentAmount: parseFloat(DOM.installmentAmount().value) || 0,
         InstallmentStartingDate: DOM.startingDate().value,
+
+        // this is for select employee for granteen employee 
+        IDGuarantor1: gList.length > 0 ? parseInt(gList[0]) : null,
+        IDGuarantor2: gList.length > 1 ? parseInt(gList[1]) : null,
+        IDGuarantor3: gList.length > 2 ? parseInt(gList[2]) : null,
         Details: details
     };
 
@@ -402,3 +529,43 @@ window.rescheduleLoan = async function () {
         }
     }
 }
+
+
+window.onGuarantorChange = async function () {
+    const applicantId = DOM.employee().value;
+    const guarantors = $(DOM.guarantors()).val() || [];
+
+    // 1. Cannot be their own guarantor
+    if (applicantId && guarantors.includes(applicantId)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Invalid Guarantor',
+            text: 'An employee cannot be a guarantor for their own loan!',
+            confirmButtonColor: '#d33'
+        });
+        const fixedGuarantors = guarantors.filter(id => id !== applicantId);
+        $(DOM.guarantors()).selectpicker('val', fixedGuarantors);
+        return;
+    }
+
+    // 2. Check Database Eligibility (Checks BOTH rules via the SP)
+    for (const gId of guarantors) {
+        const res = await apiFetch(`${API}/check-guarantor-eligibility/${gId}`);
+        const json = await res.json();
+
+        if (!json.success) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Guarantor Not Eligible',
+                text: json.message, // Shows the exact message from your SQL SP!
+                confirmButtonColor: '#d33'
+            });
+
+            // Instantly uncheck this invalid person
+            const fixedGuarantors = guarantors.filter(id => id !== gId);
+            $(DOM.guarantors()).selectpicker('val', fixedGuarantors);
+            return;
+        }
+    }
+}
+ 

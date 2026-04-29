@@ -121,6 +121,14 @@ namespace Airmax_Payroll_System.Controllers.API
             });
         }
 
+        [HttpGet("check-guarantor-eligibility/{employeeId:int}")]
+        public async Task<IActionResult> CheckGuarantorEligibility(int employeeId)
+        {
+            var res = await _service.CheckGuarantorEligibilityAsync(employeeId);
 
+            // If Result == 1, success is true. Otherwise, we send the SQL Message back to JS.
+            return Ok(new { success = res.Result == 1, message = res.Message });
+        }
+        
     }
 }

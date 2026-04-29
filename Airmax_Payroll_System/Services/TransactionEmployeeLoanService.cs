@@ -59,5 +59,10 @@ namespace Airmax_Payroll_System.Services
         public async Task<dynamic> GetScheduleAsync(int id)
             => await _repo.GetScheduleAsync(id);
 
+
+        public async Task<SaveResult> CheckGuarantorEligibilityAsync(int employeeId)
+        {
+            return await _repo.CheckGuarantorEligibilityAsync(employeeId);
+        }
     }
 }

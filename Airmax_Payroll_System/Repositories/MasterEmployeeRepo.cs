@@ -166,11 +166,11 @@ namespace Airmax_Payroll_System.Repositories
 
 
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)
+        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id, int idDivision = 0)
         {
             var param = new DynamicParameters();
             param.Add("@IDDepartment", id);
-
+            param.Add("@IDDivision", idDivision);
             return await _dapper.QueryAsync<EmployeeModel>(
                 "usp_Employee_GetByDepartment",
                 param);

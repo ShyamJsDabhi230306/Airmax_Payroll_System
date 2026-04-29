@@ -17,6 +17,8 @@ async function loadDivisions() {
                 const name = d.divisionName || d.DivisionName;
                 return `<option value="${id}">${name}</option>`;
             }).join("");
+
+        $('#filterDiv').selectpicker('refresh');
     }
 }
 
@@ -51,19 +53,19 @@ function renderStats(s) {
         </div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3">
-                <small class="text-muted fw-bold x-small text-uppercase">Total Disbursed</small>
+                <small class="text-muted fw-bold x-small text-uppercase">Total Given Loan Amount To Employee</small>
                 <h3 class="fw-bold mb-0">₹${Number(disbursed).toLocaleString()}</h3>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3 text-danger">
-                <small class="text-muted fw-bold x-small text-uppercase">Outstanding</small>
+                <small class="text-muted fw-bold x-small text-uppercase">Unpaid Loan Amount</small>
                 <h3 class="fw-bold mb-0">₹${Number(outstanding).toLocaleString()}</h3>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3 text-success">
-                <small class="text-muted fw-bold x-small text-uppercase">Recovered</small>
+                <small class="text-muted fw-bold x-small text-uppercase"> Loan Amount Recovered</small>
                 <h3 class="fw-bold mb-0">₹${Number(recovered).toLocaleString()}</h3>
             </div>
         </div>`;
@@ -108,8 +110,8 @@ function renderCards(data, searchTerm = "") {
                     <div class="col-md-6 text-end">
                         <div class="progress d-inline-flex" style="height:6px; width:100px"><div class="progress-bar bg-primary" style="width:${progress}%"></div></div>
                         <span class="ms-1 x-small">${progress}%</span>
-                        <a href="/Transaction/EmployeeLoanEntry?id=${loan.IDEmployeeLoan || loan.idEmployeeLoan}" class="btn btn-sm btn-outline-dark rounded-pill ms-3">Details</a>
-                    </div>
+                        <a href="/Transaction/EmployeeLoanSchedule?id=${loan.IDEmployeeLoan || loan.idEmployeeLoan}&divId=${loan.IDDivision || loan.idDivision}" class="btn btn-sm btn-outline-dark rounded-pill ms-3">Details</a>
+                </div>
                 </div>
                 <hr class="my-2 opacity-5">
                 <div class="x-small text-muted">

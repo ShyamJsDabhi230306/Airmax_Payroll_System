@@ -1,4 +1,4 @@
-using Airmax_Payroll_System.Helpers;
+﻿using Airmax_Payroll_System.Helpers;
 using Airmax_Payroll_System.Models.AllDTOS;
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction;
@@ -56,6 +56,10 @@ namespace Airmax_Payroll_System.Repositories
                 TotalInstallments = (int?)row.TotalInstallments,
                 InstallmentAmount = (decimal?)row.InstallmentAmount,
                 InstallmentStartingDate = (DateTime?)row.InstallmentStartingDate,
+                // 👉 ADD THESE 3 LINES:
+                IDGuarantor1 = (int?)row.IDGuarantor1,
+                IDGuarantor2 = (int?)row.IDGuarantor2,
+                IDGuarantor3 = (int?)row.IDGuarantor3,
                 Details = detailsList
             };
         }
@@ -73,6 +77,11 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@InstallmentAmount", model.InstallmentAmount);
             param.Add("@TotalInstallments", model.TotalInstallments);
             param.Add("@InstallmentStartingDate", model.InstallmentStartingDate);
+
+            // 👉 ADD THESE 3 LINES:
+            param.Add("@IDGuarantor1", model.IDGuarantor1);
+            param.Add("@IDGuarantor2", model.IDGuarantor2);
+            param.Add("@IDGuarantor3", model.IDGuarantor3);
 
             // Serialize list to JSON just like Kharchi
             param.Add("@Details", JsonConvert.SerializeObject(model.Details));
@@ -202,6 +211,17 @@ namespace Airmax_Payroll_System.Repositories
             }
         }
 
+        public async Task<SaveResult> CheckGuarantorEligibilityAsync(int employeeId)
+        {
+            var param = new DynamicParameters();
+            param.Add("@IDEmployee", employeeId);
+
+            // Calls the new SP and grabs the Result and Message!
+            var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
+                "usp_Transaction_EmployeeLoan_CheckGuarantorEligibility", param);
+
+            return result ?? SaveResult.Fail("No response from database");
+        }
 
 
     }
