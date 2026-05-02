@@ -1,4 +1,3 @@
-// Path: wwwroot/AirmaxPayRollJS/Transaction/employee_loan_entry.js
 
 const API = "/api/transaction/employee-loan";
 let companyLoanLimit = 0;
@@ -46,7 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const today = new Date().toISOString().split('T')[0];
     document.getElementById("InstallmentStartingDate").setAttribute("min", today);
 });
-
+// update updateInstallmentAmount  function so this is work like this way 
 window.updateInstallmentAmount = function () {
     const loanAmount = parseFloat(DOM.loanAmount().value) || 0;
     const installments = parseInt(DOM.totalInstallments().value) || 0;
@@ -74,7 +73,7 @@ window.onLoanAmountChange = function () {
     }
     updateInstallmentAmount();
 };
-
+// loadExistingData function which is used in the edit and so many where 
 async function loadExistingData(id) {
     const res = await apiFetch(`${API}/get-by-id/${id}`);
     const json = await res.json();
@@ -105,7 +104,7 @@ async function loadExistingData(id) {
     if (m.idGuarantor3 && m.idGuarantor3 > 0) selectedGuarantors.push(m.idGuarantor3);
 
     $(DOM.guarantors()).selectpicker('val', selectedGuarantors);
-
+    
 
     const btnReschedule = document.getElementById('btnReschedule');
     if (btnReschedule) {
@@ -115,6 +114,8 @@ async function loadExistingData(id) {
     if (m.details) {
         // ✅ Check if skip limit already used (any Extended row exists = limit reached)
         const skipLimitReached = m.details.some(d => d.isExtended === true || d.isExtended === 1 || d.status === 'Extended' || d.status === 'Skipped');
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
         DOM.grid().innerHTML = m.details.map((item, index) => {
             // Determine badge color based on status
@@ -140,8 +141,8 @@ async function loadExistingData(id) {
                 } else {
                     // ✅ Original Pending and no skip used yet — show Skip button
                     actionHtml = `<button type="button" class="btn btn-danger btn-xs px-2" 
-                                    onclick="skipMonth(${item.idEmployeeLoanDetails})" title="Skip Month">
-                                    <i class="fa fa-fast-forward"></i> Skip
+                                    onclick="skipMonth(${item.IDEmployeeLoanDetails})" title="Skip Month">
+                                    <i class="fa fa-fast-forward"></i> Skip  
                                   </button>`;
                 }
             } else if (isExtendedRow) {
@@ -152,10 +153,13 @@ async function loadExistingData(id) {
                 actionHtml = `<small class="text-muted">Locked</small>`;
             }
 
+            // Convert numeric month to name
+            const mName = (item.month >= 1 && item.month <= 12) ? monthNames[item.month - 1] : item.month;
+
             return `
             <tr class="align-middle">
                 <td class="text-center">${index + 1}</td>
-                <td class="text-center fw-bold">${item.month}</td>
+                <td class="text-center fw-bold" data-month="${item.month}">${mName}</td>
                 <td class="text-center fw-bold">${item.year}</td>
                 <td>
                     <input type="number" class="form-control text-end inst-amt" 
@@ -174,13 +178,13 @@ async function loadExistingData(id) {
     }
     calculateTotal();
 }
-
+// it is generate loan number in small code 
 async function generateLoanNo() {
     const res = await apiFetch(`${API}/generate-no`);
     const json = await res.json();
     if (json.success) DOM.loanNo().value = json.data;
 }
-
+// loading division from api
 async function loadDivisions() {
     const res = await apiFetch("/api/transaction/kharchi/get-divisions-with-count");
     const json = await res.json();
@@ -191,23 +195,9 @@ async function loadDivisions() {
     }
 }
 
-//window.loadDepartments = async function () {
-//    const divId = DOM.division().value;
-//    const ddl = DOM.department();
-//    ddl.innerHTML = '<option value="">Select Department</option>';
-//    DOM.employee().innerHTML = '<option value="">Select Employee</option>';
-//    if (!divId) return;
-
-//    const res = await apiFetch(`/api/transaction/kharchi/get-departments/${divId}?month=0&year=0`);
-//    const json = await res.json();
-//    if (json.success) {
-//        ddl.innerHTML += json.data.map(d => `<option value="${d.idDepartment || d.IDDepartment}">${d.departmentName || d.DepartmentName}</option>`).join("");
-//        $(DOM.department()).selectpicker('refresh');
-
-//    }
-//}
 
 
+// loading the deparment perfectly 
 window.loadDepartments = async function () {
     const divId = DOM.division().value;
     const ddl = DOM.department();
@@ -256,46 +246,7 @@ window.loadDepartments = async function () {
         $(DOM.guarantors()).selectpicker('refresh');
     }
 }
-//window.loadEmployees = async function () {
-//    const deptId = DOM.department().value;
-//    const divId = DOM.division().value || 0; // Get the selected Division ID
-//    const ddl = DOM.employee();
-
-//    // Default starting HTML
-//    let html = '<option value="">Select Employee</option>';
-
-//    // If no department is selected, just clear it and stop
-//    if (!deptId) {
-//        ddl.innerHTML = html;
-//        $(ddl).selectpicker('refresh');
-//        return;
-//    }
-
-//    const res = await apiFetch(`/api/master/employee/by-department/${deptId}?divId=${divId}`);
-//    const json = await res.json();
-
-//    if (json.success) {
-//        // 👉 Apply the two-column formatting here!
-//        html += json.data.map(emp => {
-//            const content = `<div class='d-flex justify-content-between w-100 pe-3'>
-//                                <span class='fw-bold'>${emp.employeeName}</span>
-//                                <span class='badge bg-light text-dark border'>${emp.employeeCode}</span>
-//                             </div>`;
-
-//            return `<option value="${emp.idEmployee}" title="${emp.employeeName}" data-content="${content}">
-//                        ${emp.employeeName}
-//                    </option>`;
-//        }).join("");
-
-//        ddl.innerHTML = html;
-//        $(ddl).selectpicker('refresh'); // Update the UI!
-//        DOM.guarantors().innerHTML = html;
-//        $(DOM.guarantors()).selectpicker('refresh');
-//    }
-//}
-
-
-// 2. 👉 Runs when DEPARTMENT changes (Loads Main Employee Division+Dept wise)
+// load employee  division and deparment wiswe 
 window.loadEmployees = async function () {
     const deptId = DOM.department().value;
     const divId = DOM.division().value || 0;
@@ -354,7 +305,7 @@ window.onEmployeeChange = async function () {
 
 
 
-
+// generate installment using function 
 window.generateInstallments = function () {
     const totalAmount = parseFloat(DOM.loanAmount().value) || 0;
     const installmentCount = parseInt(DOM.totalInstallments().value) || 0;
@@ -369,35 +320,39 @@ window.generateInstallments = function () {
     const totalAllocated = baseInstallment * (installmentCount - 1);
     const lastInstallment = (totalAmount - totalAllocated).toFixed(2);
 
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const startDate = new Date(startValue);
-    let currentMonth = startDate.getMonth();
+    let currentMonth = startDate.getMonth(); // 0-11
     let currentYear = startDate.getFullYear();
 
     let html = "";
     for (let i = 0; i < installmentCount; i++) {
         const displayAmt = (i === installmentCount - 1) ? lastInstallment : baseInstallment.toFixed(2);
+        const mName = monthNames[currentMonth];
+
         html += `
             <tr>
                 <td>${i + 1}</td>
-                <td class="text-center">${currentMonth + 1}</td>
+                <td class="text-center" data-month="${currentMonth + 1}">${mName}</td>
                 <td class="text-center">${currentYear}</td>
                 <td><input type="number" class="form-control text-end inst-amt" value="${displayAmt}" onchange="calculateTotal()" /></td>
                 <td class="text-center"><button type="button" class="btn btn-danger btn-xs" onclick="this.closest('tr').remove(); calculateTotal();">X</button></td>
             </tr>
         `;
+
         currentMonth++;
         if (currentMonth > 11) { currentMonth = 0; currentYear++; }
     }
     DOM.grid().innerHTML = html;
     calculateTotal();
 }
-
+// calculation  which is use in the intallment 
 window.calculateTotal = function () {
     let total = 0;
     document.querySelectorAll(".inst-amt").forEach(input => total += parseFloat(input.value) || 0);
     DOM.totalLabel().innerText = total.toFixed(2);
 }
-
+// save data function  which is save the all loan 
 window.saveData = async function () {
     const loanAmount = parseFloat(document.getElementById("LoanAmount").value) || 0;
     if (companyLoanLimit === 0) {
@@ -421,7 +376,8 @@ window.saveData = async function () {
 
     const details = [];
     document.querySelectorAll("#tblLoanBody tr").forEach(row => {
-        const month = parseInt(row.cells[1].innerText);
+        const monthCell = row.cells[1];
+        const month = parseInt(monthCell.getAttribute("data-month")) || parseInt(monthCell.innerText);
         const year = parseInt(row.cells[2].innerText);
         details.push({
             Month: month,
@@ -530,7 +486,7 @@ window.rescheduleLoan = async function () {
     }
 }
 
-
+// search for is it have other loan or not so this is the way it is work 
 window.onGuarantorChange = async function () {
     const applicantId = DOM.employee().value;
     const guarantors = $(DOM.guarantors()).val() || [];

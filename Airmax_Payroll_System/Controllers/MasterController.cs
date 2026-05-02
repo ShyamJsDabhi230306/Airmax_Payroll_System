@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers
 {
@@ -68,6 +68,11 @@ namespace Airmax_Payroll_System.Controllers
         }
 
         public IActionResult Configuration()
+        {
+            return View();
+        }
+
+        public IActionResult PayConfig()
         {
             return View();
         }

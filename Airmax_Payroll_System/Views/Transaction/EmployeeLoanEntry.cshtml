@@ -5,7 +5,7 @@
 
 <input type="hidden" id="IDEmployeeLoan" value="0" />
 
-<div class="row">
+<div class="row align-items-start">
     <!-- ====== CARD HEADER (Full Width) ====== -->
     <div class="col-12 mb-3">
         <div class="card">
@@ -20,7 +20,7 @@
 
     <!-- ====== LEFT: Employee Loan Form (Vertical Fields) ====== -->
     <div class="col-md-5">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fa fa-user me-2"></i> Loan Information</h5>
             </div>
@@ -85,7 +85,7 @@
 
     <!-- ====== RIGHT: Monthly Installment Details ====== -->
     <div class="col-md-7">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header">
                 <h5 class="card-title mb-0"><i class="fa fa-list me-2"></i> Monthly Installment Details</h5>
             </div>
@@ -114,7 +114,7 @@
                   
                 </div>
             </div>
-            <div class="card-footer text-end mt-auto">
+            <div class="card-footer text-end">
                 <a href="/Transaction/EmployeeLoanList" class="btn btn-light me-2">Cancel</a>
                 <button class="btn btn-primary px-4" id="btnSave" onclick="saveData()">
                     <i class="fa fa-save me-1"></i> Save / Update
@@ -132,3 +132,28 @@
 @section Scripts {
     <script src="~/AirmaxPayRollJS/Transaction/employee_loan_entry.js" asp-append-version="true"></script>
 }
+
+<style>
+    /* 1. FIX RIGHT SIDE: Put align-self on the COLUMN so it physically cannot stretch */
+    .col-md-7 {
+        align-self: flex-start !important;
+    }
+
+    /* 2. FIX LEFT SIDE: Fix Bootstrap Select showing huge vertical spaces for selected Guarantors */
+    .filter-option-inner-inner .row {
+        display: inline !important;
+        margin: 0 !important;
+    }
+
+    .filter-option-inner-inner .col-8 {
+        display: inline !important;
+        padding: 0 !important;
+        white-space: normal !important;
+    }
+
+    /* Hide the employee code badge inside the selected box so they sit side-by-side cleanly */
+    .filter-option-inner-inner .col-4 {
+        display: none !important;
+    }
+</style>
+
