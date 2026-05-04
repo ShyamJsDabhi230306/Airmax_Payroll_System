@@ -1,0 +1,908 @@
+﻿@* Path: Airmax_Payroll_System/Views/Master/PayRollApiConfigration.cshtml *@
+@{
+    ViewBag.Title = "API & Attendance Configuration";
+}
+
+<div class="row">
+    <!-- Page Header -->
+    <!-- PAGE HEADER / TOP ACTION BAR -->
+    <div class="col-12 mb-3">
+        <div class="card shadow-sm border-0">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white py-3">
+                <h4 class="card-title mb-0 fw-bold text-primary">
+                    <i class="fas fa-cog me-2"></i>API & Attendance Configuration
+                </h4>
+
+                <div class="d-flex align-items-center gap-3">
+                    <!-- Company Selection (Mapped to IDCompany) -->
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="small fw-bold text-muted text-uppercase mb-0" style="font-size:11px;">Company</label>
+                        <select id="IDCompany" name="IDCompany" class="form-control selectpicker shadow-none" data-width="200px" data-style="btn-light border">
+                            <option value="1">Aira</option>
+                            <option value="2">Airmax</option>
+                            <!-- Other companies will be loaded dynamically via JS -->
+                        </select>
+                    </div>
+
+                    <div class="vr mx-2"></div> <!-- Vertical Separator -->
+                    <!-- Save All Button -->
+                    <button class="btn btn-primary px-4 fw-bold shadow-sm" onclick="saveAll()">
+                        <i class="fas fa-save me-1"></i> Save All Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Navigation Tabs -->
+    <div class="col-12 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-2">
+                <ul class="nav nav-pills nav-fill" id="configTabs" role="tablist">
+                    <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-conn"><i class="fas fa-plug me-2"></i>Connection</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-pull"><i class="fas fa-cloud-download-alt me-2"></i>Pull API</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-dev"><i class="fas fa-microchip me-2"></i>Devices</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-sync"><i class="fas fa-sync-alt me-2"></i>Sync Settings</button></li>
+                    <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-endpoints"><i class="fas fa-sync-alt me-2"></i>EndPointTesting</button></li>
+                    <li class="nav-item"><button class="nav-link text-success" data-bs-toggle="pill" data-bs-target="#tab-test"><i class="fas fa-vial me-2"></i>API Tester</button></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="tab-content" id="configTabsContent">
+
+            
+            <!-- 1. CONNECTION TAB -->
+            <div class="tab-pane fade show active" id="tab-conn" role="tabpanel">
+
+                <!-- Hidden Primary Keys (SQL Mapped) -->
+                <input type="hidden" id="IDPayrollApiConfigration" name="IDPayrollApiConfigration" value="0" />
+                <input type="hidden" id="IDCompany" name="IDCompany" value="1" />
+
+                <!-- Status Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm border-start border-4 border-success h-100">
+                            <div class="card-body p-3">
+                                <div class="small fw-bold text-muted text-uppercase mb-1" style="font-size:10px;">Connection</div>
+                                <h4 class="text-success fw-bold mb-0">Online</h4>
+                                <small class="text-muted" style="font-size:11px;">Last pinged 12s ago</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm border-start border-4 border-primary h-100">
+                            <div class="card-body p-3">
+                                <div class="small fw-bold text-muted text-uppercase mb-1" style="font-size:10px;">Active Devices</div>
+                                <h4 class="fw-bold mb-0">3 / 3</h4>
+                                <small class="text-muted" style="font-size:11px;">All reporting</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm border-start border-4 border-info h-100">
+                            <div class="card-body p-3">
+                                <div class="small fw-bold text-muted text-uppercase mb-1" style="font-size:10px;">Last Pull</div>
+                                <h4 class="fw-bold mb-0">2m 14s</h4>
+                                <small class="text-muted" style="font-size:11px;">142 logs fetched</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm border-start border-4 border-warning h-100">
+                            <div class="card-body p-3">
+                                <div class="small fw-bold text-muted text-uppercase mb-1" style="font-size:10px;">Pending Cmds</div>
+                                <h4 class="text-warning fw-bold mb-0">2</h4>
+                                <small class="text-muted" style="font-size:11px;">In queue</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SmartOffice API Connection Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-key text-warning me-2"></i>SmartOffice API Connection</h6>
+                        <span class="badge bg-success-light text-success fw-bold" style="font-size:10px;">● Connected</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Base URL</label>
+                                <input type="text" id="BaseUrl" name="BaseUrl" class="form-control bg-light font-monospace" placeholder="https://sohcm.com/SmartApp_ess">
+                                <div class="form-text small" style="font-size:11px;">SmartOffice cloud endpoint (no trailing slash)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Account Name</label>
+                                <input type="text" id="AccountName" name="AccountName" class="form-control bg-light" placeholder="ACE">
+                                <div class="form-text small" style="font-size:11px;">Tenant identifier on SmartOffice cloud</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">API Key (Authentication Token)</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="password" id="ApiKey" name="ApiKey" class="form-control bg-light font-monospace" placeholder="••••••••••••">
+                                    <button class="btn btn-secondary px-3" type="button" onclick="togglePass('ApiKey')">Show</button>
+                                </div>
+                                <div class="form-text small" style="font-size:11px;">Provided by SmartOffice — used in every request</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Pull API Endpoint</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" id="PullApiEndPoint" name="PullApiEndPoint" class="form-control bg-light font-monospace" value="/api/SwipeDetails/GetDeviceLogs">
+                                    <button class="btn btn-primary px-3" type="button" onclick="copyVal('PullApiEndPoint')">Copy</button>
+                                </div>
+                                <div class="form-text small" style="font-size:11px;">Appended to base URL when polling</div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Request Timeout (Sec)</label>
+                                <input type="number" id="RequestTimeout" name="RequestTimeout" class="form-control bg-light" value="30">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Retry Attempt of Failure</label>
+                                <input type="number" id="RetryAttemptOfFailer" name="RetryAttemptOfFailer" class="form-control bg-light" value="3">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Retry Backoff (Sec)</label>
+                                <input type="number" id="RetryBackOff" name="RetryBackOff" class="form-control bg-light" value="5">
+                                <div class="form-text small" style="font-size:11px;">Wait between retries</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white py-3 d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary btn-sm fw-bold px-3" onclick="testConnection()">
+                                <i class="fas fa-bolt me-2"></i>Test Connection
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm fw-bold px-3" onclick="copyFullUrl()">
+                                <i class="fas fa-copy me-2"></i>Copy Full Pull URL
+                            </button>
+                        </div>
+                        <div class="small text-muted fw-bold" style="font-size:11px;">
+                            Last test: <span class="text-success">200 OK</span> · 248ms
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Authentication & Security Card (Checkboxes mapped to SQL BIT columns) -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-lock text-danger me-2"></i>Authentication & Security</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold mb-0 small">Use HTTPS only</div>
+                                        <div class="text-muted extra-small" style="font-size:11px;">Reject http:// requests — recommended for production</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="UseHTTPSOnly" name="UseHTTPSOnly" checked>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold mb-0 small">Mask API key in logs</div>
+                                        <div class="text-muted extra-small" style="font-size:11px;">Never write API key to file logs (only first 4 + last 2 chars)</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="maskApiInLog" name="maskApiInLog" checked>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item py-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold mb-0 small">IP whitelist enforcement</div>
+                                        <div class="text-muted extra-small" style="font-size:11px;">Only allow requests from registered IPs</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="IPWhiteListEnforcement" name="IPWhiteListEnforcement">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-group-item py-3 border-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-bold mb-0 small">Auto-rotate API key every 90 days</div>
+                                        <div class="text-muted extra-small" style="font-size:11px;">Notify admin via email before expiry</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="AutoRotateApiKeyOnEvery90Days" name="AutoRotateApiKeyOnEvery90Days">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 2. PULL API TAB -->
+            <div class="tab-pane fade" id="tab-pull" role="tabpanel">
+
+                <!-- Polling Schedule Card (Mapped to SQL) -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-clock text-primary me-2"></i>Polling Schedule & Frequency</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Pull Frequency</label>
+                                <select id="PullFrequency" name="PullFrequency" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="5">Every 5 Minutes</option>
+                                    <option value="15" selected>Every 15 Minutes</option>
+                                    <option value="30">Every 30 Minutes</option>
+                                    <option value="60">Every 1 Hour</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Date Range Window</label>
+                                <select id="DateRangeWindow" name="DateRangeWindow" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="1">Last 1 Day</option>
+                                    <option value="2" selected>Last 2 Days</option>
+                                    <option value="7">Last 7 Days</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Active Hours</label>
+                                <select id="ActiveHours" name="ActiveHours" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="24" selected>24/7 (Always Active)</option>
+                                    <option value="08-18">08:00 - 18:00</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Selection Toggles (Mapped to SQL BIT Columns) -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-check-double text-success me-2"></i>Data Selection Toggles</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-3 border-end">
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" id="UserIDPull" name="UserIDPull" checked>
+                                    <label class="form-check-label fw-bold small">User ID Pull</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 border-end">
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" id="LogDate" name="LogDate" checked>
+                                    <label class="form-check-label fw-bold small">Log Date/Time</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 border-end">
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" id="SerialNumberPull" name="SerialNumberPull" checked>
+                                    <label class="form-check-label fw-bold small">Serial Number</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-check form-switch mb-1">
+                                    <input class="form-check-input" type="checkbox" id="DeviceNamePull" name="DeviceNamePull">
+                                    <label class="form-check-label fw-bold small">Device Name</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Mapping Table (Mapped to SQL nvarchar(max) Columns) -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-table text-info me-2"></i>Field Mapping → Payroll System</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light small fw-bold text-uppercase">
+                                    <tr>
+                                        <th class="ps-4">SmartOffice Field</th>
+                                        <th>Payroll System Column</th>
+                                        <th>Transformation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Row 1: UserID -->
+                                    <tr>
+                                        <td class="ps-4 fw-bold small">UserId</td>
+                                        <td><input type="text" id="UseridPayroll" name="UseridPayroll" class="form-control form-control-sm" value="employees.staff_code"></td>
+                                        <td><input type="text" id="UseridTransform" name="UseridTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                    </tr>
+                                    <!-- Row 2: LogDate -->
+                                    <tr>
+                                        <td class="ps-4 fw-bold small">LogDate</td>
+                                        <td><input type="text" id="LogDatePayroll" name="LogDatePayroll" class="form-control form-control-sm" value="punches.punch_time"></td>
+                                        <td><input type="text" id="LogdateTransform" name="LogdateTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                    </tr>
+                                    <!-- Row 3: SerialNumber -->
+                                    <tr>
+                                        <td class="ps-4 fw-bold small">SerialNumber</td>
+                                        <td><input type="text" id="SerialNumberPayroll" name="SerialNumberPayroll" class="form-control form-control-sm" value="punches.machine_serial"></td>
+                                        <td><input type="text" id="SerialNumberTransform" name="SerialNumberTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                    </tr>
+                                    <!-- Row 4: DeviceSName (The one you requested) -->
+                                    <tr>
+                                        <td class="ps-4 fw-bold small">DeviceName</td>
+                                        <td><input type="text" id="DeviceSNamesPayroll" name="DeviceSNamesPayroll" class="form-control form-control-sm" placeholder="punches.device_name"></td>
+                                        <td><input type="text" id="deviceSNamesTransform" name="deviceSNamesTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duplicate Handling Card (Mapped to SQL) -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-shield-alt text-warning me-2"></i>Duplicate Handling & Validation</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">On Duplicate Punch</label>
+                                <select id="OnDuplicatePunch" name="OnDuplicatePunch" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Ignore">Ignore</option>
+                                    <option value="Overwrite">Overwrite</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Unknown Employee Code</label>
+                                <select id="UnknownEmployeeCode" name="UnknownEmployeeCode" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="LogError">Log Error</option>
+                                    <option value="Create">Create</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 border-top pt-3">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="RejectFuturePunch" name="RejectFuturePunch" checked>
+                                    <label class="form-check-label fw-bold small">Reject Future Punches</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="RejectOldPunch" name="RejectOldPunch">
+                                    <label class="form-check-label fw-bold small">Reject Old Punches</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="EmailOnFailure" name="EmailOnFailure">
+                                    <label class="form-check-label fw-bold small">Email on Failure</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- 3. DEVICES TAB -->
+            <div class="tab-pane fade" id="tab-dev">
+
+                <!-- Biometric Devices Table Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0 fw-bold"><i class="fas fa-microchip text-primary me-2"></i>Biometric Device Management</h6>
+                            <small class="text-muted">Total Registered: <span id="dev-count-text" class="fw-bold text-primary">0</span></small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-success-light text-success border border-success-subtle px-3 py-2 rounded-pill fw-bold" style="font-size:10px;">● 3 Online</span>
+                            <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="addDeviceRow()">
+                                <i class="fas fa-plus me-1"></i> Add Device
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="alert alert-primary border-0 rounded-0 small mb-0 p-2 text-center" style="background:#EFF6FF; color:#1E40AF;">
+                            <i class="fas fa-info-circle me-2"></i>Devices are synced with SmartOffice via <code>/AddBiometric</code>. Changes save to local DB and Cloud.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered mb-0 align-middle">
+                                <thead class="table-light small fw-bold text-uppercase text-center">
+                                    <tr>
+                                        <th width="50">#</th>
+                                        <th>Device Name</th>
+                                        <th>Serial Number</th>
+                                        <th>Model / Type</th>
+                                        <th>Location</th>
+                                        <th width="100">Status</th>
+                                        <th width="50">#</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblDeviceBody" class="text-center">
+                                    <!-- Dynamic rows will be injected here via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device-Wide Capabilities Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-cog text-secondary me-2"></i>Device-Wide Global Capabilities</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Default Verify Mode</label>
+                                <select id="DefaultVerifyMode" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Face">Face Only</option>
+                                    <option value="Finger">Fingerprint Only</option>
+                                    <option value="Card">Card Only</option>
+                                    <option value="Face+Card" selected>Face + Card (Dual)</option>
+                                    <option value="Any">Any Mode</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Upload Face Templates</label>
+                                <select id="UploadFaceTemplates" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="True">Enabled</option>
+                                    <option value="False">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Upload Fingerprints</label>
+                                <select id="UploadFingerprints" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="True">Enabled</option>
+                                    <option value="False">Disabled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Upload Cards</label>
+                                <select id="UploadCards" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="True">Enabled</option>
+                                    <option value="False">Disabled</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Device Maintenance Commands Card -->
+                <div class="card shadow-sm border-danger-subtle">
+                    <div class="card-header bg-light-subtle py-3 border-danger-subtle">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-tools text-danger me-2"></i>Device Maintenance & Remote Commands</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning border-0 rounded-3 small mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Commands are issued asynchronously. Track execution status in the <strong>API Tester → Commands Log</strong>.
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Auto-Clear Logs After Sync</label>
+                                <select id="AutoClearLogsAfterSync" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="None">Keep logs on device</option>
+                                    <option value="Success">Clear after successful pull</option>
+                                    <option value="Always">Wipe after every session</option>
+                                </select>
+                                <div class="form-text small" style="font-size:11px;">Frees storage on physical device</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Online Enrollment</label>
+                                <select id="OnlineEnrollment" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Enabled">Enabled — trigger from HRMS</option>
+                                    <option value="Disabled">Local enrollment only</option>
+                                </select>
+                                <div class="form-text small" style="font-size:11px;">Calls <code>/TriggerUserOnlineEnrollment</code></div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Block User Support</label>
+                                <select id="BlockUserSupport" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Full">Full (Suspend access immediately)</option>
+                                    <option value="Limited">Limited (Model-dependent)</option>
+                                    <option value="None">None</option>
+                                </select>
+                                <div class="form-text small" style="font-size:11px;">Hardware must support /BlockUser</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 pt-3 border-top">
+                            <button class="btn btn-outline-primary fw-bold" onclick="executeBatchCommand('PullUsers')">
+                                <i class="fas fa-download me-2"></i>Pull users from all devices
+                            </button>
+                            <button class="btn btn-outline-success fw-bold" onclick="executeBatchCommand('PushEmployees')">
+                                <i class="fas fa-upload me-2"></i>Push all active employees
+                            </button>
+                            <button class="btn btn-outline-secondary fw-bold" onclick="executeBatchCommand('ClearLogs')">
+                                <i class="fas fa-trash-alt me-2"></i>Clear logs (all devices)
+                            </button>
+                            <button class="btn btn-outline-danger fw-bold" onclick="executeBatchCommand('Reboot')">
+                                <i class="fas fa-redo me-2"></i>Reboot devices
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+           
+            <!-- 4. SYNC SETTINGS TAB -->
+            <div class="tab-pane fade" id="tab-sync">
+
+                <!-- Employee Push Rules Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-sync text-purple me-2"></i>Employee Push & Automation Rules</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Auto-Push on Employee Add</label>
+                                <select id="AutoPushOnEmployeeAdd" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Immediate" selected>Yes — push immediately</option>
+                                    <option value="Manual">No — manual sync only</option>
+                                    <option value="Scheduled">Batch — push at night</option>
+                                </select>
+                                <div class="form-text small" style="font-size:11px;">Calls <code>/UploadUser</code> when staff_code is created</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Auto-Delete on Resign</label>
+                                <select id="AutoDeleteOnEmployeeResign" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="All" selected>Yes — delete from all devices</option>
+                                    <option value="Mapped">Yes — delete from mapped only</option>
+                                    <option value="No">No — keep on hardware</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Push on Department Change</label>
+                                <select id="PushOnDepartmentChange" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                    <option value="Re-push" selected>Re-push only to new location</option>
+                                    <option value="DeleteOld">Delete from old, push to new</option>
+                                    <option value="None">None</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="border-top pt-2">
+                            <div class="small fw-bold text-muted text-uppercase mb-3" style="font-size:11px;">Push Trigger Toggles</div>
+
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                    <div>
+                                        <div class="fw-bold mb-0">Push photo from HRMS profile to device</div>
+                                        <div class="text-muted small">Calls <code>/PhotoUploadInBiometric</code> — uses base64 from employee profile picture</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="IsPushPhotoEnabled" checked>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                    <div>
+                                        <div class="fw-bold mb-0">Set user expiration = Date of Resignation</div>
+                                        <div class="text-muted small">Auto-calls <code>/SetUserExpiration</code> with employee.DOR</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="IsExpirySetOnResign" checked>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                    <div>
+                                        <div class="fw-bold mb-0">Push to location-mapped devices only</div>
+                                        <div class="text-muted small">Marketing staff → all devices, others → assigned location only</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="IsPushLocationRestricted" checked>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center py-3 px-0">
+                                    <div>
+                                        <div class="fw-bold mb-0">Block user instead of delete on suspension</div>
+                                        <div class="text-muted small">Calls <code>/BlockUserinBiometric</code> — preserves enrollment data on hardware</div>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="IsBlockOnSuspend">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location -> Device Mapping Card -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-map-marker-alt text-teal me-2"></i>Location → Device Mapping</h6>
+                        <button class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="addMappingRow()">
+                            <i class="fas fa-plus me-1"></i> Add Mapping
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="alert alert-info border-0 rounded-0 small mb-0 p-2 text-center" style="background:#F0FDFA; color:#0F766E;">
+                            <i class="fas fa-info-circle me-2"></i>When pushing employees, only their location's devices are targeted. Multi-location employees push to all listed devices.
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered mb-0 align-middle">
+                                <thead class="table-light small fw-bold text-uppercase text-center">
+                                    <tr>
+                                        <th>Location</th>
+                                        <th>Mapped Device Serials</th>
+                                        <th width="120">Employees</th>
+                                        <th width="50">#</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblMappingBody" class="text-center">
+                                    <!-- Mapping rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Command Queue Behaviour Card -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-hourglass-half text-warning me-2"></i>Command Queue Behaviour</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Max Queue Size per Device</label>
+                                <input type="number" id="MaxQueueSizePerDevice" class="form-control bg-light" value="500" min="50">
+                                <div class="form-text small" style="font-size:11px;">Older pending commands dropped if exceeded</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Stale Command TTL (Hours)</label>
+                                <input type="number" id="StaleCommandTTLHours" class="form-control bg-light" value="24" min="1">
+                                <div class="form-text small" style="font-size:11px;">Pending > X hrs auto-marked failed</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label small fw-bold text-uppercase text-muted">Concurrent Commands per Device</label>
+                                <input type="number" id="ConcurrentCommandsPerDevice" class="form-control bg-light" value="3" min="1" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 5. ENDPOINTS TAB -->
+            <div class="tab-pane fade" id="tab-endpoints">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-satellite-dish text-blue me-2"></i>Available API Endpoints</h6>
+                        <span class="badge bg-primary-light text-primary border border-primary-subtle px-3 py-2 rounded-pill fw-bold" style="font-size:10px;">SmartOffice v1.0.4</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info border-0 rounded-3 small mb-4">
+                            <i class="fas fa-info-circle me-2"></i>All endpoints are pre-bound to your company's API key. Click <strong>Test</strong> to jump to the tester with the selected endpoint.
+                        </div>
+
+                        <!-- Device Management Section -->
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:11px;">📟 Device Management</div>
+                        <div class="list-group mb-4 shadow-sm">
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <span class="badge bg-success me-3" style="width: 45px;">POST</span>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">Add Biometric Device</div>
+                                    <div class="text-muted extra-small" style="font-size:11px;">Register new device on SmartOffice cloud</div>
+                                </div>
+                                <div class="font-monospace text-muted small me-4 d-none d-md-block">/api/v2/WebAPI/AddBiometric</div>
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" onclick="testEndpoint('AddBiometric')">Test ▶</button>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <span class="badge bg-primary me-3" style="width: 45px;">GET</span>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">Get Device Commands Status</div>
+                                    <div class="text-muted extra-small" style="font-size:11px;">Track issued commands & their state</div>
+                                </div>
+                                <div class="font-monospace text-muted small me-4 d-none d-md-block">/api/WebAPI/GetDeviceCommands</div>
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" onclick="testEndpoint('GetDeviceCommands')">Test ▶</button>
+                            </div>
+                        </div>
+
+                        <!-- User Management Section -->
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:11px;">👥 User Management</div>
+                        <div class="list-group mb-4 shadow-sm">
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <span class="badge bg-success me-3" style="width: 45px;">POST</span>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">Upload User</div>
+                                    <div class="text-muted extra-small" style="font-size:11px;">Push employee to one or many devices</div>
+                                </div>
+                                <div class="font-monospace text-muted small me-4 d-none d-md-block">/api/v2/WebAPI/UploadUser</div>
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" onclick="testEndpoint('UploadUser')">Test ▶</button>
+                            </div>
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <span class="badge bg-primary me-3" style="width: 45px;">GET</span>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">Fetch Live Users</div>
+                                    <div class="text-muted extra-small" style="font-size:11px;">List enrolled users on a device</div>
+                                </div>
+                                <div class="font-monospace text-muted small me-4 d-none d-md-block">/api/v2/WebAPI/FetchLiveUsersFromBiometric</div>
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" onclick="testEndpoint('FetchLiveUsers')">Test ▶</button>
+                            </div>
+                        </div>
+
+                        <!-- Logs & Data Section -->
+                        <div class="small fw-bold text-muted text-uppercase mb-2" style="font-size:11px;">⬇ Logs & Data</div>
+                        <div class="list-group shadow-sm">
+                            <div class="list-group-item d-flex align-items-center py-3">
+                                <span class="badge bg-primary me-3" style="width: 45px;">GET</span>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold small">Pull API (4-field)</div>
+                                    <div class="text-muted extra-small" style="font-size:11px;">Public pull API — only 4 fields exposed</div>
+                                </div>
+                                <div class="font-monospace text-muted small me-4 d-none d-md-block">/api/SwipeDetails/GetDeviceLogs</div>
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3 rounded-pill" onclick="testEndpoint('PullAPI')">Test ▶</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. TESTER -->
+            <!-- 6. API TESTER TAB -->
+            <div class="tab-pane fade" id="tab-tester">
+
+                <!-- Dark Simulator Wrap -->
+                <div class="card bg-dark text-white shadow-lg mb-4 border-0 rounded-4 overflow-hidden" style="background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%) !important;">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <div class="bg-primary rounded-circle" style="width:10px; height:10px; box-shadow: 0 0 10px #2563EB;"></div>
+                            <h5 class="mb-0 fw-bold">Live API Tester</h5>
+                        </div>
+                        <p class="text-secondary small mb-4">Fire a request against the configured SmartOffice endpoint using current credentials.</p>
+
+                        <!-- Tester Controls -->
+                        <div class="row g-2 align-items-end mb-4">
+                            <div class="col-md-5">
+                                <label class="small fw-bold text-secondary text-uppercase" style="font-size:10px;">Endpoint</label>
+                                <select id="t-endpoint" class="form-select bg-black text-white border-secondary shadow-none" onchange="updateTesterPreview()">
+                                    <option value="pull" selected>GET — Pull API (4-field)</option>
+                                    <option value="logs">GET — Internal Get Device Logs</option>
+                                    <option value="upload">POST — Upload User</option>
+                                    <option value="fetchusers">GET — Fetch Live Users</option>
+                                    <option value="commands">GET — Get Device Commands</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small fw-bold text-secondary text-uppercase" style="font-size:10px;">From / Param 1</label>
+                                <input type="text" id="t-p1" class="form-control bg-black text-white border-secondary shadow-none" value="2026-04-25">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="small fw-bold text-secondary text-uppercase" style="font-size:10px;">To / Param 2</label>
+                                <input type="text" id="t-p2" class="form-control bg-black text-white border-secondary shadow-none" value="2026-05-02">
+                            </div>
+                            <div class="col-md-1">
+                                <button class="btn btn-primary w-100 fw-bold shadow-none" onclick="runApiTest()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status Metrics -->
+                        <div class="row g-3 mb-4 text-center">
+                            <div class="col-6 col-md-3">
+                                <div class="bg-white bg-opacity-10 p-2 rounded-3 border border-white border-opacity-10">
+                                    <div class="extra-small text-secondary fw-bold" style="font-size:9px;">STATUS</div>
+                                    <div class="h5 mb-0 text-success fw-bold" id="t-status">200 OK</div>
+                                    <div class="extra-small text-muted" style="font-size:9px;">Success</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="bg-white bg-opacity-10 p-2 rounded-3 border border-white border-opacity-10">
+                                    <div class="extra-small text-secondary fw-bold" style="font-size:9px;">LATENCY</div>
+                                    <div class="h5 mb-0 fw-bold" id="t-latency">248 ms</div>
+                                    <div class="extra-small text-muted" style="font-size:9px;">TTFB + body</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="bg-white bg-opacity-10 p-2 rounded-3 border border-white border-opacity-10">
+                                    <div class="extra-small text-secondary fw-bold" style="font-size:9px;">RECORDS</div>
+                                    <div class="h5 mb-0 fw-bold" id="t-records">142</div>
+                                    <div class="extra-small text-muted" style="font-size:9px;">Logs returned</div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <div class="bg-white bg-opacity-10 p-2 rounded-3 border border-white border-opacity-10">
+                                    <div class="extra-small text-secondary fw-bold" style="font-size:9px;">PAYLOAD</div>
+                                    <div class="h5 mb-0 fw-bold" id="t-size">14.2 KB</div>
+                                    <div class="extra-small text-muted" style="font-size:9px;">gzipped</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabbed Output -->
+                        <ul class="nav nav-pills nav-justified mb-3 small" style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 4px;">
+                            <li class="nav-item"><button class="nav-link active py-1 text-white opacity-75" data-bs-toggle="pill" data-bs-target="#sp-req">Request</button></li>
+                            <li class="nav-item"><button class="nav-link py-1 text-white opacity-75" data-bs-toggle="pill" data-bs-target="#sp-res">Response</button></li>
+                            <li class="nav-item"><button class="nav-link py-1 text-white opacity-75" data-bs-toggle="pill" data-bs-target="#sp-log">Activity Log</button></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="sp-req">
+                                <div class="bg-black bg-opacity-50 p-3 rounded-3 font-monospace small border border-secondary border-opacity-25" id="req-pre" style="min-height: 120px;">
+                                    <!-- Request preview injected via JS -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="sp-res">
+                                <div class="bg-black bg-opacity-50 p-3 rounded-3 font-monospace small border border-secondary border-opacity-25" id="res-pre" style="min-height: 120px; color: #10B981;">
+                                    <!-- Response JSON injected via JS -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="sp-log">
+                                <div class="bg-black bg-opacity-50 p-3 rounded-3 font-monospace small border border-secondary border-opacity-25" id="t-log" style="min-height: 120px; color: #94A3B8;">
+                                    <!-- Execution logs injected via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Card -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold"><i class="fas fa-history text-muted me-2"></i>Recent Pull Activity</h6>
+                        <span class="badge bg-success-light text-success fw-bold" style="font-size:10px;">Last 24h</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle small">
+                                <thead class="table-light text-uppercase" style="font-size: 10px;">
+                                    <tr>
+                                        <th class="ps-4">Method</th>
+                                        <th>Endpoint / Description</th>
+                                        <th>Status</th>
+                                        <th>Latency</th>
+                                        <th class="pe-4 text-end">Payload</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="ps-4"><span class="badge bg-primary px-2 py-1">GET</span></td>
+                                        <td><div class="fw-bold">Pull API · 142 logs</div><div class="text-muted extra-small">2026-05-02 14:32:18 IST</div></td>
+                                        <td><span class="badge bg-success-light text-success border border-success-subtle">200 OK</span></td>
+                                        <td>248ms</td>
+                                        <td class="pe-4 text-end text-muted font-monospace">14.2 KB</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4"><span class="badge bg-success px-2 py-1">POST</span></td>
+                                        <td><div class="fw-bold">UploadUser · #STF1042</div><div class="text-muted extra-small">2026-05-02 13:48:02 IST</div></td>
+                                        <td><span class="badge bg-success-light text-success border border-success-subtle">200 OK</span></td>
+                                        <td>412ms</td>
+                                        <td class="pe-4 text-end text-muted font-monospace">2.1 KB</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4"><span class="badge bg-primary px-2 py-1">GET</span></td>
+                                        <td><div class="fw-bold">Pull API · timeout</div><div class="text-muted extra-small">2026-05-02 13:32:48 IST</div></td>
+                                        <td><span class="badge bg-danger-light text-danger border border-danger-subtle">408</span></td>
+                                        <td>30000ms</td>
+                                        <td class="pe-4 text-end text-muted font-monospace">—</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/payroll_api_config_entry.js" asp-append-version="true"></script>
+}

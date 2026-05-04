@@ -69,6 +69,13 @@ builder.Services.AddScoped<MasterConfigurationRepo>();
 builder.Services.AddScoped<TransactionEmployeeLoanService>();
 builder.Services.AddScoped<TransactionEmployeeLoanRepo>();
 
+
+
+// Repositories for Master Configuration Module
+builder.Services.AddScoped<MasterBiomatricDevicesRepo>();
+builder.Services.AddScoped<MasterLocationDeviceMappingRepo>();
+builder.Services.AddScoped<MasterPayRollApiConfigrationRepo>();
+
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
@@ -89,6 +96,10 @@ builder.Services.AddScoped<MasterConfigurationService>();
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();
 builder.Services.AddScoped<TransactionEmployeeKharchiRepo>();
 
+// Services for Master Configuration Module
+builder.Services.AddScoped<MasterBiomatricDevicesService>();
+builder.Services.AddScoped<MasterLocationDeviceMappingService>();
+builder.Services.AddScoped<MasterPayRollApiConfigrationService>();
 
 // ---------------------------------
 // JWT AUTH

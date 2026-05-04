@@ -72,9 +72,21 @@ namespace Airmax_Payroll_System.Controllers
             return View();
         }
 
-        public IActionResult PayConfig()
+
+        public IActionResult BiometricDevice()
         {
             return View();
         }
+
+        public IActionResult LocationDeviceMapping()
+        {
+            return View();
+        }
+
+        public IActionResult PayRollApiConfigration()
+        {
+            return View();
+        }
+        
     }
 }
