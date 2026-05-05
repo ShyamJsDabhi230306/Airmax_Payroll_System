@@ -71,5 +71,15 @@ namespace Airmax_Payroll_System.Controllers
         {
             return View();
         }
+
+        public IActionResult PayrollConfigurationList()
+        {
+            return View();
+        }
+
+        public IActionResult PayrollConfigurationEntry()
+        {
+            return View();
+        }
     }
 }

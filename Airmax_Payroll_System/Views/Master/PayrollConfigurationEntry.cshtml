@@ -1,0 +1,593 @@
+﻿@{
+    ViewBag.Title = "Payroll Configuration Entry";
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 text-primary fw-bold">Payroll Configuration Entry</h5>
+            <small class="text-muted">Configure shift, late, early, OT, loan, extra day and payslip rules</small>
+        </div>
+
+        <a href="/Master/PayrollConfigurationList" class="btn btn-outline-secondary btn-sm px-3 shadow-sm">
+            <i class="fas fa-list me-1"></i> Configuration List
+        </a>
+    </div>
+
+    <div class="card-body">
+        <input type="hidden" id="IDPayrollConfiguration" value="0" />
+
+        <!-- Company / Employee Group -->
+        <div class="card shadow-sm border-0 mb-3">
+            <div class="card-body bg-light rounded border">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Company</label>
+                        <select id="IDCompany" class="form-control selectpicker" data-live-search="true">
+                            <option value="">Select Company</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Employee Group</label>
+                        <select id="IDEmployeeGroup" class="form-control selectpicker" data-live-search="true">
+                            <option value="">Select Employee Group</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs mb-3" id="payrollConfigTabs" role="tablist">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabShift" type="button">
+                    <i class="fas fa-clock me-1"></i> Shift
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabLate" type="button">
+                    <i class="fas fa-stopwatch me-1"></i> Late Rule
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabEarly" type="button">
+                    <i class="fas fa-walking me-1"></i> Early Going
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabOT" type="button">
+                    <i class="fas fa-moon me-1"></i> OT
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabLoan" type="button">
+                    <i class="fas fa-hand-holding-usd me-1"></i> Loan
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabExtraDay" type="button">
+                    <i class="fas fa-calendar-day me-1"></i> Extra Day
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPayslip" type="button">
+                    <i class="fas fa-file-invoice me-1"></i> Payslip
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabComponents" type="button">
+                    <i class="fas fa-layer-group me-1"></i> Salary Components
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active" id="tabShift">
+            <!-- Shift Configuration -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-clock me-2"></i> Shift Configuration
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Shift In Time</label>
+                            <input type="time" id="ShiftInTime" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Shift Out Time</label>
+                            <input type="time" id="ShiftOutTime" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Grace Period</label>
+                            <input type="time" id="GracePeriods" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Shift Type</label>
+                            <select id="ShiftType" class="form-control form-select default-select">
+                                <option value="Fixed">Fixed</option>
+                                <option value="Flexible">Flexible</option>
+                                <option value="Rotational">Rotational</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Working Hour</label>
+                            <input type="number" id="WorkingHour" class="form-control" step="0.5" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Min Full Day Hours</label>
+                            <input type="number" id="MinFullDayHours" class="form-control" step="0.5" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Weekly Off</label>
+                            <select id="WeeklyOff" class="form-control form-select default-select">
+                                <option value="Sunday">Sunday</option>
+                                <option value="Sunday+Saturday">Sunday+Saturday</option>
+                                <option value="2nd & 4th Saturday + Sunday">2nd & 4th Saturday + Sunday</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabLate">
+            <!-- Late Rule -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-stopwatch me-2"></i> Late Rule
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Allowed Late Count</label>
+                            <input type="number" id="AllowedLateCount" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Max Allowed Late Time</label>
+                            <input type="time" id="MaxAllowedLateTime" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">After Late Action</label>
+                            <select id="AfterLateActionType" class="form-control form-select default-select">
+                                <option value="Half Day Deduction">Half Day Deduction</option>
+                                <option value="Salary Deduction">Salary Deduction</option>
+                                <option value="Warning">Warning</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Penalty Start Count</label>
+                            <input type="number" id="PenaltyStartFromCount" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Half Day Threshold</label>
+                            <input type="time" id="HalfDayThreshold" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Full Absent Threshold</label>
+                            <input type="time" id="FullAbsentThreshold" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Grace Period Late</label>
+                            <input type="time" id="GracePeriodLate" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Fixed Deduction / Minute</label>
+                            <input type="number" id="FixedDeductionPerMinute" class="form-control" step="0.01" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Max Deductible Per Day</label>
+                            <select id="MaxDeductiblePerDay" class="form-control form-select default-select">
+                                <option value="Half Day">Half Day</option>
+                                <option value="Full Day">Full Day</option>
+                                <option value="No Cap">No Cap</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Per Minute Auto Calculate</label>
+                            <select id="PerMinuteAutoCalculate" class="form-control form-select default-select">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-2">
+                            <thead class="table-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>From Time</th>
+                                    <th>To Time</th>
+                                    <th>Deduction</th>
+                                    <th>Value</th>
+                                    <th width="50"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblLateSlabBody"></tbody>
+                        </table>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addLateSlabRow()">
+                        + Add Late Slab
+                    </button>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabEarly">
+            <!-- Early Going Rule -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-walking me-2"></i> Early Going Rule
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Allowed Count</label>
+                            <input type="number" id="EarlyAllowedCount" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Buffer Minutes</label>
+                            <input type="number" id="EarlyBufferMinutes" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">After Count Action</label>
+                            <select id="EarlyAfterCountAction" class="form-control form-select default-select">
+                                <option value="Half Day Deduction">Half Day Deduction</option>
+                                <option value="Salary Deduction">Salary Deduction</option>
+                                <option value="Warning">Warning</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Half Day Before Time</label>
+                            <input type="time" id="EarlyHalfDayBeforeTime" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-2">
+                            <thead class="table-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>Leave Before</th>
+                                    <th>Leave After</th>
+                                    <th>Deduction</th>
+                                    <th width="50"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblEarlySlabBody"></tbody>
+                        </table>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addEarlySlabRow()">
+                        + Add Early Slab
+                    </button>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabOT">
+                <!-- Overtime Rule -->
+                <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-moon me-2"></i> Overtime Rule
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">OT Start After</label>
+                            <input type="time" id="OTStartAfterTime" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Calculation Basis</label>
+                            <select id="OTCalculationBasis" class="form-control form-select default-select">
+                                <option value="Hours">Hours</option>
+                                <option value="Exact Minutes">Exact Minutes</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Max OT Per Day</label>
+                            <input type="number" id="MaxOTPerDay" class="form-control" step="0.5" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">OT Applicable</label>
+                            <select id="OTApplicable" class="form-control form-select default-select">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-2">
+                            <thead class="table-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>From Time</th>
+                                    <th>To Time</th>
+                                    <th>OT Hours</th>
+                                    <th>Rate Multiplier</th>
+                                    <th width="50"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblOTSlabBody"></tbody>
+                        </table>
+                    </div>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addOTSlabRow()">
+                        + Add OT Slab
+                    </button>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabLoan">
+                <!-- Loan Configuration -->
+                <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-hand-holding-usd me-2"></i> Loan Configuration
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Max Loan Amount</label><input type="number" id="MaxLoanAmount" class="form-control" /></div>
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Alternate Loan Amount</label><input type="number" id="AlternateLoanAmount" class="form-control" /></div>
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Salary Threshold</label><input type="number" id="SalaryThresholdForAltLoan" class="form-control" /></div>
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Max Loan Tenure</label><input type="number" id="MaxLoanTenure" class="form-control" /></div>
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Min Service Required</label><input type="number" id="MinServiceRequired" class="form-control" /></div>
+                        <div class="col-md-3"><label class="form-label small fw-bold text-muted text-uppercase">Guarantor Required</label><input type="number" id="GuarantorRequired" class="form-control" /></div>
+                            <div class="col-md-2"><label class="form-label small fw-bold text-muted text-uppercase">Pre Close</label><select id="AllowPreClose" class="form-control form-select default-select"><option value="true">Yes</option><option value="false">No</option></select></div>
+                            <div class="col-md-2"><label class="form-label small fw-bold text-muted text-uppercase">EMI Skip</label><select id="AllowEMISkip" class="form-control form-select default-select"><option value="true">Yes</option><option value="false">No</option></select></div>
+                            <div class="col-md-2"><label class="form-label small fw-bold text-muted text-uppercase">Interest</label><select id="InterestApplicable" class="form-control form-select default-select"><option value="true">Yes</option><option value="false">No</option></select></div>
+                            <div class="col-md-2"><label class="form-label small fw-bold text-muted text-uppercase">Auto EMI</label><select id="AutoDeductEMI" class="form-control form-select default-select"><option value="true">Yes</option><option value="false">No</option></select></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabExtraDay">
+                <!-- Extra Day Rule -->
+                <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-calendar-day me-2"></i> Extra Day Rule
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Enable Extra Day Payment</label>
+                            <select id="ExtraDayPaymentEnabled" class="form-control">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Payment Type</label>
+                            <select id="ExtraDayPaymentType" class="form-control form-select default-select">
+                                <option value="Basic Salary Only">Basic Salary Only</option>
+                                <option value="Full Salary">Full Salary</option>
+                                <option value="Custom multiplier">Custom multiplier</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Applicable Days</label>
+                            <select id="ExtraDayApplicable" class="form-control form-select default-select">
+                                <option value="Sunday only">Sunday only</option>
+                                <option value="All weekly offs">All weekly offs</option>
+                                <option value="Public holidays only">Public holidays only</option>
+                                <option value="All off days">All off days</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Min Hours</label>
+                            <input type="number" id="ExtraDayMinHours" class="form-control" step="0.5" />
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Exclusions — Do not include in extra day pay</label>
+                            <div class="d-flex flex-wrap gap-2" id="extraDayExclusionBox">
+                                    <button type="button" class="btn btn-sm btn-primary exclusion-chip active" data-name="Bonus">Bonus</button>
+                                    <button type="button" class="btn btn-sm btn-primary exclusion-chip active" data-name="Tea / Coffee">Tea / Coffee</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary exclusion-chip" data-name="Leave Credit">Leave Credit</button>
+                                    <button type="button" class="btn btn-sm btn-primary exclusion-chip active" data-name="OT Amount">OT Amount</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary exclusion-chip" data-name="HRA">HRA</button>
+                                    <button type="button" class="btn btn-sm btn-primary exclusion-chip active" data-name="PF Deduction">PF Deduction</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabPayslip">
+                <!-- Payslip Settings -->
+                <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white py-3">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-file-invoice me-2"></i> Payslip Settings
+                    </h6>
+                </div>
+
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label small fw-bold text-muted text-uppercase">Header Text</label><input type="text" id="PayslipHeaderText" class="form-control" /></div>
+                        <div class="col-md-6"><label class="form-label small fw-bold text-muted text-uppercase">Footer Note</label><input type="text" id="PayslipFooterNote" class="form-control" /></div>
+
+                        <!-- Logo -->
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted text-uppercase d-block">Logo</label>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="ShowCompanyLogo" checked>
+                    <label class="form-check-label" for="ShowCompanyLogo">Yes</label>
+                </div>
+            </div>
+
+            <!-- PF/ESIC -->
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted text-uppercase d-block">PF/ESIC</label>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="ShowPFESICBreakdown" checked>
+                    <label class="form-check-label" for="ShowPFESICBreakdown">Yes</label>
+                </div>
+            </div>
+
+            <!-- Component Breakdown -->
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted text-uppercase d-block">Component Breakdown</label>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="ShowSalaryComponentBreakdown" checked>
+                    <label class="form-check-label" for="ShowSalaryComponentBreakdown">Yes</label>
+                </div>
+            </div>
+
+            <!-- Auto Email -->
+            <div class="col-md-2">
+                <label class="form-label small fw-bold text-muted text-uppercase d-block">Auto Email</label>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="AutoEmailPayslip" checked>
+                    <label class="form-check-label" for="AutoEmailPayslip">Yes</label>
+                </div>
+            </div>
+
+            <!-- Show OT Separately -->
+            <div class="col-md-3">
+                <label class="form-label small fw-bold text-muted text-uppercase d-block">Show OT Separately</label>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="ShowOTAmountSeparately" checked>
+                    <label class="form-check-label" for="ShowOTAmountSeparately">Yes</label>
+                </div>
+            </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="tab-pane fade" id="tabComponents">
+                <!-- Salary Components -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="alert alert-primary small mb-3">
+                        Define salary components. Click variable or operator buttons below to insert into selected Formula field.
+                    </div>
+
+                    <div class="border rounded p-3 mb-0 bg-light">
+                        <label class="form-label small fw-bold text-muted text-uppercase">
+                            Available Formula Variables — Click to Insert
+                        </label>
+
+                        <div class="d-flex flex-wrap gap-2 mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="salary">salary</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="workingDays">workingDays</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="presentDays">presentDays</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="totalDays">totalDays</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="paidDays">paidDays</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="otDays">otDays</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="leavePercentage">leavePercentage</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="bonusPer">bonusPer</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="lateHrs">lateHrs</button>
+                            <button type="button" class="btn btn-sm btn-outline-primary formula-tag" data-value="secondSalary">secondSalary</button>
+
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="basic">basic</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="hra">hra</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="conveyance">conveyance</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="medical">medical</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="salaryAmt">salaryAmt</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="leaveAmt">leaveAmt</button>
+                            <button type="button" class="btn btn-sm btn-outline-success formula-tag" data-value="bonusAmt">bonusAmt</button>
+                        </div>
+
+                        <label class="form-label small fw-bold text-muted text-uppercase mt-2">
+                            Operators
+                        </label>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" + ">+ Add</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" - ">− Minus</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" * ">× Multiply</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" / ">÷ Divide</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" ( ">(</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark formula-tag" data-value=" ) ">)</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-layer-group me-2"></i> Salary Components
+                    </h6>
+
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="addComponentRow()">
+                        + Add Component
+                    </button>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small text-muted text-uppercase">
+                                    <th>Component</th>
+                                    <th>Formula</th>
+                                    <th>Taxable</th>
+                                    <th>Show On Payslip</th>
+                                    <th>Sort</th>
+                                    <th width="50"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblComponentBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-end">
+            <a href="/Master/PayrollConfigurationList" class="btn btn-outline-secondary px-4">Cancel</a>
+            <button type="button" id="btnSave" class="btn btn-primary px-5 fw-bold" onclick="saveData()">
+                <i class="fas fa-save me-1"></i> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/payroll_configuration_entry.js" asp-append-version="true"></script>
+}

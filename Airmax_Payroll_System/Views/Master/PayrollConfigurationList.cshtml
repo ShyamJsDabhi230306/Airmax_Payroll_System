@@ -1,0 +1,44 @@
+﻿@{
+    ViewBag.Title = "Payroll Configuration List";
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <div>
+            <h5 class="mb-0 text-primary fw-bold">Payroll Configuration</h5>
+            <small class="text-muted">Manage payroll rules company and employee group wise</small>
+        </div>
+
+        <a href="/Master/PayrollConfigurationEntry" class="btn btn-primary btn-sm px-4 fw-bold shadow-sm">
+            <i class="fas fa-plus-circle me-1"></i> ADD NEW
+        </a>
+    </div>
+
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="payrollConfigList" class="table table-hover border">
+                <thead class="bg-light">
+                    <tr class="small text-muted text-uppercase">
+                        <th class="text-center">#</th>
+                        <th>Company</th>
+                        <th>Employee Group</th>
+                        <th>Shift</th>
+                        <th>Weekly Off</th>
+                        <th>OT</th>
+                        <th>Extra Day</th>
+                        <th style="width:2%">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tblBody">
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">Loading payroll configuration...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/payroll_configuration_list.js" asp-append-version="true"></script>
+}

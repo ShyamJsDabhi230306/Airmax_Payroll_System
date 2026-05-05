@@ -146,18 +146,18 @@
         };
 
         // Show message from query string if present (Spec Requirement #5)
-        document.addEventListener("DOMContentLoaded", function() {
-            const params = new URLSearchParams(window.location.search);
-            const msg = params.get("message");
-            if (msg) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Access Restricted',
-                    text: msg,
-                    confirmButtonText: 'Understood'
-                });
-            }
-        });
+        // document.addEventListener("DOMContentLoaded", function() {
+        //     const params = new URLSearchParams(window.location.search);
+        //     const msg = params.get("message");
+        //     if (msg) {
+        //         Swal.fire({
+        //             icon: 'warning',
+        //             title: 'Access Restricted',
+        //             text: msg,
+        //             confirmButtonText: 'Understood'
+        //         });
+        //     }
+        // });
     </script>
 
 </body>

@@ -59,6 +59,7 @@ builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsRepo>();
 builder.Services.AddScoped<UserRightsRepo>();
 builder.Services.AddScoped<MasterPageRepo>();
 builder.Services.AddScoped<MasterConfigurationRepo>();
+builder.Services.AddScoped<MasterPayrollConfigurationRepo>();          // Payroll Config Repo
 
 // Master Configuration Module
 
@@ -83,6 +84,7 @@ builder.Services.AddScoped<MasterEmployeeGroupBonusDetailsService>();
 builder.Services.AddScoped<UserRightsService>();
 builder.Services.AddScoped<MasterPageService>();
 builder.Services.AddScoped<MasterConfigurationService>();
+builder.Services.AddScoped<MasterPayrollConfigurationService>();          // Payroll Config service
 
 
 // FOR TRANSACTION SERVICE
