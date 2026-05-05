@@ -114,5 +114,13 @@ namespace Airmax_Payroll_System.Controllers.API
                 data
             });
         }
+
+        [HttpGet("get-count-by-location/{id:int}")]
+        public async Task<IActionResult> GetCountByLocation(int id)
+        {
+            var count = await _service.GetCountByLocationAsync(id);
+            return Ok(new { success = true, count = count });
+        }
+
     }
 }

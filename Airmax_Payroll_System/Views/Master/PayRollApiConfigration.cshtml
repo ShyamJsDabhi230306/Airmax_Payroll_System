@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "API & Attendance Configuration";
 }
-
+ @* value="/api/SwipeDetails/GetDeviceLogs" *@
 <div class="row">
     <!-- Page Header -->
     <!-- PAGE HEADER / TOP ACTION BAR -->
@@ -112,12 +112,12 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Base URL</label>
-                                <input type="text" id="BaseUrl" name="BaseUrl" class="form-control bg-light font-monospace" placeholder="https://sohcm.com/SmartApp_ess">
+                                <input type="text" id="BaseUrl" name="BaseUrl" class="form-control bg-light font-monospace" placeholder=" Please Enter Base Url">
                                 <div class="form-text small" style="font-size:11px;">SmartOffice cloud endpoint (no trailing slash)</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Account Name</label>
-                                <input type="text" id="AccountName" name="AccountName" class="form-control bg-light" placeholder="ACE">
+                                <input type="text" id="AccountName" name="AccountName" class="form-control bg-light" placeholder="Please Enter Account Name">
                                 <div class="form-text small" style="font-size:11px;">Tenant identifier on SmartOffice cloud</div>
                             </div>
                         </div>
@@ -126,7 +126,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-uppercase text-muted">API Key (Authentication Token)</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="password" id="ApiKey" name="ApiKey" class="form-control bg-light font-monospace" placeholder="••••••••••••">
+                                    <input type="password" id="ApiKey" name="ApiKey" class="form-control bg-light font-monospace" placeholder=" Please Enter Api Key">
                                     <button class="btn btn-secondary px-3" type="button" onclick="togglePass('ApiKey')">Show</button>
                                 </div>
                                 <div class="form-text small" style="font-size:11px;">Provided by SmartOffice — used in every request</div>
@@ -134,7 +134,7 @@
                             <div class="col-md-6">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Pull API Endpoint</label>
                                 <div class="input-group input-group-sm">
-                                    <input type="text" id="PullApiEndPoint" name="PullApiEndPoint" class="form-control bg-light font-monospace" value="/api/SwipeDetails/GetDeviceLogs">
+                                    <input type="text" id="PullApiEndPoint" name="PullApiEndPoint" class="form-control bg-light font-monospace" placeholder="Enter Enter Endpoint">
                                     <button class="btn btn-primary px-3" type="button" onclick="copyVal('PullApiEndPoint')">Copy</button>
                                 </div>
                                 <div class="form-text small" style="font-size:11px;">Appended to base URL when polling</div>
@@ -301,8 +301,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Field Mapping Table (Mapped to SQL nvarchar(max) Columns) -->
+                <!-- FIELD MAPPING -->
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white py-3">
                         <h6 class="mb-0 fw-bold"><i class="fas fa-table text-info me-2"></i>Field Mapping → Payroll System</h6>
@@ -312,35 +311,79 @@
                             <table class="table table-hover mb-0 align-middle">
                                 <thead class="table-light small fw-bold text-uppercase">
                                     <tr>
-                                        <th class="ps-4">SmartOffice Field</th>
+                                        <th class="ps-4" width="200">SmartOffice Field</th>
                                         <th>Payroll System Column</th>
                                         <th>Transformation</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Row 1: UserID -->
+                                    <!-- UserID -->
                                     <tr>
                                         <td class="ps-4 fw-bold small">UserId</td>
-                                        <td><input type="text" id="UseridPayroll" name="UseridPayroll" class="form-control form-control-sm" value="employees.staff_code"></td>
-                                        <td><input type="text" id="UseridTransform" name="UseridTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                        <td>
+                                            <select id="UseridPayroll" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="employees.staff_code">employees.staff_code</option>
+                                                <option value="employees.id">employees.id</option>
+                                                <option value="employees.biometric_id">employees.biometric_id</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="UseridTransform" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="None">None</option>
+                                                <option value="Trim">Trim</option>
+                                                <option value="Uppercase">Uppercase</option>
+                                                <option value="Pad zeros">Pad zeros</option>
+                                            </select>
+                                        </td>
                                     </tr>
-                                    <!-- Row 2: LogDate -->
+                                    <!-- LogDate -->
                                     <tr>
                                         <td class="ps-4 fw-bold small">LogDate</td>
-                                        <td><input type="text" id="LogDatePayroll" name="LogDatePayroll" class="form-control form-control-sm" value="punches.punch_time"></td>
-                                        <td><input type="text" id="LogdateTransform" name="LogdateTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                        <td>
+                                            <select id="LogDatePayroll" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="punches.punch_time">punch_logs.punch_time</option>
+                                                <option value="attendance.timestamp">attendance.timestamp</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="LogdateTransform" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="None">None</option>
+                                                <option value="UTC → IST (+05:30)">UTC → IST (+05:30)</option>
+                                                <option value="Strip seconds">Strip seconds</option>
+                                            </select>
+                                        </td>
                                     </tr>
-                                    <!-- Row 3: SerialNumber -->
+                                    <!-- SerialNumber -->
                                     <tr>
                                         <td class="ps-4 fw-bold small">SerialNumber</td>
-                                        <td><input type="text" id="SerialNumberPayroll" name="SerialNumberPayroll" class="form-control form-control-sm" value="punches.machine_serial"></td>
-                                        <td><input type="text" id="SerialNumberTransform" name="SerialNumberTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                        <td>
+                                            <select id="SerialNumberPayroll" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="punch_logs.device_serial">punch_logs.device_serial</option>
+                                                <option value="devices.id (lookup)">devices.id (lookup)</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="SerialNumberTransform" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="None">None</option>
+                                                <option value="Trim">Trim</option>
+                                            </select>
+                                        </td>
                                     </tr>
-                                    <!-- Row 4: DeviceSName (The one you requested) -->
+                                    <!-- DeviceName -->
                                     <tr>
                                         <td class="ps-4 fw-bold small">DeviceName</td>
-                                        <td><input type="text" id="DeviceSNamesPayroll" name="DeviceSNamesPayroll" class="form-control form-control-sm" placeholder="punches.device_name"></td>
-                                        <td><input type="text" id="deviceSNamesTransform" name="deviceSNamesTransform" class="form-control form-control-sm" placeholder="None"></td>
+                                        <td>
+                                            <select id="DeviceSNamesPayroll" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="punch_logs.device_name">punch_logs.device_name</option>
+                                                <option value="(skip)">(skip)</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select id="deviceSNamesTransform" class="form-control selectpicker" data-live-search="true" data-container="body" data-width="100%">
+                                                <option value="None">None</option>
+                                                <option value="Trim">Trim</option>
+                                            </select>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -348,51 +391,68 @@
                     </div>
                 </div>
 
-                <!-- Duplicate Handling Card (Mapped to SQL) -->
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-white py-3">
-                        <h6 class="mb-0 fw-bold"><i class="fas fa-shield-alt text-warning me-2"></i>Duplicate Handling & Validation</h6>
+
+                <!-- Duplicate Handling & Validation Card -->
+                <div class="card shadow-sm mb-4 border-0">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold">
+                            <i class="fas fa-shield-alt text-warning me-2"></i>Duplicate Handling & Validation
+                        </h6>
                     </div>
-                    <div class="card-body">
-                        <div class="row g-3 mb-4">
+                    <div class="card-body p-4">
+                        <!-- Top Row: Main Logic Dropdowns -->
+                        <div class="row g-4 mb-4">
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-uppercase text-muted">On Duplicate Punch</label>
-                                <select id="OnDuplicatePunch" name="OnDuplicatePunch" class="form-control selectpicker shadow-none" data-style="btn-light border">
-                                    <option value="Ignore">Ignore</option>
-                                    <option value="Overwrite">Overwrite</option>
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2">On Duplicate Punch</label>
+                                <select id="OnDuplicatePunch" name="OnDuplicatePunch" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
+                                    <option value="Ignore">Ignore (Recommended)</option>
+                                    <option value="Overwrite">Overwrite Existing</option>
                                 </select>
+                                <div class="form-text extra-small mt-1 text-muted">What to do if a punch exists at the exact same time.</div>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label small fw-bold text-uppercase text-muted">Unknown Employee Code</label>
-                                <select id="UnknownEmployeeCode" name="UnknownEmployeeCode" class="form-control selectpicker shadow-none" data-style="btn-light border">
-                                    <option value="LogError">Log Error</option>
-                                    <option value="Create">Create</option>
+                                <label class="form-label small fw-bold text-uppercase text-muted mb-2">Unknown Employee Code</label>
+                                <select id="UnknownEmployeeCode" name="UnknownEmployeeCode" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
+                                    <option value="LogError">Log Error & Skip</option>
+                                    <option value="Create">Create Placeholder Employee</option>
                                 </select>
+                                <div class="form-text extra-small mt-1 text-muted">Handling of User IDs not found in the Payroll database.</div>
                             </div>
                         </div>
 
-                        <div class="row g-3 border-top pt-3">
+                        <!-- Bottom Row: Status Toggles -->
+                        <div class="row g-3 pt-4 border-top">
                             <div class="col-md-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="RejectFuturePunch" name="RejectFuturePunch" checked>
-                                    <label class="form-check-label fw-bold small">Reject Future Punches</label>
+                                <div class="form-check form-switch d-flex align-items-center gap-3 ps-0">
+                                    <input class="form-check-input ms-0" type="checkbox" id="RejectFuturePunch" name="RejectFuturePunch" checked style="width: 2.5em; height: 1.25em;">
+                                    <div>
+                                        <label class="form-check-label fw-bold small d-block mb-0" for="RejectFuturePunch">Reject Future Punches</label>
+                                        <small class="text-muted" style="font-size:10px;">Ignore logs with future timestamps</small>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="RejectOldPunch" name="RejectOldPunch">
-                                    <label class="form-check-label fw-bold small">Reject Old Punches</label>
+                                <div class="form-check form-switch d-flex align-items-center gap-3 ps-0">
+                                    <input class="form-check-input ms-0" type="checkbox" id="RejectOldPunch" name="RejectOldPunch" style="width: 2.5em; height: 1.25em;">
+                                    <div>
+                                        <label class="form-check-label fw-bold small d-block mb-0" for="RejectOldPunch">Reject Old Punches</label>
+                                        <small class="text-muted" style="font-size:10px;">Ignore logs older than 30 days</small>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="EmailOnFailure" name="EmailOnFailure">
-                                    <label class="form-check-label fw-bold small">Email on Failure</label>
+                                <div class="form-check form-switch d-flex align-items-center gap-3 ps-0">
+                                    <input class="form-check-input ms-0" type="checkbox" id="EmailOnFailure" name="EmailOnFailure" style="width: 2.5em; height: 1.25em;">
+                                    <div>
+                                        <label class="form-check-label fw-bold small d-block mb-0" for="EmailOnFailure">Email on Failure</label>
+                                        <small class="text-muted" style="font-size:10px;">Notify admin if sync fails</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
 
@@ -448,7 +508,7 @@
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Default Verify Mode</label>
-                                <select id="DefaultVerifyMode" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="DefaultVerifyMode" name="DefaultVerifyMode" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
                                     <option value="Face">Face Only</option>
                                     <option value="Finger">Fingerprint Only</option>
                                     <option value="Card">Card Only</option>
@@ -458,26 +518,27 @@
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Upload Face Templates</label>
-                                <select id="UploadFaceTemplates" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="UploadFaceTemplates" name="UploadFaceTemplates" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
                                     <option value="True">Enabled</option>
                                     <option value="False">Disabled</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Upload Fingerprints</label>
-                                <select id="UploadFingerprints" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="UploadFingerprints" name="UploadFingerprints" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
                                     <option value="True">Enabled</option>
                                     <option value="False">Disabled</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Upload Cards</label>
-                                <select id="UploadCards" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="UploadCards" name="UploadCards" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border" data-container="body" data-width="100%">
                                     <option value="True">Enabled</option>
                                     <option value="False">Disabled</option>
                                 </select>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -494,7 +555,7 @@
                         <div class="row g-4 mb-4">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Auto-Clear Logs After Sync</label>
-                                <select id="AutoClearLogsAfterSync" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="AutoClearLogsAfterSync" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="None">Keep logs on device</option>
                                     <option value="Success">Clear after successful pull</option>
                                     <option value="Always">Wipe after every session</option>
@@ -503,7 +564,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Online Enrollment</label>
-                                <select id="OnlineEnrollment" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="OnlineEnrollment" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="Enabled">Enabled — trigger from HRMS</option>
                                     <option value="Disabled">Local enrollment only</option>
                                 </select>
@@ -511,7 +572,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Block User Support</label>
-                                <select id="BlockUserSupport" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="BlockUserSupport" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="Full">Full (Suspend access immediately)</option>
                                     <option value="Limited">Limited (Model-dependent)</option>
                                     <option value="None">None</option>
@@ -552,7 +613,7 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Auto-Push on Employee Add</label>
-                                <select id="AutoPushOnEmployeeAdd" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="AutoPushOnEmployeeAdd" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="Immediate" selected>Yes — push immediately</option>
                                     <option value="Manual">No — manual sync only</option>
                                     <option value="Scheduled">Batch — push at night</option>
@@ -561,7 +622,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Auto-Delete on Resign</label>
-                                <select id="AutoDeleteOnEmployeeResign" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="AutoDeleteOnEmployeeResign" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="All" selected>Yes — delete from all devices</option>
                                     <option value="Mapped">Yes — delete from mapped only</option>
                                     <option value="No">No — keep on hardware</option>
@@ -569,7 +630,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Push on Department Change</label>
-                                <select id="PushOnDepartmentChange" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="PushOnDepartmentChange" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="Re-push" selected>Re-push only to new location</option>
                                     <option value="DeleteOld">Delete from old, push to new</option>
                                     <option value="None">None</option>

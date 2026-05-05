@@ -29,5 +29,9 @@ namespace Airmax_Payroll_System.Services
 
         public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id, int idDivision = 0)
    => await _repo.GetByDepartmentAsync(id, idDivision);
+
+        public async Task<int> GetCountByLocationAsync(int idLocation)
+    => await _repo.GetCountByLocationAsync(idLocation);
+
     }
 }
