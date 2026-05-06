@@ -15,14 +15,15 @@
 
                 <div class="d-flex align-items-center gap-3">
                     <!-- Company Selection (Mapped to IDCompany) -->
+                    <!-- Company Selection -->
                     <div class="d-flex align-items-center gap-2">
-                        <label class="small fw-bold text-muted text-uppercase mb-0" style="font-size:11px;">Company</label>
-                        <select id="IDCompany" name="IDCompany" class="form-control selectpicker shadow-none" data-width="200px" data-style="btn-light border">
-                            <option value="1">Aira</option>
-                            <option value="2">Airmax</option>
-                            <!-- Other companies will be loaded dynamically via JS -->
+                        <label class="small fw-bold text-muted text-uppercase mb-0" style="font-size:11px;">Select Company</label>
+                        <select id="IDCompany" name="IDCompany" class="form-control selectpicker shadow-none"
+                                data-live-search="true" data-width="250px" data-style="btn-light border fw-bold">
+                            <option value="0">-- Loading Companies --</option>
                         </select>
                     </div>
+
 
                     <div class="vr mx-2"></div> <!-- Vertical Separator -->
                     <!-- Save All Button -->
@@ -58,9 +59,12 @@
             <!-- 1. CONNECTION TAB -->
             <div class="tab-pane fade show active" id="tab-conn" role="tabpanel">
 
-                <!-- Hidden Primary Keys (SQL Mapped) -->
-                <input type="hidden" id="IDPayrollApiConfigration" name="IDPayrollApiConfigration" value="0" />
-                <input type="hidden" id="IDCompany" name="IDCompany" value="1" />
+                <!-- Hidden Primary Keys -->
+                <div id="hidden-keys">
+                    <input type="hidden" id="IDPayrollApiConfigration" name="IDPayrollApiConfigration" value="0" />
+                    <!-- hfIDCompany is optional if you use select#IDCompany directly -->
+                    <input type="hidden" id="hfIDCompany" value="0" />
+                </div>
 
                 <!-- Status Summary Cards -->
                 <div class="row g-3 mb-4">
@@ -241,7 +245,7 @@
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Pull Frequency</label>
-                                <select id="PullFrequency" name="PullFrequency" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="PullFrequency" name="PullFrequency" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="5">Every 5 Minutes</option>
                                     <option value="15" selected>Every 15 Minutes</option>
                                     <option value="30">Every 30 Minutes</option>
@@ -250,7 +254,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Date Range Window</label>
-                                <select id="DateRangeWindow" name="DateRangeWindow" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="DateRangeWindow" name="DateRangeWindow" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="1">Last 1 Day</option>
                                     <option value="2" selected>Last 2 Days</option>
                                     <option value="7">Last 7 Days</option>
@@ -258,7 +262,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label small fw-bold text-uppercase text-muted">Active Hours</label>
-                                <select id="ActiveHours" name="ActiveHours" class="form-control selectpicker shadow-none" data-style="btn-light border">
+                                <select id="ActiveHours" name="ActiveHours" class="form-control selectpicker shadow-none" data-live-search="true" data-style="btn-light border">
                                     <option value="24" selected>24/7 (Always Active)</option>
                                     <option value="08-18">08:00 - 18:00</option>
                                 </select>
@@ -481,21 +485,22 @@
                         <div class="table-responsive">
                             <table class="table table-hover table-bordered mb-0 align-middle">
                                 <thead class="table-light small fw-bold text-uppercase text-center">
-                                    <tr>
-                                        <th width="50">#</th>
-                                        <th>Device Name</th>
-                                        <th>Serial Number</th>
-                                        <th>Model / Type</th>
-                                        <th>Location</th>
+                                    <tr class="bg-light">
+                                        <th width="40">#</th>
+                                        <th width="25%">Device Name</th>
+                                        <th width="20%">Serial Number</th>
+                                        <th width="15%">Model / Type</th>
+                                        <th width="20%">Location</th>
                                         <th width="100">Status</th>
-                                        <th width="50">#</th>
+                                        <th width="50">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tblDeviceBody" class="text-center">
-                                    <!-- Dynamic rows will be injected here via JS -->
+                                <tbody id="tblDeviceBody" class="text-center bg-white">
+                                    <!-- JS will inject rows here -->
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
 
@@ -591,9 +596,7 @@
                             <button class="btn btn-outline-secondary fw-bold" onclick="executeBatchCommand('ClearLogs')">
                                 <i class="fas fa-trash-alt me-2"></i>Clear logs (all devices)
                             </button>
-                            <button class="btn btn-outline-danger fw-bold" onclick="executeBatchCommand('Reboot')">
-                                <i class="fas fa-redo me-2"></i>Reboot devices
-                            </button>
+                           
                         </div>
                     </div>
                 </div>

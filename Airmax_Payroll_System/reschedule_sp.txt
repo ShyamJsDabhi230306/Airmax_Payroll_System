@@ -95,17 +95,19 @@ BEGIN
             
             INSERT INTO Master_BiomatricDevices (DeviceName, SerialNumber, ModelType, IDLocation, Status, IsActive, IsDelete, E_Date, E_By)
             SELECT DeviceName, SerialNumber, ModelType, IDLocation, Status, 1, 0, GETDATE(), @username
-            FROM OPENJSON(@DeviceJson) WITH (DeviceName NVARCHAR(MAX), SerialNumber NVARCHAR(MAX), ModelType NVARCHAR(MAX), IDLocation INT, Status NVARCHAR(MAX));
+            FROM OPENJSON(@DeviceJson) WITH (DeviceName NVARCHAR(MAX), SerialNumber NVARCHAR(MAX), ModelType NVARCHAR(MAX), IDLocation INT, Status NVARCHAR(MAX))
+            WHERE IDLocation IS NOT NULL AND IDLocation > 0;
         END
 
         -- C. SAVE MAPPINGS (FIX: Missing logic to persist mappings)
         IF @MappingJson IS NOT NULL AND LEN(@MappingJson) > 2
         BEGIN
-            DELETE FROM Master_LocationDeviceMaping WHERE IDLocation IN (SELECT IDLocation FROM Master_Location WHERE IDCompany = @IDCompany);
+            DELETE FROM Master_LocationDeviceMapping WHERE IDLocation IN (SELECT IDLocation FROM Master_Location WHERE IDCompany = @IDCompany);
             
-            INSERT INTO Master_LocationDeviceMaping (IDLocation, MappedDeviceSerials, IDEmployee, IsActive, IsDelete, E_Date, E_By)
+            INSERT INTO Master_LocationDeviceMapping (IDLocation, MappedDeviceSerials, IDEmployee, IsActive, IsDelete, E_Date, E_By)
             SELECT IDLocation, MappedDeviceSerials, IDEmployee, 1, 0, GETDATE(), @username
-            FROM OPENJSON(@MappingJson) WITH (IDLocation INT, MappedDeviceSerials NVARCHAR(MAX), IDEmployee INT);
+            FROM OPENJSON(@MappingJson) WITH (IDLocation INT, MappedDeviceSerials NVARCHAR(MAX), IDEmployee INT)
+            WHERE IDLocation IS NOT NULL AND IDLocation > 0;
         END
 
         COMMIT TRANSACTION;

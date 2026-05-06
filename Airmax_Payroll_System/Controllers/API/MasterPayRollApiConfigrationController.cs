@@ -35,15 +35,26 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpPost("save")]
         public async Task<IActionResult> Save([FromBody] MasterPayRollApiConfigration model)
         {
-            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
-            var result = await _service.SaveAsync(model, loggedInUserFullName);
-
-            return Ok(new
+            try
             {
-                success = result.Result == 1,
-                message = result.Message
-            });
+                var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
+                var result = await _service.SaveAsync(model, loggedInUserFullName);
+
+                if (result == null)
+                    return StatusCode(500, new { success = false, message = "Save operation returned no result from database." });
+
+                return Ok(new
+                {
+                    success = result.Result == 1,
+                    message = result.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
         }
+
 
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)

@@ -34,9 +34,10 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@IDLocationDeviceMaping", model.IDLocationDeviceMaping);
             param.Add("@IDLocation", model.IDLocation);
             param.Add("@MappedDeviceSerials", model.MappedDeviceSerials);
-            param.Add("@IDEmployee", model.IDEmployee);
+            param.Add("@TotalEmployee", model.TotalEmployee);
             param.Add("@IsActive", model.IsActive);
             param.Add("@username", username);
+            param.Add("@IDPayrollApiConfigration", model.IDPayrollApiConfigration);
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>("usp_Master_LocationDeviceMapping_Save", param);
         }

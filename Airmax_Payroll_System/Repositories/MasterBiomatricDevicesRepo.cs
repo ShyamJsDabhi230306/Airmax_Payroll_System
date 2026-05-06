@@ -42,6 +42,7 @@ namespace Airmax_Payroll_System.Repositories
             param.Add("@Status", model.Status);
             param.Add("@IsActive", model.IsActive);
             param.Add("@username", username);
+            param.Add("@IDPayrollApiConfigration", model.IDPayrollApiConfigration);
 
             return await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                 "usp_Master_BiomatricDevices_Save",
