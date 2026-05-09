@@ -4,6 +4,7 @@ using Airmax_Payroll_System.Repositories;
 using Airmax_Payroll_System.Services;
 using DRSPortal.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -156,6 +157,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+// If you see something like this, it is blocking the upload:
 
 var app = builder.Build();
 

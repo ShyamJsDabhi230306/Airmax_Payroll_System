@@ -47,6 +47,8 @@ const DOM = {
     logo: () => document.getElementById("LogoFile"),
     sign: () => document.getElementById("SignFile"),
 
+    logoDisplay: () => document.getElementById("LogoNameDisplay"),
+    signDisplay: () => document.getElementById("SignNameDisplay"),
     save: () => document.getElementById("btnSave"),
     tbody: () => document.getElementById("tblBody"),
     modal: () => document.getElementById("addModal")
@@ -189,7 +191,13 @@ async function editEntry(id) {
 
         DOM.deviceSerial().value = d.deviceSerialNo || "";
         DOM.outDeviceSerial().value = d.outDeviceSerialNo || "";
+        if (d.logoFileName) {
+            DOM.logoDisplay().innerHTML = "Current: " + d.logoFileName;
+        }
 
+        if (d.signFileName) {
+            DOM.signDisplay().innerHTML = "Current: " + d.signFileName;
+        }
         entryModal.show();
 
     } catch (err) {
@@ -229,78 +237,158 @@ async function deleteEntry(id) {
 // ======================================================
 // SAVE
 // ======================================================
-async function saveData() {
+//async function saveData() {
+
+//    if (!DOM.companyName().value.trim()) {
+//        DOM.companyName().classList.add("is-invalid");
+//        showToast("danger", "Company name required", "Company Master");
+//        return;
+//    }
+
+//    const idValue = DOM.id().value;
+
+//    const formData = new FormData();
+//    formData.append("IDCompany", idValue ? Number(idValue) : 0);
+//    formData.append("CompanyName", DOM.companyName().value.trim());
+//    formData.append("Office_Address", DOM.officeAddress().value.trim());
+//    formData.append("CityName", DOM.city().value.trim());
+//    formData.append("StateCode", DOM.state().value.trim());
+//    formData.append("Pincode", DOM.pincode().value.trim());
+//    formData.append("ContactNo", DOM.contactNo().value.trim());
+//    formData.append("OTPMobNo", DOM.otpMobNo().value.trim());
+//    formData.append("PhoneNo", DOM.phoneNo().value.trim());
+//    formData.append("Comp_EmailID", DOM.email().value.trim());
+//    formData.append("FaxNo", DOM.fax().value.trim());
+//    formData.append("Website", DOM.website().value.trim());
+//    formData.append("PanNo", DOM.pan().value.trim());
+//    formData.append("GSTNo", DOM.gst().value.trim());
+//    formData.append("GSTDate", DOM.gstDate().value || "");
+//    formData.append("DbUserID", DOM.dbUser().value.trim());
+//    formData.append("DbUserPassword", DOM.dbPassword().value.trim());
+//    formData.append("DbDatabaseName", DOM.dbName().value.trim());
+//    formData.append("DbDatasource", DOM.dbSource().value.trim());
+//    formData.append("DbTimeOut", DOM.dbTimeout().value.trim());
+//    formData.append("Unit", DOM.unit().value.trim());
+//    formData.append("PF", parseFloat(DOM.pf().value) || 0);
+//    formData.append("ESIC", parseFloat(DOM.esic().value) || 0);
+//    formData.append("PT", parseFloat(DOM.pt().value) || 0);
+//    formData.append("DeviceSerialNo", DOM.deviceSerial().value.trim());
+//    formData.append("OutDeviceSerialNo", DOM.outDeviceSerial().value.trim());
+
+//    if (DOM.logo().files[0]) formData.append("LogoFile", DOM.logo().files[0]);
+//    if (DOM.sign().files[0]) formData.append("SignFile", DOM.sign().files[0]);
+
+//    DOM.save().disabled = true;
+
+//    try {
+//        const res = await apiFetch(`${API}/save`, {
+//            method: "POST",
+//            body: formData
+//        });
+
+//        const json = await res.json();
+
+//        if (!json.success)
+//            throw new Error(json.message);
+
+//        showToast("success", json.message, "Company Master");
+
+//        entryModal.hide();
+//        clearForm();
+//        bindTable();
+//    }
+//    catch (err) {
+//        showToast("danger", err.message, "Company Master");
+//    }
+//    finally {
+//        DOM.save().disabled = false;
+//    }
+//}
+// --- wwwroot/AirmaxPayRollJS/Master/Company.js ---
+
+// 1. ADD THIS VALIDATION FUNCTION:
+function validateForm() {
+    let isValid = true;
 
     if (!DOM.companyName().value.trim()) {
         DOM.companyName().classList.add("is-invalid");
-        showToast("danger", "Company name required", "Company Master");
-        return;
+        showToast("danger", "Company name is required", "Validation Error");
+        isValid = false;
+    } else {
+        DOM.companyName().classList.remove("is-invalid");
     }
 
+    return isValid;
+}
+
+// 2. UPDATED SAVEDATA FUNCTION:
+async function saveData() {
+    // Check validation first
+    if (!validateForm()) return;
+
     const idValue = DOM.id().value;
+    const formData = new FormData();
 
-    const dto = {
+    // Add all fields to formData
+    formData.append("IDCompany", idValue ? Number(idValue) : 0);
+    formData.append("CompanyName", DOM.companyName().value.trim());
+    formData.append("Office_Address", DOM.officeAddress().value.trim());
+    formData.append("CityName", DOM.city().value.trim());
+    formData.append("StateCode", DOM.state().value.trim());
+    formData.append("Pincode", DOM.pincode().value.trim());
+    formData.append("ContactNo", DOM.contactNo().value.trim());
+    formData.append("OTPMobNo", DOM.otpMobNo().value.trim());
+    formData.append("PhoneNo", DOM.phoneNo().value.trim());
+    formData.append("Comp_EmailID", DOM.email().value.trim());
+    formData.append("FaxNo", DOM.fax().value.trim());
+    formData.append("Website", DOM.website().value.trim());
+    formData.append("PanNo", DOM.pan().value.trim());
+    formData.append("GSTNo", DOM.gst().value.trim());
+    formData.append("GSTDate", DOM.gstDate().value || "");
+    formData.append("DbUserID", DOM.dbUser().value.trim());
+    formData.append("DbUserPassword", DOM.dbPassword().value.trim());
+    formData.append("DbDatabaseName", DOM.dbName().value.trim());
+    formData.append("DbDatasource", DOM.dbSource().value.trim());
+    formData.append("DbTimeOut", DOM.dbTimeout().value.trim());
+    formData.append("Unit", DOM.unit().value.trim());
+    formData.append("PF", parseFloat(DOM.pf().value) || 0);
+    formData.append("ESIC", parseFloat(DOM.esic().value) || 0);
+    formData.append("PT", parseFloat(DOM.pt().value) || 0);
+    formData.append("DeviceSerialNo", DOM.deviceSerial().value.trim());
+    formData.append("OutDeviceSerialNo", DOM.outDeviceSerial().value.trim());
 
-        idCompany: idValue ? Number(idValue) : 0,
-
-        companyName: DOM.companyName().value.trim(),
-        office_Address: DOM.officeAddress().value.trim(),
-        cityName: DOM.city().value.trim(),
-        stateCode: DOM.state().value.trim(),
-        pincode: DOM.pincode().value.trim(),
-
-        contactNo: DOM.contactNo().value.trim(),
-        otpMobNo: DOM.otpMobNo().value.trim(),
-        phoneNo: DOM.phoneNo().value.trim(),
-
-        comp_EmailID: DOM.email().value.trim(),
-        faxNo: DOM.fax().value.trim(),
-        website: DOM.website().value.trim(),
-
-        panNo: DOM.pan().value.trim(),
-        gstNo: DOM.gst().value.trim(),
-        gstDate: DOM.gstDate().value || null,
-
-        dbUserID: DOM.dbUser().value.trim(),
-        dbUserPassword: DOM.dbPassword().value.trim(),
-        dbDatabaseName: DOM.dbName().value.trim(),
-        dbDatasource: DOM.dbSource().value.trim(),
-        dbTimeOut: DOM.dbTimeout().value.trim(),
-
-        unit: DOM.unit().value.trim(),
-
-        pf: DOM.pf().value || null,
-        esic: DOM.esic().value || null,
-        pt: DOM.pt().value || null,
-
-        deviceSerialNo: DOM.deviceSerial().value.trim(),
-        outDeviceSerialNo: DOM.outDeviceSerial().value.trim()
-    };
+    // Add files if selected
+    if (DOM.logo().files[0]) formData.append("LogoFile", DOM.logo().files[0]);
+    if (DOM.sign().files[0]) formData.append("SignFile", DOM.sign().files[0]);
 
     DOM.save().disabled = true;
 
     try {
-
-        const res = await apiFetch(`${API}/save`, {
+        // DIRECT FETCH to bypass any JSON header issues
+        const res = await fetch(`${API}/save`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(dto)
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("auth_token")}`
+            },
+            body: formData
         });
 
-        const json = await res.json();
+        if (!res.ok) {
+            const errorText = await res.text();
+            throw new Error(`Server Error (${res.status}): ${errorText}`);
+        }
 
-        if (!json.success)
-            throw new Error(json.message);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
 
         showToast("success", json.message, "Company Master");
-
         entryModal.hide();
         clearForm();
         bindTable();
-
     }
     catch (err) {
         showToast("danger", err.message, "Company Master");
+        console.error("Save Error:", err);
     }
     finally {
         DOM.save().disabled = false;
@@ -318,4 +406,6 @@ function clearForm() {
         .forEach(x => x.value = "");
 
     DOM.companyName().classList.remove("is-invalid");
+    DOM.logoDisplay().innerHTML = "";
+    DOM.signDisplay().innerHTML = "";
 }

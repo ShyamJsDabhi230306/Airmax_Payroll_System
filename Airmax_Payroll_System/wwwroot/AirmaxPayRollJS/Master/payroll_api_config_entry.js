@@ -590,7 +590,7 @@ function addDeviceRow(data = {}) {
         <td>
             <select id="dev-model-${rowId}" class="form-control selectpicker" data-container="body">
                 <option value="SpeedFace" ${model === 'SpeedFace' ? 'selected' : ''}>SpeedFace</option>
-                <option value="K40" ${model === 'K40' ? 'selected' : ''}>K40</option>
+                <option value="K 40" ${model === 'K40' ? 'selected' : ''}>K40</option>
             </select>
         </td>
         <td><select id="dev-loc-${rowId}" class="form-control selectpicker" data-live-search="true" data-container="body">${locOptions}</select></td>

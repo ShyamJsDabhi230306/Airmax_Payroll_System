@@ -39,7 +39,7 @@ async function bindTable() {
     const res = await apiFetch(`${API}/get-all`);
     const json = await res.json();
     if (!json.success) return;
-
+    console.log(json)
     if ($.fn.DataTable.isDataTable('#configList')) {
         $('#configList').DataTable().destroy();
     }
