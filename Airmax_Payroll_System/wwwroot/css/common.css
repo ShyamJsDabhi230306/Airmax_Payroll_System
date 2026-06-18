@@ -425,3 +425,9 @@ input[readonly] {
     border: 1px solid #e2e8f0 !important;
     padding: 6px 15px !important;
 }
+
+
+.bootstrap-select .dropdown-menu li a span.text {
+    display: block !important;
+    width: 100% !important;
+}

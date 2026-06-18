@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers
 {
@@ -71,6 +71,23 @@ namespace Airmax_Payroll_System.Controllers
         {
             return View();
         }
+
+
+        public IActionResult BiometricDevice()
+        {
+            return View();
+        }
+
+        public IActionResult LocationDeviceMapping()
+        {
+            return View();
+        }
+
+        public IActionResult PayRollApiConfigration()
+        {
+            return View();
+        }
+        
 
         public IActionResult PayrollConfigurationList()
         {

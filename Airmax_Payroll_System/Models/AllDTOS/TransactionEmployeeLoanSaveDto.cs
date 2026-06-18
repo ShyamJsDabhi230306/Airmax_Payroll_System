@@ -15,6 +15,11 @@ namespace Airmax_Payroll_System.Models.AllDTOS
         public int? TotalInstallments { get; set; }
         public decimal? InstallmentAmount { get; set; }
         public DateTime? InstallmentStartingDate { get; set; }
+
+
+        public int? IDGuarantor1 { get; set; }
+        public int? IDGuarantor2 { get; set; }
+        public int? IDGuarantor3 { get; set; }
         public List<Transaction_EmployeeLoanDetails>? Details { get; set; }
     }
 }

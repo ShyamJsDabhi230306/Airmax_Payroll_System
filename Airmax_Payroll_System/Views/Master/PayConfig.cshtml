@@ -1,0 +1,310 @@
+@{
+    ViewBag.Title = "PayConfig - API Configuration";
+}
+
+<div class="payconfig-container animate__animated animate__fadeIn">
+    <!-- Header Area -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold mb-0 text-dark">PayConfig</h3>
+            <p class="text-muted small mb-0">API & Attendance Machine Configuration</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-flex align-items-center gap-2 bg-white px-3 py-2 rounded-pill shadow-sm border">
+                <span class="text-muted small fw-bold">COMPANY</span>
+                <select class="form-select border-0 bg-transparent fw-bold text-primary p-0" style="width: auto; min-width: 80px;">
+                    <option value="Aira">Aira</option>
+                </select>
+            </div>
+            <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow" onclick="saveAll()">
+                Save All
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <ul class="nav nav-pills mb-4 bg-white p-2 rounded-4 shadow-sm border d-inline-flex w-100" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4" id="connection-tab" data-bs-toggle="pill" data-bs-target="#connection-content" type="button" role="tab">
+                <i class="fas fa-plug me-2"></i>Connection
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="pull-api-tab" data-bs-toggle="pill" data-bs-target="#pull-api-content" type="button" role="tab">
+                <i class="fas fa-cloud-download-alt me-2"></i>Pull API
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="devices-tab" data-bs-toggle="pill" data-bs-target="#devices-content" type="button" role="tab">
+                <i class="fas fa-microchip me-2"></i>Devices <span class="badge bg-secondary ms-1">3</span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="sync-tab" data-bs-toggle="pill" data-bs-target="#sync-content" type="button" role="tab">
+                <i class="fas fa-sync-alt me-2"></i>Sync Settings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="endpoints-tab" data-bs-toggle="pill" data-bs-target="#endpoints-content" type="button" role="tab">
+                <i class="fas fa-network-wired me-2"></i>Endpoints
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 text-success" id="tester-tab" data-bs-toggle="pill" data-bs-target="#tester-content" type="button" role="tab">
+                <i class="fas fa-vial me-2"></i>API Tester
+            </button>
+        </li>
+    </ul>
+
+    <!-- Status Cards Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="status-card border-start-online">
+                <div class="status-content">
+                    <p class="status-label">CONNECTION</p>
+                    <h2 class="status-value text-online">Online</h2>
+                    <p class="status-footer text-muted">Last pinged 12s ago</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card border-start-devices">
+                <div class="status-content">
+                    <p class="status-label">ACTIVE DEVICES</p>
+                    <h2 class="status-value">3 / 3</h2>
+                    <p class="status-footer text-muted">All reporting</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card border-start-pull">
+                <div class="status-content">
+                    <p class="status-label">LAST PULL</p>
+                    <h2 class="status-value">2m 14s</h2>
+                    <p class="status-footer text-muted">142 logs fetched</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="status-card border-start-pending">
+                <div class="status-content">
+                    <p class="status-label">PENDING CMDS</p>
+                    <h2 class="status-value text-pending">2</h2>
+                    <p class="status-footer text-muted">In queue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="connection-content" role="tabpanel">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="icon-box bg-light text-primary">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <h5 class="mb-0 fw-bold">SmartOffice API Connection</h5>
+                    </div>
+                    <span class="badge bg-success-soft text-success px-3 py-2 rounded-pill">
+                        <i class="fas fa-circle small me-2 animate-pulse"></i>Connected
+                    </span>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="config-label">BASE URL</label>
+                            <input type="text" class="form-control config-input" id="BaseUrl" value="https://sohcm.com/SmartApp_ess" placeholder="https://..." />
+                            <small class="text-muted mt-1 d-block">SmartOffice cloud endpoint (no trailing slash)</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="config-label">ACCOUNT NAME</label>
+                            <input type="text" class="form-control config-input" id="AccountName" value="ACE" placeholder="Tenant identifier" />
+                            <small class="text-muted mt-1 d-block">Tenant identifier on SmartOffice cloud</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="config-label">API KEY (AUTHENTICATION TOKEN)</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control config-input border-end-0" id="ApiKey" value="233916012427" />
+                                <button class="btn border border-start-0 bg-white text-muted px-3" type="button" onclick="togglePassword('ApiKey')">
+                                    Hide
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Provided by SmartOffice - used in every request</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="config-label">PULL API ENDPOINT</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control config-input border-end-0" id="Endpoint" value="/api/SwipeDetails/GetDeviceLogs" />
+                                <button class="btn btn-primary px-3" type="button" onclick="copyToClipboard('Endpoint')">
+                                    Copy
+                                </button>
+                            </div>
+                            <small class="text-muted mt-1 d-block">Appended to base URL when polling</small>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="config-label">REQUEST TIMEOUT (SEC)</label>
+                            <input type="number" class="form-control config-input" id="Timeout" value="30" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="config-label">RETRY ATTEMPTS ON FAILURE</label>
+                            <input type="number" class="form-control config-input" id="RetryAttempts" value="3" />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="config-label">RETRY BACKOFF (SEC)</label>
+                            <input type="number" class="form-control config-input" id="RetryBackoff" value="5" />
+                            <small class="text-muted mt-1 d-block">Wait between retries</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-top p-4 d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3">
+                        <button class="btn btn-primary px-4 py-2 rounded-3 fw-bold" onclick="testConnection()">
+                            <i class="fas fa-vial me-2"></i>Test Connection
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 py-2 rounded-3 fw-bold bg-white" onclick="copyPullUrl()">
+                            <i class="fas fa-link me-2"></i>Copy Full Pull URL
+                        </button>
+                    </div>
+                    <div id="testStatus" class="small fw-bold">
+                        Last test: <span class="text-success">200 OK</span> - <span class="text-muted">233ms</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-pane fade" id="pull-api-content" role="tabpanel">
+            <!-- Content for Pull API tab -->
+            <div class="card shadow-sm border-0 rounded-4 p-5 text-center">
+                <i class="fas fa-cloud-download-alt fa-3x text-muted mb-3"></i>
+                <h5>Pull API Configuration Coming Soon</h5>
+            </div>
+        </div>
+        <!-- Add other tab panes similarly -->
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --success-color: #2ec4b6;
+        --warning-color: #ff9f1c;
+        --danger-color: #e71d36;
+        --bg-light: #f8f9fa;
+        --online-green: #00b894;
+        --device-blue: #0984e3;
+        --pull-gray: #636e72;
+        --pending-yellow: #fdcb6e;
+    }
+
+    body {
+        background-color: #f0f2f5;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .payconfig-container {
+        max-width: 1200px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    .nav-pills .nav-link {
+        color: #6c757d;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .nav-pills .nav-link.active {
+        background-color: var(--primary-color);
+        box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .status-card {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        height: 100%;
+        transition: transform 0.3s ease;
+    }
+
+    .status-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .border-start-online { border-left: 5px solid var(--online-green); }
+    .border-start-devices { border-left: 5px solid var(--device-blue); }
+    .border-start-pull { border-left: 5px solid var(--pull-gray); }
+    .border-start-pending { border-left: 5px solid var(--pending-yellow); }
+
+    .status-label {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #adb5bd;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+
+    .status-value {
+        font-weight: 700;
+        margin-bottom: 4px;
+        font-size: 1.5rem;
+    }
+
+    .text-online { color: var(--online-green); }
+    .text-pending { color: var(--warning-color); }
+
+    .status-footer {
+        font-size: 0.75rem;
+        margin-bottom: 0;
+    }
+
+    .icon-box {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    .bg-success-soft {
+        background-color: rgba(46, 196, 182, 0.1);
+    }
+
+    .config-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #6c757d;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .config-input {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #dee2e6;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .config-input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .animate-pulse {
+        animation: pulse-animation 2s infinite;
+    }
+
+    @@keyframes pulse-animation {
+        0% { opacity: 1; }
+        50% { opacity: 0.4; }
+        100% { opacity: 1; }
+    }
+</style>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/pay_config.js" asp-append-version="true"></script>
+}

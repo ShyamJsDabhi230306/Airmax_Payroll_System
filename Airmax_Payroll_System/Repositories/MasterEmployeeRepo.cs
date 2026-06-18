@@ -166,14 +166,30 @@ namespace Airmax_Payroll_System.Repositories
 
 
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)
+        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id, int idDivision = 0)
         {
             var param = new DynamicParameters();
             param.Add("@IDDepartment", id);
-
+            param.Add("@IDDivision", idDivision);
             return await _dapper.QueryAsync<EmployeeModel>(
                 "usp_Employee_GetByDepartment",
                 param);
         }
+
+        public async Task<int> GetCountByLocationAsync(int idLocation)
+        {
+            try
+            {
+                var param = new DynamicParameters();
+                param.Add("@IDLocation", idLocation);
+                return await _dapper.ExecuteScalarAsync<int>("usp_Master_Employee_GetCountByLocation", param);
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error in GetCountByLocationAsync");
+                return 0;
+            }
+        }
+
     }
 }

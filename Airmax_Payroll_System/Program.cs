@@ -4,6 +4,7 @@ using Airmax_Payroll_System.Repositories;
 using Airmax_Payroll_System.Services;
 using DRSPortal.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -70,6 +71,13 @@ builder.Services.AddScoped<MasterPayrollConfigurationRepo>();          // Payrol
 builder.Services.AddScoped<TransactionEmployeeLoanService>();
 builder.Services.AddScoped<TransactionEmployeeLoanRepo>();
 
+
+
+// Repositories for Master Configuration Module
+builder.Services.AddScoped<MasterBiomatricDevicesRepo>();
+builder.Services.AddScoped<MasterLocationDeviceMappingRepo>();
+builder.Services.AddScoped<MasterPayRollApiConfigrationRepo>();
+
 // this is the service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
@@ -91,7 +99,13 @@ builder.Services.AddScoped<MasterPayrollConfigurationService>();          // Pay
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();
 builder.Services.AddScoped<TransactionEmployeeKharchiRepo>();
 
+// Services for Master Configuration Module
+builder.Services.AddScoped<MasterBiomatricDevicesService>();
+builder.Services.AddScoped<MasterLocationDeviceMappingService>();
+builder.Services.AddScoped<MasterPayRollApiConfigrationService>();
 
+builder.Services.AddScoped<DeviceLogService>();
+builder.Services.AddScoped<AttendanceCalculationService>();
 // ---------------------------------
 // JWT AUTH
 // ---------------------------------
@@ -147,6 +161,7 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+// If you see something like this, it is blocking the upload:
 
 var app = builder.Build();
 

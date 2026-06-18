@@ -1,28 +1,28 @@
-﻿@* Path: Views/Transaction/EmployeeLoanSchedule.cshtml *@
+@* Path: Views/Transaction/EmployeeLoanSchedule.cshtml *@
 @{
     ViewBag.Title = "Employee Loan Schedule";
 }
 
 <div class="container-fluid py-4" style="background: #f8fafc; min-height: 100vh;">
+    <div class="d-flex justify-content-between mb-3">
+        <h4 class="fw-bold">Loan Analytics Dashboard</h4>
+        <a href="/Transaction/EmployeeLoanList" class="btn btn-sm btn-outline-secondary">Back to List</a>
+    </div>
     <!-- Main Search Card -->
     <div class="card border-0 shadow-sm mb-4" style="border-radius: 15px;">
         <div class="card-body p-4">
             <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="small fw-bold text-muted mb-1 d-block ms-1">Search Name/Code/Loan#</label>
-                    <input type="text" id="txtSearch" class="form-control border-0 bg-light py-2" placeholder="Type to filter..." onkeyup="loadEmployeesWithLoans()">
-                </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label class="small fw-bold text-muted mb-1 d-block ms-1">Division</label>
-                    <select id="IDDivision" class="form-select border-0 bg-light py-2" onchange="loadEmployeesWithLoans()"></select>
+                    <select id="IDDivision" class="form-control selectpicker" data-live-search="true" data-container="body" onchange="loadEmployeesWithLoans()"></select>
                 </div>
                 
-                <div class="col-md-4">
-                    <label class="small fw-bold text-muted mb-1 d-block ms-1">Select Employee Result</label>
-                    <select id="IDEmployeeLoan" class="form-select border-0 bg-light py-2"></select>
+                <div class="col-md-6">
+                    <label class="small fw-bold text-muted mb-1 d-block ms-1">Select Employee </label>
+                    <select id="IDEmployeeLoan" class="form-control selectpicker" data-live-search="true" data-container="body"></select>
                 </div>
                 <div class="col-md-2">
-                    <button class="btn btn-dark w-100 fw-bold py-2 shadow-sm" onclick="showSchedule()">
+                    <button class="btn btn-primary w-100 fw-bold py-2 lh-lg shadow-sm" onclick="showSchedule()">
                         <i class="fa fa-eye me-1"></i> Show
                     </button>
                 </div>

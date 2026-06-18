@@ -1,30 +1,80 @@
+//async function apiFetch(url, options = {}) {
+//    const token = localStorage.getItem("auth_token");
+
+//    // 1. Initialize headers if they don't exist
+//    options.headers = {
+//        "Authorization": `Bearer ${token}`,
+//        ...options.headers
+//    };
+//    // 2. SAFE CHECK:
+//    // Only set Content-Type to JSON if the body is NOT FormData.
+//    // This allows your new Company Image upload to work while
+//    // keeping every other module in your software exactly the same.
+//    if (options.body && !(options.body instanceof FormData)) {
+//        options.headers["Content-Type"] = "application/json";
+//    }
+//    else if (!options.body) {
+//        options.headers["Content-Type"] = "application/json";
+//    }
+//    const response = await fetch(url, options);
+
+//    if (response.status === 401) {
+//        localStorage.clear();
+//        window.location.href = "/Account/Login";
+//        return null;
+//    }
+
+//    if (response.status === 403) {
+//        if (typeof showToast === 'function') {
+//            showToast("danger", "You do not have permission.", "Access Denied");
+//        }
+//    }
+
+//    return response;
+//}
+
+
 async function apiFetch(url, options = {}) {
     const token = localStorage.getItem("auth_token");
 
+    // 1. Initialize headers with Authorization
     options.headers = {
-        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
         ...options.headers
     };
 
+    // 2. SMART CONTENT-TYPE HANDLING
+    if (options.body && options.body instanceof FormData) {
+        // 🛑 IMPORTANT: For file uploads, we MUST remove the Content-Type header.
+        // This allows the browser to automatically set "multipart/form-data".
+        delete options.headers["Content-Type"];
+        delete options.headers["content-type"];
+    }
+    else {
+        // For all other regular API calls (JSON), we keep it as application/json
+        options.headers["Content-Type"] = "application/json";
+    }
+
+    // 3. Perform the request
     const response = await fetch(url, options);
-    
+
+    // 4. Handle Authentication Errors (401 Unauthorized)
     if (response.status === 401) {
         localStorage.clear();
         window.location.href = "/Account/Login";
         return null;
     }
 
+    // 5. Handle Permission Errors (403 Forbidden)
     if (response.status === 403) {
         if (typeof showToast === 'function') {
-            showToast("danger", "You do not have permission to perform this action.", "Access Denied");
-        } else {
-            alert("Access Denied: You do not have permission to perform this action.");
+            showToast("danger", "You do not have permission.", "Access Denied");
         }
     }
 
     return response;
 }
+
 function logoutUser() {
     Swal.fire({
         icon: "warning",

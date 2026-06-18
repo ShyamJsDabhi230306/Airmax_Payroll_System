@@ -105,15 +105,22 @@ namespace Airmax_Payroll_System.Controllers.API
         }
 
         [HttpGet("by-department/{id}")]
-        public async Task<IActionResult> GetByDepartment(int id)
+        public async Task<IActionResult> GetByDepartment(int id, [FromQuery] int divId = 0)
         {
-            var data = await _service.GetByDepartmentAsync(id);
-
+            var data = await _service.GetByDepartmentAsync(id, divId);
             return Ok(new
             {
                 success = true,
                 data
             });
         }
+
+        [HttpGet("get-count-by-location/{id:int}")]
+        public async Task<IActionResult> GetCountByLocation(int id)
+        {
+            var count = await _service.GetCountByLocationAsync(id);
+            return Ok(new { success = true, count = count });
+        }
+
     }
 }

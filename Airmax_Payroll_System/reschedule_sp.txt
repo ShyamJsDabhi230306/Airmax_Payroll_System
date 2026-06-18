@@ -1,114 +1,121 @@
-Text                                                                                                                                                                                                                                                           
----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-CREATE   PROCEDURE [dbo].[usp_Transaction_EmployeeLoan_Reschedule]
-                                                                                                                                                                                           
-    @IDEmployeeLoan INT,
-                                                                                                                                                                                                                                     
-    @NewRemainingMonths INT
-                                                                                                                                                                                                                                  
+USE [AirmaxSalaryPayroll_DB]
+GO
+/****** Object:  StoredProcedure [dbo].[usp_Master_PayRollApiConfigration_Save]    Script Date: 05-05-2026 14:24:45 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[usp_Master_PayRollApiConfigration_Save]
+(
+    @IDPayrollApiConfigration INT = 0,
+    @IDCompany INT,
+    @BaseUrl NVARCHAR(MAX) = NULL,
+    @AccountName NVARCHAR(250) = NULL,
+    @ApiKey NVARCHAR(MAX) = NULL,
+    @PullApiEndPoint NVARCHAR(MAX) = NULL,
+    @RequestTimeout INT = NULL,
+    @RetryAttemptOfFailer INT = NULL,
+    @RetryBackOff INT = NULL,
+    @UseHTTPSOnly BIT = 0,
+    @maskApiInLog BIT = 0,
+    @IPWhiteListEnforcement BIT = 0,
+    @AutoRotateApiKeyOnEvery90Days BIT = 0,
+    @PullFrequency NVARCHAR(50) = NULL,
+    @DateRangeWindow NVARCHAR(50) = NULL,
+    @ActiveHours NVARCHAR(100) = NULL,
+    @UserIDPull BIT = 0,
+    @LogDate BIT = 0,
+    @SerialNumberPull BIT = 0,
+    @DeviceNamePull BIT = 0,
+    @UseridPayroll NVARCHAR(250) = NULL,
+    @UseridTransform NVARCHAR(250) = NULL,
+    @LogDatePayroll NVARCHAR(250) = NULL,
+    @LogdateTransform NVARCHAR(250) = NULL,
+    @SerialNumberPayroll NVARCHAR(250) = NULL,
+    @SerialNumberTransform NVARCHAR(250) = NULL,
+    @DeviceSNamesPayroll NVARCHAR(250) = NULL,
+    @deviceSNamesTransform NVARCHAR(250) = NULL,
+    @OnDuplicatePunch NVARCHAR(100) = NULL,
+    @UnknownEmployeeCode NVARCHAR(100) = NULL,
+    @RejectFuturePunch BIT = 0,
+    @RejectOldPunch BIT = 0,
+    @EmailOnFailure BIT = 0,
+    @IDBiometricDevice INT = NULL,
+    @DefaultVerifyMode NVARCHAR(100) = NULL,
+    @FaceCardDual NVARCHAR(100) = NULL,
+    @UploadFaceTemplates NVARCHAR(100) = NULL,
+    @UploadFingerprints NVARCHAR(100) = NULL,
+    @UploadCards NVARCHAR(100) = NULL,
+    @AutoClearLogsAfterSync NVARCHAR(50) = NULL,
+    @OnlineEnrollment NVARCHAR(50) = NULL,
+    @BlockUserSupport NVARCHAR(50) = NULL,
+    @AutoPushOnEmployeeAdd NVARCHAR(50) = NULL,
+    @AutoDeleteOnEmployeeResign NVARCHAR(50) = NULL,
+    @PushOnDepartmentChange NVARCHAR(50) = NULL,
+    @IsPushPhotoEnabled BIT = 0,
+    @IsExpirySetOnResign BIT = 0,
+    @IsPushLocationRestricted BIT = 0,
+    @IsBlockOnSuspend BIT = 0,
+    @IDLocationDeviceMaping INT = NULL,
+    @MaxQueueSizePerDevice INT = NULL,
+    @StaleCommandTTLHours INT = NULL,
+    @ConcurrentCommandsPerDevice INT = NULL,
+    @IsActive BIT = 1,
+    @username NVARCHAR(100),
+    @DeviceJson NVARCHAR(MAX) = NULL,
+    @MappingJson NVARCHAR(MAX) = NULL
+)
 AS
-                                                                                                                                                                                                                                                           
 BEGIN
-                                                                                                                                                                                                                                                        
     SET NOCOUNT ON;
-                                                                                                                                                                                                                                          
     BEGIN TRY
-                                                                                                                                                                                                                                                
-        DECLARE @TotalLoanAmount DECIMAL(18,2), @PaidAmount DECIMAL(18,2), @RemainingBalance DECIMAL(18,2);
-                                                                                                                                                  
-        DECLARE @StartMonth INT, @StartYear INT, @NewEMI DECIMAL(18,2);
-                                                                                                                                                                                      
+        BEGIN TRANSACTION;
 
-                                                                                                                                                                                                                                                             
-        -- 1. Get total loan amount
-                                                                                                                                                                                                                          
-        SELECT @TotalLoanAmount = LoanAmount FROM Transaction_EmployeeLoan WHERE IDEmployeeLoan = @IDEmployeeLoan;
-                                                                                                                                           
-
-                                                                                                                                                                                                                                                             
-        -- 2. Calculate already PAID amount
-                                                                                                                                                                                                                  
-        SELECT @PaidAmount = SUM(ISNULL(InstallmentAmount, 0)) 
-                                                                                                                                                                                              
-        FROM Transaction_EmployeeLoanDetails 
-                                                                                                                                                                                                                
-        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Paid';
-                                                                                                                                                                                          
-
-                                                                                                                                                                                                                                                             
-        SET @RemainingBalance = @TotalLoanAmount - ISNULL(@PaidAmount, 0);
-                                                                                                                                                                                   
-        SET @NewEMI = @RemainingBalance / @NewRemainingMonths;
-                                                                                                                                                                                               
-
-                                                                                                                                                                                                                                                             
-        -- 3. Get the starting point (the first month that is currently Pending)
-                                                                                                                                                                             
-        SELECT TOP 1 @StartMonth = Month, @StartYear = Year 
-                                                                                                                                                                                                 
-        FROM Transaction_EmployeeLoanDetails 
-                                                                                                                                                                                                                
-        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Pending'
-                                                                                                                                                                                        
-        ORDER BY Year ASC, Month ASC;
-                                                                                                                                                                                                                        
-
-                                                                                                                                                                                                                                                             
-        -- 4. Delete all future PENDING installments (Keep Paid and Skipped)
-                                                                                                                                                                                 
-        DELETE FROM Transaction_EmployeeLoanDetails 
-                                                                                                                                                                                                         
-        WHERE IDEmployeeLoan = @IDEmployeeLoan AND Status = 'Pending';
-                                                                                                                                                                                       
-
-                                                                                                                                                                                                                                                             
-        -- 5. Regenerate new schedule for the remaining months
-                                                                                                                                                                                               
-        DECLARE @i INT = 0;
-                                                                                                                                                                                                                                  
-        WHILE @i < @NewRemainingMonths
-                                                                                                                                                                                                                       
+        -- A. UPSERT MAIN CONFIG
+        -- FIX: Removed the logic that forced an update of existing company records when ID=0.
+        -- This prevents "deleting" (overwriting) previous configurations when a user tries to create a new one for the same company.
+        
+        IF @IDPayrollApiConfigration = 0
         BEGIN
-                                                                                                                                                                                                                                                
-            INSERT INTO Transaction_EmployeeLoanDetails (IDEmployeeLoan, Month, Year, Date, InstallmentAmount, Status)
-                                                                                                                                       
-            VALUES (
-                                                                                                                                                                                                                                         
-                @IDEmployeeLoan, 
-                                                                                                                                                                                                                            
-                @StartMonth, 
-                                                                                                                                                                                                                                
-                @StartYear, 
-                                                                                                                                                                                                                                 
-                CAST(CAST(@StartYear AS VARCHAR) + '-' + CAST(@StartMonth AS VARCHAR) + '-01' AS DATE),
-                                                                                                                                                      
-                CASE WHEN @i = @NewRemainingMonths - 1 THEN @RemainingBalance - (@NewEMI * (@NewRemainingMonths - 1)) ELSE @NewEMI END, -- Adjust last EMI for rounding
-                                                                                      
-                'Pending'
-                                                                                                                                                                                                                                    
-            );
-                                                                                                                                                                                                                                               
-
-                                                                                                                                                                                                                                                             
-            SET @StartMonth = @StartMonth + 1;
-                                                                                                                                                                                                               
-            IF (@StartMonth > 12) BEGIN SET @StartMonth = 1; SET @StartYear = @StartYear + 1; END
-                                                                                                                                                            
-            SET @i = @i + 1;
-                                                                                                                                                                                                                                 
+            INSERT INTO Master_PayRollApiConfigration (IDCompany, BaseUrl, AccountName, ApiKey, PullApiEndPoint, RequestTimeout, RetryAttemptOfFailer, RetryBackOff, UseHTTPSOnly, maskApiInLog, IPWhiteListEnforcement, AutoRotateApiKeyOnEvery90Days, PullFrequency, DateRangeWindow, ActiveHours, UserIDPull, LogDate, SerialNumberPull, DeviceNamePull, UseridPayroll, UseridTransform, LogDatePayroll, LogdateTransform, SerialNumberPayroll, SerialNumberTransform, DeviceSNamesPayroll, deviceSNamesTransform, OnDuplicatePunch, UnknownEmployeeCode, RejectFuturePunch, RejectOldPunch, EmailOnFailure, IDBiometricDevice, DefaultVerifyMode, FaceCardDual, UploadFaceTemplates, UploadFingerprints, UploadCards, AutoClearLogsAfterSync, OnlineEnrollment, BlockUserSupport, AutoPushOnEmployeeAdd, AutoDeleteOnEmployeeResign, PushOnDepartmentChange, IsPushPhotoEnabled, IsExpirySetOnResign, IsPushLocationRestricted, IsBlockOnSuspend, IDLocationDeviceMaping, MaxQueueSizePerDevice, StaleCommandTTLHours, ConcurrentCommandsPerDevice, IsActive, IsDelete, E_Date, E_By)
+            VALUES (@IDCompany, @BaseUrl, @AccountName, @ApiKey, @PullApiEndPoint, @RequestTimeout, @RetryAttemptOfFailer, @RetryBackOff, @UseHTTPSOnly, @maskApiInLog, @IPWhiteListEnforcement, @AutoRotateApiKeyOnEvery90Days, @PullFrequency, @DateRangeWindow, @ActiveHours, @UserIDPull, @LogDate, @SerialNumberPull, @DeviceNamePull, @UseridPayroll, @UseridTransform, @LogDatePayroll, @LogdateTransform, @SerialNumberPayroll, @SerialNumberTransform, @DeviceSNamesPayroll, @deviceSNamesTransform, @OnDuplicatePunch, @UnknownEmployeeCode, @RejectFuturePunch, @RejectOldPunch, @EmailOnFailure, @IDBiometricDevice, @DefaultVerifyMode, @FaceCardDual, @UploadFaceTemplates, @UploadFingerprints, @UploadCards, @AutoClearLogsAfterSync, @OnlineEnrollment, @BlockUserSupport, @AutoPushOnEmployeeAdd, @AutoDeleteOnEmployeeResign, @PushOnDepartmentChange, @IsPushPhotoEnabled, @IsExpirySetOnResign, @IsPushLocationRestricted, @IsBlockOnSuspend, @IDLocationDeviceMaping, @MaxQueueSizePerDevice, @StaleCommandTTLHours, @ConcurrentCommandsPerDevice, @IsActive, 0, GETDATE(), @username);
+            SET @IDPayrollApiConfigration = SCOPE_IDENTITY();
         END
-                                                                                                                                                                                                                                                  
+        ELSE
+        BEGIN
+            UPDATE Master_PayRollApiConfigration SET BaseUrl=@BaseUrl, AccountName=@AccountName, ApiKey=@ApiKey, PullApiEndPoint=@PullApiEndPoint, RequestTimeout=@RequestTimeout, RetryAttemptOfFailer=@RetryAttemptOfFailer, RetryBackOff=@RetryBackOff, UseHTTPSOnly=@UseHTTPSOnly, maskApiInLog=@maskApiInLog, IPWhiteListEnforcement=@IPWhiteListEnforcement, AutoRotateApiKeyOnEvery90Days=@AutoRotateApiKeyOnEvery90Days, PullFrequency=@PullFrequency, DateRangeWindow=@DateRangeWindow, ActiveHours=@ActiveHours, UserIDPull=@UserIDPull, LogDate=@LogDate, SerialNumberPull=@SerialNumberPull, DeviceNamePull=@DeviceNamePull, UseridPayroll=@UseridPayroll, UseridTransform=@UseridTransform, LogDatePayroll=@LogDatePayroll, LogdateTransform=@LogdateTransform, SerialNumberPayroll=@SerialNumberPayroll, SerialNumberTransform=@SerialNumberTransform, DeviceSNamesPayroll=@DeviceSNamesPayroll, deviceSNamesTransform=@deviceSNamesTransform, OnDuplicatePunch=@OnDuplicatePunch, UnknownEmployeeCode=@UnknownEmployeeCode, RejectFuturePunch=@RejectFuturePunch, RejectOldPunch=@RejectOldPunch, EmailOnFailure=@EmailOnFailure, IDBiometricDevice=@IDBiometricDevice, DefaultVerifyMode=@DefaultVerifyMode, FaceCardDual=@FaceCardDual, UploadFaceTemplates=@UploadFaceTemplates, UploadFingerprints=@UploadFingerprints, UploadCards=@UploadCards, AutoClearLogsAfterSync=@AutoClearLogsAfterSync, OnlineEnrollment=@OnlineEnrollment, BlockUserSupport=@BlockUserSupport, AutoPushOnEmployeeAdd=@AutoPushOnEmployeeAdd, AutoDeleteOnEmployeeResign=@AutoDeleteOnEmployeeResign, PushOnDepartmentChange=@PushOnDepartmentChange, IsPushPhotoEnabled=@IsPushPhotoEnabled, IsExpirySetOnResign=@IsExpirySetOnResign, IsPushLocationRestricted=@IsPushLocationRestricted, IsBlockOnSuspend=@IsBlockOnSuspend, IDLocationDeviceMaping=@IDLocationDeviceMaping, MaxQueueSizePerDevice=@MaxQueueSizePerDevice, StaleCommandTTLHours=@StaleCommandTTLHours, ConcurrentCommandsPerDevice=@ConcurrentCommandsPerDevice, IsActive=@IsActive, U_Date=GETDATE(), U_By=@username
+            WHERE IDPayrollApiConfigration = @IDPayrollApiConfigration;
+        END
 
-                                                                                                                                                                                                                                                             
-        SELECT 1 AS Result, 'Schedule recalculated successfully' AS Message;
-                                                                                                                                                                                 
+        -- B. SAVE DEVICES
+        IF @DeviceJson IS NOT NULL AND LEN(@DeviceJson) > 2
+        BEGIN
+            -- Clear existing devices for this company's locations
+            DELETE FROM Master_BiomatricDevices WHERE IDLocation IN (SELECT IDLocation FROM Master_Location WHERE IDCompany = @IDCompany);
+            
+            INSERT INTO Master_BiomatricDevices (DeviceName, SerialNumber, ModelType, IDLocation, Status, IsActive, IsDelete, E_Date, E_By)
+            SELECT DeviceName, SerialNumber, ModelType, IDLocation, Status, 1, 0, GETDATE(), @username
+            FROM OPENJSON(@DeviceJson) WITH (DeviceName NVARCHAR(MAX), SerialNumber NVARCHAR(MAX), ModelType NVARCHAR(MAX), IDLocation INT, Status NVARCHAR(MAX))
+            WHERE IDLocation IS NOT NULL AND IDLocation > 0;
+        END
+
+        -- C. SAVE MAPPINGS (FIX: Missing logic to persist mappings)
+        IF @MappingJson IS NOT NULL AND LEN(@MappingJson) > 2
+        BEGIN
+            DELETE FROM Master_LocationDeviceMapping WHERE IDLocation IN (SELECT IDLocation FROM Master_Location WHERE IDCompany = @IDCompany);
+            
+            INSERT INTO Master_LocationDeviceMapping (IDLocation, MappedDeviceSerials, IDEmployee, IsActive, IsDelete, E_Date, E_By)
+            SELECT IDLocation, MappedDeviceSerials, IDEmployee, 1, 0, GETDATE(), @username
+            FROM OPENJSON(@MappingJson) WITH (IDLocation INT, MappedDeviceSerials NVARCHAR(MAX), IDEmployee INT)
+            WHERE IDLocation IS NOT NULL AND IDLocation > 0;
+        END
+
+        COMMIT TRANSACTION;
+        SELECT Result = 1, Message = 'Success', NewId = @IDPayrollApiConfigration;
     END TRY
-                                                                                                                                                                                                                                                  
     BEGIN CATCH
-                                                                                                                                                                                                                                              
-        SELECT 0 AS Result, ERROR_MESSAGE() AS Message;
-                                                                                                                                                                                                      
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        -- Return actual error details for easier debugging
+        SELECT Result = -1, Message = ERROR_MESSAGE(), ErrorLine = ERROR_LINE(), ErrorProcedure = ERROR_PROCEDURE();
     END CATCH
-                                                                                                                                                                                                                                                
 END
-                                                                                                                                                                                                                                                          

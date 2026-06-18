@@ -54,5 +54,10 @@ namespace Airmax_Payroll_System.Controllers
         }
 
 
+        public IActionResult AttendanceLog()
+        {
+            return View();
+        }
+
     }
 }

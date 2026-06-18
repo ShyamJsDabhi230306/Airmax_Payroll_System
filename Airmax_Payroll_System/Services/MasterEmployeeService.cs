@@ -27,7 +27,11 @@ namespace Airmax_Payroll_System.Services
             => await _repo.DeleteAsync(id, deleteBy);
 
 
-        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id)
-           => await _repo.GetByDepartmentAsync(id);
+        public async Task<IEnumerable<EmployeeModel>> GetByDepartmentAsync(int id, int idDivision = 0)
+   => await _repo.GetByDepartmentAsync(id, idDivision);
+
+        public async Task<int> GetCountByLocationAsync(int idLocation)
+    => await _repo.GetCountByLocationAsync(idLocation);
+
     }
 }

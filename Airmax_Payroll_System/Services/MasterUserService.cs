@@ -45,9 +45,7 @@ namespace Airmax_Payroll_System.Services
         // ---------------------------------------------------------
         // LOGIN
         // ---------------------------------------------------------
-        public async Task<LoginResponse> LoginAsync(
-            string userName,
-            string password)
+        public async Task<LoginResponse> LoginAsync(string userName,string password)
         {
             if (string.IsNullOrWhiteSpace(userName)
                 || string.IsNullOrWhiteSpace(password))
@@ -82,7 +80,7 @@ namespace Airmax_Payroll_System.Services
 
             return new LoginResponse
             {
-                Success = true,
+                Success = true, 
                 Message = "Login successful",
                 Token = token,
                 ExpiresAt = DateTime.UtcNow.AddHours(4),

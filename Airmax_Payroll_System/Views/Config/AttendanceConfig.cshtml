@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "API & Attendance Configuration";
+}
+
+<div class="row">
+    <!-- 1. HEADER SECTION -->
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                <div>
+                    <h4 class="card-title mb-0 text-primary fw-bold">API & Attendance Configuration</h4>
+                    <small class="text-muted">Manage SmartOffice Cloud Integration</small>
+                </div>
+                <div class="d-flex gap-2">
+                    @* <div class="input-group input-group-sm" style="width: 200px;">
+                        <span class="input-group-text bg-light fw-bold">Company</span>
+                        <select class="form-control selectpicker" id="co-select" onchange="loadCompany(this.value)">
+                            <option value="aira">Aira</option>
+                            <option value="airmax">Airmax</option>
+                            <option value="4matic">4matic</option>
+                        </select>
+                    </div> *@
+                    <button class="btn btn-primary btn-sm px-4 shadow-sm" onclick="saveAll()">
+                        <i class="fa fa-save me-1"></i> Save All Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. NAVIGATION TABS -->
+    <div class="col-12">
+        <div class="card border-0 bg-transparent shadow-none">
+            <div class="card-body p-0">
+                <ul class="nav nav-tabs custom-tabs mb-4" role="tablist">
+                    <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tp-connection">🔌 Connection</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tp-pull">⬇ Pull API</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tp-devices">📟 Devices <span class="badge bg-secondary ms-1" id="dev-count">3</span></a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tp-sync">🔄 Sync Settings</a></li>
+                    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tp-endpoints">📡 Endpoints</a></li>
+                    <li class="nav-item"><a class="nav-link text-success fw-bold" data-bs-toggle="tab" href="#tp-tester">🧪 API Tester</a></li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <!-- TAB 1: CONNECTION -->
+                    <div class="tab-pane fade show active" id="tp-connection">
+                        <!-- Dashboard Info -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3"><div class="card bg-success text-white p-3 text-center border-0 shadow-sm"><small>Connection</small><h3 class="mb-0 fw-bold">Online</h3></div></div>
+                            <div class="col-md-3"><div class="card bg-info text-white p-3 text-center border-0 shadow-sm"><small>Active Devices</small><h3 class="mb-0 fw-bold">3 / 3</h3></div></div>
+                            <div class="col-md-3"><div class="card bg-dark text-white p-3 text-center border-0 shadow-sm"><small>Last Pull</small><h3 class="mb-0 fw-bold">2m 14s</h3></div></div>
+                            <div class="col-md-3"><div class="card bg-warning text-white p-3 text-center border-0 shadow-sm"><small>Pending Cmds</small><h3 class="mb-0 fw-bold">2</h3></div></div>
+                        </div>
+                        <!-- API Connection Form -->
+                        <div class="card shadow-sm">
+                            <div class="card-header"><h5 class="mb-0 fw-bold"><i class="fa fa-link me-2 text-primary"></i> API Connection</h5></div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Base URL</label><input type="text" id="api-base" class="form-control" value="https://sohcm.com/SmartApp_ess" /></div>
+                                    <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Account Name</label><input type="text" id="api-account" class="form-control" value="ACE" /></div>
+                                    <div class="col-md-6 mb-3"><label class="form-label fw-bold small">API Key</label><div class="input-group"><input type="password" id="api-key" class="form-control" value="233916012427" /><button class="btn btn-outline-secondary" onclick="toggleApiKey(this)">Show</button></div></div>
+                                    <div class="col-md-6 mb-3"><label class="form-label fw-bold small">Pull Endpoint</label><div class="input-group"><input type="text" id="api-pull" class="form-control" value="/api/SwipeDetails/GetDeviceLogs" /><button class="btn btn-outline-secondary" onclick="copyText('api-pull',this)">Copy</button></div></div>
+                                </div>
+                                <hr />
+                                <div class="d-flex align-items-center"><button class="btn btn-primary px-4" onclick="testConnection()"><i class="fa fa-bolt me-1"></i> Test Connection</button><span class="ms-auto text-muted small fw-bold" id="conn-msg">Last test: 200 OK</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: PULL API -->
+                    <div class="tab-pane fade" id="tp-pull">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-header"><h5 class="mb-0 fw-bold"><i class="fa fa-clock me-2 text-success"></i> Polling Schedule</h5></div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4"><label class="form-label fw-bold small">Frequency</label><select class="form-control" id="pull-freq"><option value="5">5 min</option><option value="15" selected>15 min</option><option value="60">1 hour</option></select></div>
+                                    <div class="col-md-4"><label class="form-label fw-bold small">Date Window</label><select class="form-control"><option selected>Last 2 days</option></select></div>
+                                    <div class="col-md-4"><label class="form-label fw-bold small">Status</label><div class="form-control bg-light border-0"><span class="badge bg-success">ACTIVE</span></div></div>
+                                </div>
+                                <div class="d-flex gap-2 mt-2">
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="setFreq(15)">15 min</button>
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="setFreq(60)">1 hour</button>
+                                    <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="setFreq(1440)">Daily</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: DEVICES -->
+                    <div class="tab-pane fade" id="tp-devices">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0 fw-bold"><i class="fa fa-microchip me-2 text-info"></i> Biometric Devices</h5>
+                                <button class="btn btn-info btn-sm text-white" onclick="addDeviceRow()">+ Add Device</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle mb-0">
+                                        <thead class="table-light"><tr><th width="50">#</th><th>Device Name</th><th>Serial Number</th><th>Location</th><th width="100">Status</th><th width="50"></th></tr></thead>
+                                        <tbody id="dev-rows">
+                                            <tr><td>1</td><td><input type="text" class="form-control form-control-sm" value="Main Entrance"></td><td><input type="text" class="form-control form-control-sm font-monospace" value="C26044C84F352331"></td><td><input type="text" class="form-control form-control-sm" value="HQ"></td><td><span class="badge bg-success">Online</span></td><td><button class="btn btn-danger btn-sm p-1" onclick="this.closest('tr').remove()"><i class="fa fa-times"></i></button></td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 6: API TESTER -->
+                    <div class="tab-pane fade" id="tp-tester">
+                        <div class="card bg-dark text-white shadow-sm">
+                            <div class="card-header border-secondary"><h5 class="mb-0 fw-bold text-white"><i class="fa fa-vial me-2 text-warning"></i> API Tester Simulator</h5></div>
+                            <div class="card-body">
+                                <div class="row align-items-end mb-4">
+                                    <div class="col-md-6"><label class="form-label small fw-bold">Endpoint</label><select class="form-control bg-secondary text-white border-0" id="t-endpoint"><option value="GetDeviceLogs">GET — Fetch Biometric Logs</option><option value="UploadUser">POST — Upload User</option></select></div>
+                                    <div class="col-md-6"><button class="btn btn-warning w-100 fw-bold" onclick="runTest()">▶ Send Simulated Request</button></div>
+                                </div>
+                                <div class="p-3 bg-black rounded" style="min-height: 200px;">
+                                    <pre id="res-pre" class="text-success small mb-0">// JSON Response will appear here...</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- /tab-content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Config/attendance_config.js" asp-append-version="true"></script>
+}

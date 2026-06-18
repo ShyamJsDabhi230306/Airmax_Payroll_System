@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>API & Attendance Machine Configuration</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F2F4F8;
+  --surface:#FFFFFF;
+  --s2:#F8F9FC;
+  --border:#E3E7EF;
+  --border2:#CBD1DE;
+  --ink:#111827;
+  --ink2:#374151;
+  --ink3:#6B7280;
+  --ink4:#9CA3AF;
+  --blue:#2563EB;
+  --blue-l:#EFF4FF;
+  --blue-m:#BFCFFE;
+  --green:#059669;
+  --green-l:#ECFDF5;
+  --amber:#D97706;
+  --amber-l:#FFFBEB;
+  --red:#DC2626;
+  --red-l:#FEF2F2;
+  --purple:#7C3AED;
+  --purple-l:#F5F3FF;
+  --teal:#0D9488;
+  --teal-l:#F0FDFA;
+  --sans:'Plus Jakarta Sans',sans-serif;
+  --mono:'Fira Code',monospace;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --sh2:0 0 0 3px rgba(37,99,235,.12);
+  --r:6px;--r2:10px;--r3:14px;
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:13.5px;line-height:1.55;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ─── TOP BAR ──────────────────────────────────────────────────────────── */
+.topbar{
+  background:var(--surface);
+  border-bottom:1.5px solid var(--border);
+  padding:0 28px;
+  height:54px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 0 var(--border);
+}
+.brand{font-size:15px;font-weight:700;letter-spacing:-.4px;color:var(--ink);}
+.brand em{color:var(--blue);font-style:normal;}
+.topbar-sep{width:1px;height:20px;background:var(--border2);}
+.topbar-title{font-size:13px;font-weight:500;color:var(--ink3);}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.company-wrap{display:flex;align-items:center;gap:8px;}
+.company-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink4);}
+.company-select{
+  font-family:var(--sans);font-size:13px;font-weight:600;color:var(--ink);
+  background:var(--blue-l);border:1.5px solid var(--blue-m);
+  border-radius:var(--r2);padding:6px 14px;cursor:pointer;outline:none;
+  transition:border-color .15s;
+}
+.company-select:focus{border-color:var(--blue);}
+.btn-save-top{
+  background:var(--blue);color:#fff;border:none;
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  padding:8px 20px;border-radius:var(--r2);cursor:pointer;
+  transition:background .15s;
+}
+.btn-save-top:hover{background:#1D4ED8;}
+
+/* ─── SECTION TABS ───────────────────────────────────────────────── */
+.emp-tab-bar{
+  background:var(--surface);
+  border-bottom:1.5px solid var(--border);
+  padding:0 28px;
+  display:flex;gap:2px;
+  position:sticky;top:54px;z-index:99;
+}
+.etab{
+  padding:13px 20px;font-family:var(--sans);font-size:13px;font-weight:500;
+  color:var(--ink3);background:none;border:none;cursor:pointer;
+  border-bottom:2.5px solid transparent;margin-bottom:-1.5px;
+  transition:color .15s,border-color .15s;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;
+}
+.etab:hover{color:var(--ink);}
+.etab.active{color:var(--blue);font-weight:700;border-bottom-color:var(--blue);}
+.etab .tab-count{
+  background:var(--border);color:var(--ink3);font-size:10px;font-weight:700;
+  padding:1px 7px;border-radius:9px;
+}
+.etab.active .tab-count{background:var(--blue);color:#fff;}
+
+/* ─── PAGE BODY ────────────────────────────────────────────────────────── */
+.page{padding:24px 28px;max-width:1160px;}
+
+/* ─── SECTION BLOCK ────────────────────────────────────────────────────── */
+.cfg-section{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--r3);
+  margin-bottom:16px;
+  box-shadow:var(--sh);
+  overflow:hidden;
+}
+.cfg-section-head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 20px;
+  border-bottom:1.5px solid var(--border);
+  background:var(--s2);
+}
+.cfg-icon{
+  width:28px;height:28px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.cfg-section-title{font-size:13.5px;font-weight:700;color:var(--ink);}
+.cfg-section-sub{font-size:11.5px;color:var(--ink3);margin-left:auto;display:flex;align-items:center;gap:8px;}
+.cfg-body{padding:20px;}
+
+/* ─── GRID ─────────────────────────────────────────────────────────────── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;}
+
+/* ─── FIELD ─────────────────────────────────────────────────────────────── */
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);}
+.field input,.field select,.field textarea{
+  font-family:var(--sans);font-size:13px;color:var(--ink);
+  background:var(--s2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:8px 11px;width:100%;
+  transition:border-color .15s,box-shadow .15s;
+  resize:vertical;
+}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:var(--sh2);background:#fff;}
+.field .hint{font-size:11px;color:var(--ink4);line-height:1.4;}
+.mono{font-family:var(--mono)!important;font-size:12px!important;}
+
+/* Field with copy/action button suffix */
+.field-w-suffix{position:relative;}
+.field-w-suffix input{padding-right:78px;}
+.suffix-btn{
+  position:absolute;right:5px;top:24px;
+  font-family:var(--sans);font-size:11px;font-weight:700;
+  background:var(--blue);color:#fff;border:none;
+  padding:5px 11px;border-radius:4px;cursor:pointer;
+  transition:background .15s;
+}
+.suffix-btn:hover{background:#1D4ED8;}
+.suffix-btn.copied{background:var(--green);}
+.suffix-btn.eye{background:var(--ink3);}
+.suffix-btn.eye:hover{background:var(--ink2);}
+
+/* ─── TOGGLE ────────────────────────────────────────────────────────────── */
+.toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+  gap:14px;
+}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0;}
+.toggle-row:first-child{padding-top:0;}
+.tl{font-size:13px;font-weight:500;color:var(--ink);}
+.ts{font-size:11.5px;color:var(--ink3);margin-top:1px;}
+.sw{position:relative;width:38px;height:22px;flex-shrink:0;}
+.sw input{opacity:0;position:absolute;inset:0;cursor:pointer;width:100%;height:100%;margin:0;}
+.sw-track{position:absolute;inset:0;background:var(--border2);border-radius:11px;transition:background .2s;pointer-events:none;}
+.sw-track:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.18);}
+.sw input:checked~.sw-track{background:var(--blue);}
+.sw input:checked~.sw-track:before{transform:translateX(16px);}
+
+/* ─── BADGE ─────────────────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.04em;gap:4px;}
+.b-blue{background:var(--blue-l);color:var(--blue);}
+.b-green{background:var(--green-l);color:var(--green);}
+.b-amber{background:var(--amber-l);color:var(--amber);}
+.b-red{background:var(--red-l);color:var(--red);}
+.b-purple{background:var(--purple-l);color:var(--purple);}
+.b-teal{background:var(--teal-l);color:var(--teal);}
+.b-grey{background:#F3F4F6;color:#6B7280;}
+
+.b-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+.b-dot.live{animation:pulse-dot 1.6s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* ─── DIVIDER ───────────────────────────────────────────────────────────── */
+.div{height:1.5px;background:var(--border);margin:16px 0;}
+.section-h{font-size:11.5px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+
+/* ─── INFO ──────────────────────────────────────────────────────────────── */
+.info{
+  background:var(--blue-l);border:1px solid var(--blue-m);
+  border-radius:var(--r);padding:9px 13px;
+  font-size:12px;color:#1E40AF;margin-bottom:14px;line-height:1.5;
+  display:flex;gap:8px;align-items:flex-start;
+}
+.info.warn{background:var(--amber-l);border-color:#FCD34D;color:#92400E;}
+.info.success{background:var(--green-l);border-color:#86EFAC;color:#065F46;}
+
+/* ─── BUTTON ──────────────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  padding:7px 14px;border-radius:var(--r);cursor:pointer;
+  border:1.5px solid var(--border);background:var(--surface);color:var(--ink2);
+  transition:all .15s;
+}
+.btn:hover{border-color:var(--border2);background:var(--s2);}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.btn-primary:hover{background:#1D4ED8;border-color:#1D4ED8;}
+.btn-success{background:var(--green);color:#fff;border-color:var(--green);}
+.btn-success:hover{background:#047857;}
+.btn-danger{background:var(--red-l);color:var(--red);border-color:#FECACA;}
+.btn-danger:hover{background:#FEE2E2;}
+.btn-add-row{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--sans);font-size:12px;font-weight:600;color:var(--blue);
+  background:none;border:1.5px dashed var(--blue-m);border-radius:var(--r);
+  padding:6px 14px;cursor:pointer;transition:all .15s;
+}
+.btn-add-row:hover{background:var(--blue-l);border-color:var(--blue);}
+.btn-del{
+  width:28px;height:28px;background:var(--red-l);border:1.5px solid #FECACA;
+  border-radius:var(--r);color:var(--red);cursor:pointer;font-size:15px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:all .15s;
+}
+.btn-del:hover{background:#FEE2E2;}
+
+/* ─── DEVICE TABLE ────────────────────────────────────────────────────── */
+.dev-wrap{border:1.5px solid var(--border);border-radius:var(--r2);overflow:hidden;margin-bottom:10px;}
+.dev-head{
+  display:grid;grid-template-columns:32px 1.4fr 1.6fr 1fr 0.9fr 110px 36px;
+  gap:8px;background:var(--s2);padding:9px 12px;
+  border-bottom:1.5px solid var(--border);
+}
+.dev-head span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);}
+.dev-row{
+  display:grid;grid-template-columns:32px 1.4fr 1.6fr 1fr 0.9fr 110px 36px;
+  gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;
+}
+.dev-row:last-child{border-bottom:none;}
+.dev-row input,.dev-row select{
+  font-family:var(--sans);font-size:12px;color:var(--ink);
+  background:var(--s2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:6px 8px;width:100%;
+  transition:border-color .15s;
+}
+.dev-row input.mono{font-family:var(--mono)!important;font-size:11px!important;letter-spacing:.02em;}
+.dev-row input:focus,.dev-row select:focus{outline:none;border-color:var(--blue);background:#fff;}
+.dev-status{display:flex;align-items:center;gap:6px;justify-content:center;}
+
+/* ─── ENDPOINT TABLE ────────────────────────────────────────────────── */
+.ep-wrap{border:1.5px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.ep-row{
+  display:grid;grid-template-columns:60px 1.4fr 2fr 60px 110px;
+  gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);align-items:center;
+  background:var(--surface);transition:background .15s;
+}
+.ep-row:last-child{border-bottom:none;}
+.ep-row:hover{background:var(--s2);}
+.ep-method{
+  font-family:var(--mono);font-size:10.5px;font-weight:700;
+  padding:3px 8px;border-radius:4px;text-align:center;letter-spacing:.04em;
+}
+.ep-method.get{background:var(--green-l);color:var(--green);}
+.ep-method.post{background:var(--blue-l);color:var(--blue);}
+.ep-name{font-size:12.5px;font-weight:600;color:var(--ink);}
+.ep-name .ep-desc{font-size:11px;color:var(--ink3);font-weight:400;margin-top:1px;}
+.ep-path{font-family:var(--mono);font-size:11px;color:var(--ink2);background:var(--s2);padding:5px 9px;border-radius:4px;border:1px solid var(--border);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.btn-test{
+  background:var(--blue-l);color:var(--blue);border:1.5px solid var(--blue-m);
+  font-family:var(--sans);font-size:11px;font-weight:700;
+  padding:5px 11px;border-radius:4px;cursor:pointer;
+  transition:all .15s;
+}
+.btn-test:hover{background:var(--blue);color:#fff;}
+
+/* ─── SUMMARY ROW ─────────────────────────────────────────────────────── */
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px;}
+.sum-card{
+  border:1.5px solid var(--border);border-radius:var(--r2);
+  padding:13px 16px;background:var(--s2);
+}
+.sum-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);margin-bottom:5px;}
+.sum-val{font-size:20px;font-weight:700;color:var(--ink);font-family:var(--mono);}
+.sum-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+.sum-card.ok{background:var(--green-l);border-color:#A7F3D0;}
+.sum-card.ok .sum-val{color:var(--green);}
+.sum-card.warn{background:var(--amber-l);border-color:#FCD34D;}
+.sum-card.warn .sum-val{color:var(--amber);}
+
+/* ─── TESTER (dark sim panel) ──────────────────────────────────────── */
+.sim-wrap{
+  background:linear-gradient(135deg,#0F172A 0%,#1E293B 100%);
+  border-radius:var(--r3);padding:22px;
+  box-shadow:0 4px 24px rgba(0,0,0,.18);
+}
+.sim-title{font-size:14px;font-weight:700;color:#F1F5F9;margin-bottom:2px;display:flex;align-items:center;gap:8px;}
+.sim-dot{width:8px;height:8px;border-radius:50%;background:#38BDF8;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.sim-sub{font-size:11.5px;color:#64748B;margin-bottom:18px;}
+.sim-row{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:10px;align-items:flex-end;margin-bottom:16px;}
+.sim-field label{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748B;margin-bottom:5px;}
+.sim-field input,.sim-field select{
+  font-family:var(--mono);font-size:12.5px;color:#F1F5F9;
+  background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);
+  border-radius:var(--r);padding:8px 11px;width:100%;outline:none;
+  transition:border-color .15s;
+}
+.sim-field input:focus,.sim-field select:focus{border-color:#38BDF8;}
+.sim-field select option{background:#1E293B;color:#F1F5F9;}
+.sim-btn{
+  background:#2563EB;color:#fff;border:none;
+  font-family:var(--sans);font-size:13px;font-weight:700;
+  padding:10px 22px;border-radius:var(--r);cursor:pointer;
+  transition:background .15s;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.sim-btn:hover{background:#1D4ED8;}
+.sim-status{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;
+}
+.sim-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:var(--r2);padding:11px 13px;}
+.ss-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748B;margin-bottom:5px;}
+.ss-val{font-size:16px;font-weight:700;font-family:var(--mono);color:#F1F5F9;}
+.ss-note{font-size:10.5px;color:#64748B;margin-top:2px;}
+.ok{color:#34D399;} .warn{color:#FBBF24;} .bad{color:#F87171;}
+
+.sim-tabs{display:flex;gap:2px;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sim-tab{
+  padding:7px 14px;font-size:11px;font-weight:600;color:#64748B;
+  background:none;border:none;cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:color .15s,border-color .15s;
+}
+.sim-tab:hover{color:#F1F5F9;}
+.sim-tab.active{color:#38BDF8;border-bottom-color:#38BDF8;}
+.sim-pane{display:none;}
+.sim-pane.on{display:block;}
+
+.sim-log{font-family:var(--mono);font-size:11.5px;color:#94A3B8;line-height:1.85;background:rgba(0,0,0,.30);border-radius:var(--r);padding:12px 14px;max-height:280px;overflow:auto;}
+.sim-log .lk{color:#38BDF8;}
+.sim-log .lv{color:#FBBF24;}
+.sim-log .ls{color:#34D399;}
+.sim-log .le{color:#F87171;}
+.sim-log .lc{color:#64748B;}
+
+.json-pre{font-family:var(--mono);font-size:11px;color:#E2E8F0;line-height:1.7;background:rgba(0,0,0,.30);border-radius:var(--r);padding:12px 14px;max-height:280px;overflow:auto;white-space:pre-wrap;word-break:break-all;}
+.j-key{color:#7DD3FC;}
+.j-str{color:#86EFAC;}
+.j-num{color:#FBBF24;}
+
+/* ─── TIME CHIPS ─────────────────────────────────────────────────────── */
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chip{
+  padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:600;
+  cursor:pointer;border:1.5px solid var(--border);background:var(--s2);
+  color:var(--ink3);transition:all .15s;
+}
+.chip.on{background:var(--blue-l);border-color:var(--blue);color:var(--blue);}
+
+/* ─── FIELD MAPPING ───────────────────────────────────────────────────── */
+.map-wrap{border:1.5px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.map-head,.map-row{
+  display:grid;grid-template-columns:1fr 24px 1fr 1fr 36px;
+  gap:10px;padding:9px 13px;align-items:center;
+}
+.map-head{background:var(--s2);border-bottom:1.5px solid var(--border);}
+.map-head span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink3);}
+.map-row{border-bottom:1px solid var(--border);}
+.map-row:last-child{border-bottom:none;}
+.map-arrow{color:var(--ink4);font-size:14px;text-align:center;}
+.map-row input,.map-row select{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink);
+  background:var(--s2);border:1.5px solid var(--border);
+  border-radius:var(--r);padding:6px 9px;width:100%;
+  transition:border-color .15s;
+}
+.map-row input:focus,.map-row select:focus{outline:none;border-color:var(--blue);background:#fff;}
+.src-fixed{font-family:var(--mono);font-size:11.5px;color:var(--ink2);background:#FEF9C3;border:1.5px solid #FDE68A;border-radius:var(--r);padding:6px 9px;}
+
+/* ─── TOAST ─────────────────────────────────────────────────────────────── */
+.toast{
+  position:fixed;bottom:22px;right:22px;z-index:999;
+  background:var(--ink);color:#fff;font-size:13px;font-weight:500;
+  padding:11px 20px;border-radius:var(--r2);
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+  opacity:0;transform:translateY(8px);
+  transition:all .25s;pointer-events:none;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:none;}
+.t-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+.toast.err .t-dot{background:var(--red);}
+
+/* ─── KBD ──────────────────────────────────────────────────────────── */
+kbd{
+  font-family:var(--mono);font-size:10.5px;
+  background:var(--s2);border:1px solid var(--border2);
+  border-bottom-width:2px;border-radius:3px;
+  padding:1px 6px;color:var(--ink2);
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="brand">Pay<em>Config</em></div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-title">API & Attendance Machine Configuration</div>
+  <div class="topbar-right">
+    <div class="company-wrap">
+      <span class="company-label">Company</span>
+      <select class="company-select" onchange="loadCompany(this.value)">
+        <option value="aira">Aira</option>
+        <option value="airmax">Airmax</option>
+        <option value="4matic">4matic</option>
+      </select>
+    </div>
+    <button class="btn-save-top" onclick="saveAll()">Save All</button>
+  </div>
+</div>
+
+<!-- SECTION TABS -->
+<div class="emp-tab-bar">
+  <button class="etab active" onclick="switchTab('connection',this)">🔌 Connection</button>
+  <button class="etab" onclick="switchTab('pull',this)">⬇ Pull API</button>
+  <button class="etab" onclick="switchTab('devices',this)">📟 Devices <span class="tab-count" id="dev-count">3</span></button>
+  <button class="etab" onclick="switchTab('sync',this)">🔄 Sync Settings</button>
+  <button class="etab" onclick="switchTab('endpoints',this)">📡 Endpoints</button>
+  <button class="etab" onclick="switchTab('tester',this)">🧪 API Tester</button>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: CONNECTION -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane on" id="tp-connection">
+
+  <!-- STATUS SUMMARY -->
+  <div class="sum-grid">
+    <div class="sum-card ok">
+      <div class="sum-lbl">Connection</div>
+      <div class="sum-val" id="sm-conn">Online</div>
+      <div class="sum-sub" id="sm-conn-sub">Last pinged 12s ago</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-lbl">Active Devices</div>
+      <div class="sum-val" id="sm-devs">3 / 3</div>
+      <div class="sum-sub">All reporting</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-lbl">Last Pull</div>
+      <div class="sum-val">2m 14s</div>
+      <div class="sum-sub">142 logs fetched</div>
+    </div>
+    <div class="sum-card warn">
+      <div class="sum-lbl">Pending Cmds</div>
+      <div class="sum-val">2</div>
+      <div class="sum-sub">In queue</div>
+    </div>
+  </div>
+
+  <!-- API CONNECTION -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--blue-l);">🔑</div>
+      <div><div class="cfg-section-title">SmartOffice API Connection</div></div>
+      <span class="cfg-section-sub">
+        <span class="badge b-green"><span class="b-dot live"></span>Connected</span>
+      </span>
+    </div>
+    <div class="cfg-body">
+      <div class="g2">
+        <div class="field">
+          <label>Base URL</label>
+          <input type="text" id="api-base" class="mono" value="https://sohcm.com/SmartApp_ess"/>
+          <div class="hint">SmartOffice cloud endpoint (no trailing slash)</div>
+        </div>
+        <div class="field">
+          <label>Account Name</label>
+          <input type="text" id="api-account" value="ACE"/>
+          <div class="hint">Tenant identifier on SmartOffice cloud</div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="g2">
+        <div class="field field-w-suffix">
+          <label>API Key (Authentication Token)</label>
+          <input type="password" id="api-key" class="mono" value="233916012427"/>
+          <button class="suffix-btn eye" onclick="toggleApiKey(this)">Show</button>
+          <div class="hint">Provided by SmartOffice — used in every request</div>
+        </div>
+        <div class="field field-w-suffix">
+          <label>Pull API Endpoint</label>
+          <input type="text" id="api-pull" class="mono" value="/api/SwipeDetails/GetDeviceLogs"/>
+          <button class="suffix-btn" onclick="copyText('api-pull',this)">Copy</button>
+          <div class="hint">Appended to base URL when polling</div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="g3">
+        <div class="field">
+          <label>Request Timeout (sec)</label>
+          <input type="number" id="api-timeout" value="30" min="5" max="120"/>
+        </div>
+        <div class="field">
+          <label>Retry Attempts on Failure</label>
+          <input type="number" id="api-retry" value="3" min="0" max="10"/>
+        </div>
+        <div class="field">
+          <label>Retry Backoff (sec)</label>
+          <input type="number" id="api-backoff" value="5" min="1"/>
+          <div class="hint">Wait between retries</div>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-primary" onclick="testConnection()">⚡ Test Connection</button>
+        <button class="btn" onclick="copyFullUrl()">📋 Copy Full Pull URL</button>
+        <span style="margin-left:auto;font-size:11.5px;color:var(--ink3);" id="conn-msg">Last test: <span style="color:var(--green);font-weight:600;">200 OK</span> · 248ms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION & SECURITY -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--purple-l);">🔒</div>
+      <div><div class="cfg-section-title">Authentication & Security</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Use HTTPS only</div>
+          <div class="ts">Reject http:// requests — recommended for production</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Mask API key in logs</div>
+          <div class="ts">Never write API key to file logs (only first 4 + last 2 chars)</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">IP whitelist enforcement</div>
+          <div class="ts">Only allow requests from registered IPs</div>
+        </div>
+        <label class="sw"><input type="checkbox"/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Auto-rotate API key every 90 days</div>
+          <div class="ts">Notify admin via email before expiry</div>
+        </div>
+        <label class="sw"><input type="checkbox"/><span class="sw-track"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: PULL API -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tp-pull">
+
+  <!-- PULL SCHEDULE -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--green-l);">⬇</div>
+      <div><div class="cfg-section-title">Pull API — Polling Schedule</div></div>
+      <span class="cfg-section-sub"><span class="badge b-green"><span class="b-dot live"></span>Active</span></span>
+    </div>
+    <div class="cfg-body">
+      <div class="info">
+        ℹ The payroll software pulls raw punch data from SmartOffice Cloud at the configured interval. We do <strong>NOT</strong> push data — your software pulls when ready.
+      </div>
+      <div class="g3">
+        <div class="field">
+          <label>Pull Frequency</label>
+          <select id="pull-freq">
+            <option value="5">Every 5 minutes</option>
+            <option value="15" selected>Every 15 minutes</option>
+            <option value="30">Every 30 minutes</option>
+            <option value="60">Every hour</option>
+            <option value="360">Every 6 hours</option>
+            <option value="custom">Custom (cron)</option>
+          </select>
+          <div class="hint">How often payroll software fetches new logs</div>
+        </div>
+        <div class="field">
+          <label>Date Range Window</label>
+          <select id="pull-window">
+            <option value="1">Last 1 day</option>
+            <option value="2" selected>Last 2 days (recommended)</option>
+            <option value="7">Last 7 days</option>
+            <option value="custom">Since last successful pull</option>
+          </select>
+          <div class="hint">Overlap window prevents missed punches</div>
+        </div>
+        <div class="field">
+          <label>Active Hours</label>
+          <select id="pull-hours">
+            <option value="24" selected>24/7 (always)</option>
+            <option value="biz">Business hours only (9–22)</option>
+            <option value="custom">Custom range</option>
+          </select>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="section-h">Quick Frequency Presets</div>
+      <div class="chip-row">
+        <span class="chip" onclick="setFreq(5,this)">5 min</span>
+        <span class="chip on" onclick="setFreq(15,this)">15 min</span>
+        <span class="chip" onclick="setFreq(30,this)">30 min</span>
+        <span class="chip" onclick="setFreq(60,this)">1 hr</span>
+        <span class="chip" onclick="setFreq(360,this)">6 hr</span>
+        <span class="chip" onclick="setFreq(1440,this)">Daily</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA FORMAT -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--teal-l);">🗂</div>
+      <div><div class="cfg-section-title">Pullable Data Fields</div></div>
+      <span class="cfg-section-sub"><span class="badge b-teal">4 fields available</span></span>
+    </div>
+    <div class="cfg-body">
+      <div class="info">
+        ℹ Per the SmartOffice contract, only these 4 fields are returned by the Pull API. Toggle which to import into your payroll system.
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl"><span class="mono" style="background:var(--s2);padding:1px 6px;border-radius:3px;">UserId</span> &nbsp; Employee Code</div>
+          <div class="ts">Maps to your StaffCode — used to identify the employee</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked disabled/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl"><span class="mono" style="background:var(--s2);padding:1px 6px;border-radius:3px;">LogDate</span> &nbsp; Punch Timestamp</div>
+          <div class="ts">ISO 8601 format — e.g. <span class="mono" style="color:var(--ink2);">2025-05-10T10:00:00</span></div>
+        </div>
+        <label class="sw"><input type="checkbox" checked disabled/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl"><span class="mono" style="background:var(--s2);padding:1px 6px;border-radius:3px;">SerialNumber</span> &nbsp; Device Serial</div>
+          <div class="ts">Identifies which device captured the punch</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl"><span class="mono" style="background:var(--s2);padding:1px 6px;border-radius:3px;">DeviceSName</span> &nbsp; Device Display Name</div>
+          <div class="ts">Human-readable name e.g. "ME(Attendance)"</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="div"></div>
+      <div class="section-h">Sample Response from Pull API</div>
+      <div class="json-pre"><span class="lc">// GET /api/SwipeDetails/GetDeviceLogs?APIKey=...&AccountName=ACE&FromDate=2025-06-01&ToDate=2025-06-15</span>
+[
+  {
+    <span class="j-key">"UserId"</span>: <span class="j-str">"002"</span>,
+    <span class="j-key">"LogDate"</span>: <span class="j-str">"2025-05-10T10:00:00"</span>,
+    <span class="j-key">"SerialNumber"</span>: <span class="j-str">"CQZ7230360003"</span>,
+    <span class="j-key">"DeviceSName"</span>: <span class="j-str">"ME(Attendance)"</span>
+  }
+]</div>
+    </div>
+  </div>
+
+  <!-- FIELD MAPPING -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--amber-l);">↔</div>
+      <div><div class="cfg-section-title">Field Mapping → Payroll System</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="info">Map fields from SmartOffice (left) to columns in your payroll database (right).</div>
+      <div class="map-wrap">
+        <div class="map-head">
+          <span>SmartOffice Field</span>
+          <span></span>
+          <span>Payroll Column</span>
+          <span>Transform</span>
+          <span></span>
+        </div>
+        <div class="map-row">
+          <input class="mono" value="UserId" readonly style="background:#FEF9C3;border-color:#FDE68A;color:var(--ink2);"/>
+          <span class="map-arrow">→</span>
+          <select><option selected>employees.staff_code</option><option>employees.id</option><option>employees.biometric_id</option></select>
+          <select><option selected>None</option><option>Trim</option><option>Uppercase</option><option>Pad zeros</option></select>
+          <span></span>
+        </div>
+        <div class="map-row">
+          <input class="mono" value="LogDate" readonly style="background:#FEF9C3;border-color:#FDE68A;color:var(--ink2);"/>
+          <span class="map-arrow">→</span>
+          <select><option selected>punch_logs.punch_time</option><option>attendance.timestamp</option></select>
+          <select><option selected>UTC → IST (+05:30)</option><option>None</option><option>Strip seconds</option></select>
+          <span></span>
+        </div>
+        <div class="map-row">
+          <input class="mono" value="SerialNumber" readonly style="background:#FEF9C3;border-color:#FDE68A;color:var(--ink2);"/>
+          <span class="map-arrow">→</span>
+          <select><option selected>punch_logs.device_serial</option><option>devices.id (lookup)</option></select>
+          <select><option selected>None</option><option>Trim</option></select>
+          <span></span>
+        </div>
+        <div class="map-row">
+          <input class="mono" value="DeviceSName" readonly style="background:#FEF9C3;border-color:#FDE68A;color:var(--ink2);"/>
+          <span class="map-arrow">→</span>
+          <select><option selected>punch_logs.device_name</option><option>(skip)</option></select>
+          <select><option selected>None</option><option>Trim</option></select>
+          <span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DUPLICATE HANDLING -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--red-l);">⚠</div>
+      <div><div class="cfg-section-title">Duplicate Handling & Validation</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="g2">
+        <div class="field">
+          <label>On Duplicate Punch</label>
+          <select>
+            <option selected>Skip (idempotent insert)</option>
+            <option>Overwrite existing</option>
+            <option>Log warning & skip</option>
+            <option>Reject batch</option>
+          </select>
+          <div class="hint">Same UserId + LogDate + SerialNumber = duplicate</div>
+        </div>
+        <div class="field">
+          <label>Unknown Employee Code</label>
+          <select>
+            <option selected>Skip & log warning</option>
+            <option>Auto-create stub employee</option>
+            <option>Move to "unmapped" queue</option>
+            <option>Reject batch</option>
+          </select>
+        </div>
+      </div>
+      <div class="div"></div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Reject punches with future timestamps</div>
+          <div class="ts">If LogDate > now, log error and skip</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Reject punches older than 90 days</div>
+          <div class="ts">Probably stale data — skip silently</div>
+        </div>
+        <label class="sw"><input type="checkbox"/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Email admin on pull failure</div>
+          <div class="ts">After 3 consecutive failed pulls, send alert</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: DEVICES -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tp-devices">
+
+  <!-- DEVICE LIST -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--blue-l);">📟</div>
+      <div><div class="cfg-section-title">Biometric Devices</div></div>
+      <span class="cfg-section-sub">
+        <span class="badge b-green"><span class="b-dot"></span>3 Online</span>
+        <span class="badge b-grey"><span class="b-dot"></span>0 Offline</span>
+      </span>
+    </div>
+    <div class="cfg-body">
+      <div class="info">
+        ℹ Devices register against SmartOffice cloud via <span class="mono" style="color:#1E40AF;">/api/v2/WebAPI/AddBiometric</span>. Adding a row here calls that endpoint on Save.
+      </div>
+
+      <div class="dev-wrap">
+        <div class="dev-head">
+          <span>#</span>
+          <span>Device Name</span>
+          <span>Serial Number</span>
+          <span>Model / Type</span>
+          <span>Location</span>
+          <span style="text-align:center;">Status</span>
+          <span></span>
+        </div>
+        <div id="dev-rows">
+          <div class="dev-row">
+            <span class="badge b-blue">1</span>
+            <input value="Main Entrance"/>
+            <input class="mono" value="C26044C84F352331"/>
+            <select><option selected>SpeedFace V5L</option><option>K40</option><option>iClock 880</option><option>F18</option><option>uFace 800</option></select>
+            <select><option selected>HQ — Ground Floor</option><option>HQ — 1st Floor</option><option>Branch — Mumbai</option><option>Branch — Bangalore</option></select>
+            <div class="dev-status"><span class="badge b-green"><span class="b-dot live"></span>Online</span></div>
+            <button class="btn-del" onclick="delDevice(this)">×</button>
+          </div>
+          <div class="dev-row">
+            <span class="badge b-blue">2</span>
+            <input value="Factory Gate"/>
+            <input class="mono" value="C2689C47030A2334"/>
+            <select><option>SpeedFace V5L</option><option selected>K40</option><option>iClock 880</option><option>F18</option><option>uFace 800</option></select>
+            <select><option>HQ — Ground Floor</option><option>HQ — 1st Floor</option><option>Branch — Mumbai</option><option selected>Factory — Plant A</option></select>
+            <div class="dev-status"><span class="badge b-green"><span class="b-dot live"></span>Online</span></div>
+            <button class="btn-del" onclick="delDevice(this)">×</button>
+          </div>
+          <div class="dev-row">
+            <span class="badge b-blue">3</span>
+            <input value="Godown Reception"/>
+            <input class="mono" value="C261185157361E2C"/>
+            <select><option>SpeedFace V5L</option><option>K40</option><option selected>iClock 880</option><option>F18</option><option>uFace 800</option></select>
+            <select><option>HQ — Ground Floor</option><option>HQ — 1st Floor</option><option selected>Godown — Sector 5</option><option>Branch — Bangalore</option></select>
+            <div class="dev-status"><span class="badge b-green"><span class="b-dot live"></span>Online</span></div>
+            <button class="btn-del" onclick="delDevice(this)">×</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn-add-row" onclick="addDevice()">+ Add Device</button>
+
+      <div class="div"></div>
+
+      <div class="section-h">Device-wide Capabilities</div>
+      <div class="g4">
+        <div class="field">
+          <label>Default Verify Mode</label>
+          <select>
+            <option>Face only</option>
+            <option>Fingerprint only</option>
+            <option>Card only</option>
+            <option selected>Face + Card (dual)</option>
+            <option>Any (FP / Face / Card / Pass)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Upload Face Templates</label>
+          <select><option selected>Yes</option><option>No</option></select>
+        </div>
+        <div class="field">
+          <label>Upload Fingerprints</label>
+          <select><option selected>Yes</option><option>No</option></select>
+        </div>
+        <div class="field">
+          <label>Upload Cards</label>
+          <select><option selected>Yes</option><option>No</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEVICE COMMANDS -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--amber-l);">⚙</div>
+      <div><div class="cfg-section-title">Device Maintenance Commands</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="info warn">
+        ⚠ These commands are issued asynchronously to the device. Track status under <strong>API Tester → Commands log</strong>.
+      </div>
+
+      <div class="g3">
+        <div class="field">
+          <label>Auto-clear logs after sync</label>
+          <select>
+            <option>Disabled</option>
+            <option selected>Clear after successful pull</option>
+            <option>Clear weekly (Sunday 02:00)</option>
+            <option>Clear monthly (1st, 02:00)</option>
+          </select>
+          <div class="hint">Frees storage on device</div>
+        </div>
+        <div class="field">
+          <label>Online Enrollment</label>
+          <select>
+            <option selected>Enabled — trigger from HRMS</option>
+            <option>Disabled — manual on device only</option>
+          </select>
+          <div class="hint">Calls TriggerUserOnlineEnrollment</div>
+        </div>
+        <div class="field">
+          <label>Block User Support</label>
+          <select>
+            <option selected>Enabled (model-dependent)</option>
+            <option>Disabled</option>
+          </select>
+          <div class="hint">Few models support this</div>
+        </div>
+      </div>
+
+      <div class="div"></div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="btn" onclick="runCmd('Get All Users')">📥 Pull live users from all devices</button>
+        <button class="btn" onclick="runCmd('Push Employees')">📤 Push all active employees</button>
+        <button class="btn" onclick="runCmd('Clear Logs')">🗑 Clear logs (all devices)</button>
+        <button class="btn btn-danger" onclick="runCmd('Reboot')">⟲ Reboot devices</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 4: SYNC SETTINGS -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tp-sync">
+
+  <!-- EMPLOYEE SYNC -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--purple-l);">👥</div>
+      <div><div class="cfg-section-title">Employee Push to Devices</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="g3">
+        <div class="field">
+          <label>Auto-push on Employee Add</label>
+          <select>
+            <option selected>Yes — push immediately</option>
+            <option>Yes — queue for nightly batch</option>
+            <option>No — manual push only</option>
+          </select>
+          <div class="hint">Calls /UploadUser when StaffCode is created</div>
+        </div>
+        <div class="field">
+          <label>Auto-delete on Employee Resign</label>
+          <select>
+            <option selected>Yes — delete from all devices</option>
+            <option>Yes — only when DOR reached</option>
+            <option>No — keep on device</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Push on Department Change</label>
+          <select>
+            <option>Re-push to all devices</option>
+            <option selected>Re-push only to relevant location</option>
+            <option>Manual re-push</option>
+          </select>
+        </div>
+      </div>
+      <div class="div"></div>
+
+      <div class="section-h">Push Trigger Toggles</div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Push photo from HRMS profile to device</div>
+          <div class="ts">Calls /PhotoUploadInBiometric — uses base64 from employee profile picture</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Set user expiration = Date of Resignation</div>
+          <div class="ts">Auto-calls /SetUserExpiration with employee.DOR</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Push to location-mapped devices only</div>
+          <div class="ts">Marketing staff → all devices, others → assigned location</div>
+        </div>
+        <label class="sw"><input type="checkbox" checked/><span class="sw-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="tl">Block user instead of delete on suspension</div>
+          <div class="ts">Calls /BlockUserinBiometric — preserves enrollment data</div>
+        </div>
+        <label class="sw"><input type="checkbox"/><span class="sw-track"></span></label>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCATION → DEVICE MAP -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--teal-l);">📍</div>
+      <div><div class="cfg-section-title">Location → Device Mapping</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="info">When pushing employees, only their location's devices are targeted. Multi-location employees push to all listed devices.</div>
+      <div class="dev-wrap">
+        <div class="dev-head" style="grid-template-columns:1.2fr 2.4fr 0.7fr 36px;">
+          <span>Location</span>
+          <span>Mapped Device Serials</span>
+          <span style="text-align:center;">Employees</span>
+          <span></span>
+        </div>
+        <div class="dev-row" style="grid-template-columns:1.2fr 2.4fr 0.7fr 36px;">
+          <input value="HQ — Ground Floor"/>
+          <input class="mono" value="C26044C84F352331"/>
+          <div style="text-align:center;font-weight:600;color:var(--ink2);">42</div>
+          <button class="btn-del" onclick="delDevice(this)">×</button>
+        </div>
+        <div class="dev-row" style="grid-template-columns:1.2fr 2.4fr 0.7fr 36px;">
+          <input value="Factory — Plant A"/>
+          <input class="mono" value="C2689C47030A2334"/>
+          <div style="text-align:center;font-weight:600;color:var(--ink2);">128</div>
+          <button class="btn-del" onclick="delDevice(this)">×</button>
+        </div>
+        <div class="dev-row" style="grid-template-columns:1.2fr 2.4fr 0.7fr 36px;">
+          <input value="Godown — Sector 5"/>
+          <input class="mono" value="C261185157361E2C"/>
+          <div style="text-align:center;font-weight:600;color:var(--ink2);">23</div>
+          <button class="btn-del" onclick="delDevice(this)">×</button>
+        </div>
+        <div class="dev-row" style="grid-template-columns:1.2fr 2.4fr 0.7fr 36px;">
+          <input value="Marketing (Roving)"/>
+          <input class="mono" value="C26044C84F352331, C2689C47030A2334, C261185157361E2C"/>
+          <div style="text-align:center;font-weight:600;color:var(--ink2);">15</div>
+          <button class="btn-del" onclick="delDevice(this)">×</button>
+        </div>
+      </div>
+      <button class="btn-add-row" onclick="addLocationMap()" style="margin-top:10px;">+ Add Location Mapping</button>
+    </div>
+  </div>
+
+  <!-- COMMAND QUEUE -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--amber-l);">⏳</div>
+      <div><div class="cfg-section-title">Command Queue Behaviour</div></div>
+    </div>
+    <div class="cfg-body">
+      <div class="g3">
+        <div class="field">
+          <label>Max Queue Size per Device</label>
+          <input type="number" value="500" min="50"/>
+          <div class="hint">Older pending commands dropped if exceeded</div>
+        </div>
+        <div class="field">
+          <label>Stale Command TTL (hours)</label>
+          <input type="number" value="24" min="1"/>
+          <div class="hint">Pending > X hrs auto-marked failed</div>
+        </div>
+        <div class="field">
+          <label>Concurrent Commands per Device</label>
+          <input type="number" value="3" min="1" max="10"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 5: ENDPOINTS -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tp-endpoints">
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--blue-l);">📡</div>
+      <div><div class="cfg-section-title">Available API Endpoints</div></div>
+      <span class="cfg-section-sub"><span class="badge b-blue">SmartOffice v1.0.4</span></span>
+    </div>
+    <div class="cfg-body">
+      <div class="info">All endpoints are pre-bound to your company's API key. Click <strong>Test</strong> to fire a sample call from this page.</div>
+
+      <div class="section-h">📟 Device Management</div>
+      <div class="ep-wrap" style="margin-bottom:16px;">
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Add Biometric Device</div><div class="ep-desc">Register new device on SmartOffice cloud</div></div>
+          <div class="ep-path">/api/v2/WebAPI/AddBiometric</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('AddBiometric')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Delete Biometric Device</div><div class="ep-desc">Remove device (fails if punch records exist)</div></div>
+          <div class="ep-path">/api/v2/WebAPI/DeleteBiometric</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('DeleteBiometric')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Get Device Commands Status</div><div class="ep-desc">Track issued commands &amp; their state</div></div>
+          <div class="ep-path">/api/WebAPI/GetDeviceCommands</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('GetDeviceCommands')">Test ▶</button>
+        </div>
+      </div>
+
+      <div class="section-h">👥 User Management</div>
+      <div class="ep-wrap" style="margin-bottom:16px;">
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Upload User</div><div class="ep-desc">Push employee to one or many devices</div></div>
+          <div class="ep-path">/api/v2/WebAPI/UploadUser</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('UploadUser')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Delete User</div><div class="ep-desc">Remove employee from device(s)</div></div>
+          <div class="ep-path">/api/v2/WebAPI/DeleteUser</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('DeleteUser')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Fetch Live Users</div><div class="ep-desc">List enrolled users on a device</div></div>
+          <div class="ep-path">/api/v2/WebAPI/FetchLiveUsersFromBiometric</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('FetchLiveUsers')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Set User Expiration</div><div class="ep-desc">Lock user after a date (e.g. resignation)</div></div>
+          <div class="ep-path">/api/v2/WebAPI/SetUserExpiration</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('SetUserExpiration')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Block / Unblock User</div><div class="ep-desc">Toggle access (model-dependent)</div></div>
+          <div class="ep-path">/api/WebAPI/BlockUserinBiometric</div>
+          <span class="badge b-amber">limited</span>
+          <button class="btn-test" onclick="testEndpoint('BlockUser')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Photo Registration</div><div class="ep-desc">Enroll user via base64 image</div></div>
+          <div class="ep-path">/api/WebAPI/PhotoUploadInBiometric</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('PhotoUpload')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Trigger Online Enrollment</div><div class="ep-desc">Open enrollment session on device</div></div>
+          <div class="ep-path">/api/v2/WebAPI/TriggerUserOnlineEnrollment</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('OnlineEnrollment')">Test ▶</button>
+        </div>
+      </div>
+
+      <div class="section-h">⬇ Logs & Data</div>
+      <div class="ep-wrap" style="margin-bottom:16px;">
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Get Device Logs (Internal)</div><div class="ep-desc">Standard SmartOffice log fetch — full schema</div></div>
+          <div class="ep-path">/api/v2/WebAPI/GetDeviceLogs</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('GetDeviceLogs')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API (4-field)</div><div class="ep-desc">Public pull API — only 4 fields exposed</div></div>
+          <div class="ep-path">/api/SwipeDetails/GetDeviceLogs</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('PullAPI')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Clear All Logs from Device</div><div class="ep-desc">Wipe all attendance records on device</div></div>
+          <div class="ep-path">/api/v2/WebAPI/ClearAllLogsFromDevice</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('ClearAllLogs')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Clear Logs by Time Range</div><div class="ep-desc">SpeedFace only — time-bounded wipe</div></div>
+          <div class="ep-path">/api/v2/WebAPI/ClearLogsFromDeviceByTime</div>
+          <span class="badge b-amber">SpeedFace</span>
+          <button class="btn-test" onclick="testEndpoint('ClearLogsByTime')">Test ▶</button>
+        </div>
+      </div>
+
+      <div class="section-h">🏢 Master Data</div>
+      <div class="ep-wrap">
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Add / Update Employee</div><div class="ep-desc">Create or update employee master record</div></div>
+          <div class="ep-path">/api/v2/WebAPI/AddEmployee</div>
+          <span class="badge b-green">200</span>
+          <button class="btn-test" onclick="testEndpoint('AddEmployee')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Delete Employee</div><div class="ep-desc">Remove employee from application</div></div>
+          <div class="ep-path">/api/v2/WebAPI/DeleteEmployee</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('DeleteEmployee')">Test ▶</button>
+        </div>
+        <div class="ep-row">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">Add Company / Department / Location</div><div class="ep-desc">Master setup endpoints</div></div>
+          <div class="ep-path">/api/v2/WebAPI/Add{Company|Department|Location}</div>
+          <span class="badge b-grey">—</span>
+          <button class="btn-test" onclick="testEndpoint('Masters')">Test ▶</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 6: TESTER -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div class="tab-pane" id="tp-tester">
+  <div class="sim-wrap">
+    <div class="sim-title"><span class="sim-dot"></span>Live API Tester</div>
+    <div class="sim-sub">Fire a request against the configured SmartOffice endpoint using current credentials. No real network call is made — this is a prototype simulator.</div>
+
+    <div class="sim-row">
+      <div class="sim-field">
+        <label>Endpoint</label>
+        <select id="t-endpoint" onchange="updateTester()">
+          <option value="pull" selected>GET — Pull API (4-field)</option>
+          <option value="logs">GET — Internal Get Device Logs</option>
+          <option value="upload">POST — Upload User</option>
+          <option value="fetchusers">GET — Fetch Live Users</option>
+          <option value="commands">GET — Get Device Commands</option>
+          <option value="setexp">GET — Set User Expiration</option>
+        </select>
+      </div>
+      <div class="sim-field">
+        <label>From / Param 1</label>
+        <input type="text" id="t-p1" value="2026-04-25"/>
+      </div>
+      <div class="sim-field">
+        <label>To / Param 2</label>
+        <input type="text" id="t-p2" value="2026-05-02"/>
+      </div>
+      <button class="sim-btn" onclick="runTest()">▶ Send</button>
+    </div>
+
+    <div class="sim-status">
+      <div class="sim-stat">
+        <div class="ss-lbl">Status</div>
+        <div class="ss-val ok" id="t-status">200 OK</div>
+        <div class="ss-note" id="t-status-n">Success</div>
+      </div>
+      <div class="sim-stat">
+        <div class="ss-lbl">Latency</div>
+        <div class="ss-val" id="t-latency">248 ms</div>
+        <div class="ss-note">TTFB + body</div>
+      </div>
+      <div class="sim-stat">
+        <div class="ss-lbl">Records</div>
+        <div class="ss-val" id="t-records">142</div>
+        <div class="ss-note">Logs returned</div>
+      </div>
+      <div class="sim-stat">
+        <div class="ss-lbl">Payload</div>
+        <div class="ss-val" id="t-size">14.2 KB</div>
+        <div class="ss-note">gzipped</div>
+      </div>
+    </div>
+
+    <div class="sim-tabs">
+      <button class="sim-tab active" onclick="switchSimPane('req',this)">Request</button>
+      <button class="sim-tab" onclick="switchSimPane('res',this)">Response</button>
+      <button class="sim-tab" onclick="switchSimPane('hdr',this)">Headers</button>
+      <button class="sim-tab" onclick="switchSimPane('log',this)">Activity Log</button>
+    </div>
+
+    <div class="sim-pane on" id="sp-req">
+      <div class="json-pre" id="req-pre"></div>
+    </div>
+    <div class="sim-pane" id="sp-res">
+      <div class="json-pre" id="res-pre"></div>
+    </div>
+    <div class="sim-pane" id="sp-hdr">
+      <div class="json-pre"><span class="j-key">"Content-Type"</span>: <span class="j-str">"application/json"</span>
+<span class="j-key">"X-Account-Name"</span>: <span class="j-str">"ACE"</span>
+<span class="j-key">"X-Request-ID"</span>: <span class="j-str">"req_a8f3d2-1b5e9c"</span>
+<span class="j-key">"User-Agent"</span>: <span class="j-str">"SmartOffice-PullClient/1.0.4"</span>
+<span class="j-key">"Accept-Encoding"</span>: <span class="j-str">"gzip, deflate"</span>
+<span class="j-key">"Cache-Control"</span>: <span class="j-str">"no-cache"</span></div>
+    </div>
+    <div class="sim-pane" id="sp-log">
+      <div class="sim-log" id="t-log"></div>
+    </div>
+  </div>
+
+  <div style="height:14px;"></div>
+
+  <!-- RECENT ACTIVITY -->
+  <div class="cfg-section">
+    <div class="cfg-section-head">
+      <div class="cfg-icon" style="background:var(--green-l);">📜</div>
+      <div><div class="cfg-section-title">Recent Pull Activity</div></div>
+      <span class="cfg-section-sub"><span class="badge b-green">Last 24h</span></span>
+    </div>
+    <div class="cfg-body" style="padding:0;">
+      <div class="ep-wrap" style="border:none;border-radius:0;">
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API · 142 logs</div><div class="ep-desc">2026-05-02 14:32:18 IST</div></div>
+          <div class="badge b-green" style="justify-self:start;">200 OK</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">248ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">14.2 KB</div>
+        </div>
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API · 138 logs</div><div class="ep-desc">2026-05-02 14:17:18 IST</div></div>
+          <div class="badge b-green" style="justify-self:start;">200 OK</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">231ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">13.8 KB</div>
+        </div>
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API · 0 logs</div><div class="ep-desc">2026-05-02 14:02:18 IST</div></div>
+          <div class="badge b-amber" style="justify-self:start;">Empty</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">189ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">128 B</div>
+        </div>
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method post">POST</div>
+          <div><div class="ep-name">UploadUser · #STF1042</div><div class="ep-desc">2026-05-02 13:48:02 IST</div></div>
+          <div class="badge b-green" style="justify-self:start;">200 OK</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">412ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">2.1 KB</div>
+        </div>
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API · 156 logs</div><div class="ep-desc">2026-05-02 13:47:18 IST</div></div>
+          <div class="badge b-green" style="justify-self:start;">200 OK</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">267ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">15.6 KB</div>
+        </div>
+        <div class="ep-row" style="grid-template-columns:90px 1fr 80px 80px 100px;">
+          <div class="ep-method get">GET</div>
+          <div><div class="ep-name">Pull API · timeout</div><div class="ep-desc">2026-05-02 13:32:48 IST</div></div>
+          <div class="badge b-red" style="justify-self:start;">408</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">30000ms</div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--ink3);">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /page -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span class="t-dot"></span><span id="toast-msg">Saved</span></div>
+
+<style>
+.tab-pane{display:none;}
+.tab-pane.on{display:block;}
+</style>
+
+<script>
+// ─── TAB SWITCH ────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.etab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('on'));
+  document.getElementById('tp-' + name).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ─── COMPANY LOAD ──────────────────────────────────────────────────────────
+const COMPANY_PROFILES = {
+  aira: {
+    base: 'https://sohcm.com/SmartApp_ess',
+    account: 'ACE',
+    apiKey: '233916012427',
+    devices: 3
+  },
+  airmax: {
+    base: 'https://sohcm.com/SmartApp_ess',
+    account: 'AIRMAX',
+    apiKey: '521714042205',
+    devices: 5
+  },
+  '4matic': {
+    base: 'https://sohcm.com/SmartApp_ess',
+    account: '4MATIC',
+    apiKey: '593910012317',
+    devices: 2
+  }
+};
+
+function loadCompany(co) {
+  const p = COMPANY_PROFILES[co];
+  if (!p) return;
+  document.getElementById('api-base').value = p.base;
+  document.getElementById('api-account').value = p.account;
+  document.getElementById('api-key').value = p.apiKey;
+  document.getElementById('dev-count').textContent = p.devices;
+  showToast('Company switched: ' + co.toUpperCase());
+}
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────
+function saveAll() {
+  const btn = document.querySelector('.btn-save-top');
+  btn.textContent = 'Saved ✓';
+  btn.style.background = '#059669';
+  setTimeout(() => { btn.textContent = 'Save All'; btn.style.background = ''; }, 2000);
+  showToast('API & device configuration saved');
+}
+
+// ─── CONNECTION TEST ──────────────────────────────────────────────────────
+function testConnection() {
+  const msg = document.getElementById('conn-msg');
+  msg.innerHTML = '<span style="color:var(--amber);font-weight:600;">⟳ Testing...</span>';
+  setTimeout(() => {
+    const lat = 180 + Math.floor(Math.random() * 200);
+    msg.innerHTML = `Last test: <span style="color:var(--green);font-weight:600;">200 OK</span> · ${lat}ms`;
+    showToast('Connection successful (' + lat + 'ms)');
+  }, 900);
+}
+
+function copyFullUrl() {
+  const base = document.getElementById('api-base').value;
+  const path = document.getElementById('api-pull').value;
+  const key = document.getElementById('api-key').value;
+  const acc = document.getElementById('api-account').value;
+  const url = `${base}${path}?APIKey=${key}&AccountName=${acc}&FromDate=2025-06-01&ToDate=2025-06-15`;
+  navigator.clipboard?.writeText(url);
+  showToast('Full pull URL copied to clipboard');
+}
+
+function copyText(id, btn) {
+  const el = document.getElementById(id);
+  navigator.clipboard?.writeText(el.value);
+  const orig = btn.textContent;
+  btn.textContent = '✓';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
+}
+
+function toggleApiKey(btn) {
+  const el = document.getElementById('api-key');
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = 'Hide'; }
+  else                        { el.type = 'password'; btn.textContent = 'Show'; }
+}
+
+// ─── PULL FREQUENCY CHIPS ─────────────────────────────────────────────────
+function setFreq(mins, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  const sel = document.getElementById('pull-freq');
+  const map = {5:'5',15:'15',30:'30',60:'60',360:'360',1440:'custom'};
+  sel.value = map[mins] || 'custom';
+  showToast('Pull frequency: every ' + (mins >= 60 ? (mins/60)+' hr' : mins+' min'));
+}
+
+// ─── DEVICE ROW MGMT ──────────────────────────────────────────────────────
+function addDevice() {
+  const wrap = document.getElementById('dev-rows');
+  const idx = wrap.querySelectorAll('.dev-row').length + 1;
+  const row = document.createElement('div');
+  row.className = 'dev-row';
+  row.innerHTML = `
+    <span class="badge b-blue">${idx}</span>
+    <input placeholder="Device name…"/>
+    <input class="mono" placeholder="Serial number…"/>
+    <select><option>SpeedFace V5L</option><option>K40</option><option>iClock 880</option><option>F18</option><option>uFace 800</option></select>
+    <select><option>HQ — Ground Floor</option><option>HQ — 1st Floor</option><option>Branch — Mumbai</option><option>Branch — Bangalore</option><option>Factory — Plant A</option><option>Godown — Sector 5</option></select>
+    <div class="dev-status"><span class="badge b-grey"><span class="b-dot"></span>Not registered</span></div>
+    <button class="btn-del" onclick="delDevice(this)">×</button>`;
+  wrap.appendChild(row);
+  document.getElementById('dev-count').textContent = idx;
+}
+
+function delDevice(btn) {
+  const wrap = btn.closest('#dev-rows, .dev-wrap');
+  const rows = wrap.querySelectorAll('.dev-row');
+  if (rows.length <= 1) { showToast('At least one row required'); return; }
+  btn.closest('.dev-row').remove();
+  // renumber
+  wrap.querySelectorAll('.dev-row .badge').forEach((b, i) => {
+    if (b.textContent.match(/^\d+$/)) b.textContent = i + 1;
+  });
+  const devCount = document.getElementById('dev-count');
+  if (devCount) devCount.textContent = wrap.querySelectorAll('.dev-row').length;
+}
+
+function addLocationMap() {
+  showToast('Location mapping row added');
+}
+
+function runCmd(name) {
+  showToast('Command queued: ' + name);
+}
+
+// ─── ENDPOINT TEST ────────────────────────────────────────────────────────
+function testEndpoint(name) {
+  // jump to tester tab
+  const testerBtn = [...document.querySelectorAll('.etab')].find(b => b.textContent.includes('API Tester'));
+  if (testerBtn) testerBtn.click();
+  // map endpoint name to dropdown value
+  const map = {
+    'PullAPI':'pull','GetDeviceLogs':'logs','UploadUser':'upload',
+    'FetchLiveUsers':'fetchusers','GetDeviceCommands':'commands','SetUserExpiration':'setexp'
+  };
+  const sel = document.getElementById('t-endpoint');
+  if (map[name] && sel) { sel.value = map[name]; updateTester(); }
+  setTimeout(runTest, 300);
+}
+
+// ─── TESTER ───────────────────────────────────────────────────────────────
+const TEST_FIXTURES = {
+  pull: {
+    method:'GET',
+    path:'/api/SwipeDetails/GetDeviceLogs',
+    params:'?APIKey={key}&AccountName={acc}&FromDate={p1}&ToDate={p2}',
+    body:null,
+    res:[
+      {UserId:"002",LogDate:"2026-04-28T09:14:23",SerialNumber:"CQZ7230360003",DeviceSName:"ME(Attendance)"},
+      {UserId:"007",LogDate:"2026-04-28T09:18:51",SerialNumber:"CQZ7230360003",DeviceSName:"ME(Attendance)"},
+      {UserId:"012",LogDate:"2026-04-28T09:22:08",SerialNumber:"C26044C84F352331",DeviceSName:"Main Entrance"},
+      {UserId:"023",LogDate:"2026-04-28T09:31:44",SerialNumber:"C2689C47030A2334",DeviceSName:"Factory Gate"}
+    ],
+    records:142,
+    size:'14.2 KB'
+  },
+  logs: {
+    method:'GET',
+    path:'/api/v2/WebAPI/GetDeviceLogs',
+    params:'?APIKey={key}&FromDate={p1}&ToDate={p2}',
+    body:null,
+    res:[
+      {EmployeeCode:"002",LogDate:"2026-04-28 09:14:23",SerialNumber:"CQZ7230360003",PunchDirection:"in",Temperature:97.4,TemperatureState:"Normal"},
+      {EmployeeCode:"007",LogDate:"2026-04-28 09:18:51",SerialNumber:"CQZ7230360003",PunchDirection:"in",Temperature:0.0,TemperatureState:"Not Measured"}
+    ],
+    records:248,
+    size:'38.4 KB'
+  },
+  upload: {
+    method:'POST',
+    path:'/api/v2/WebAPI/UploadUser',
+    params:'?APIKey={key}&EmployeeCode={p1}&EmployeeName={p2}&SerialNumber=C26044C84F352331&IsFaceUpload=true&IsCardUpload=true',
+    body:null,
+    res:"Command Send Successfully.",
+    records:1,
+    size:'471 B'
+  },
+  fetchusers: {
+    method:'GET',
+    path:'/api/v2/WebAPI/FetchLiveUsersFromBiometric',
+    params:'?APIKey={key}&SerialNumber={p1}',
+    body:null,
+    res:[
+      {EmployeeCode:"01",FPCount:"1",Privilege:"USER"},
+      {EmployeeCode:"02",FPCount:"2",Privilege:"USER"},
+      {EmployeeCode:"99",FPCount:"0",Privilege:"ADMIN"}
+    ],
+    records:42,
+    size:'1.9 KB'
+  },
+  commands: {
+    method:'GET',
+    path:'/api/WebAPI/GetDeviceCommands',
+    params:'?APIKey={key}&FromDate={p1}&ToDate={p2}',
+    body:null,
+    res:{status:"success",message:"",records:[
+      {Title:"Get All Users from Biometric -MUM_BKC",DeviceCode:"MUM_BKC",SerialNumber:"C2689C47030A2334",CreationDate:"2026-04-30 15:08",ExecutionDate:"2026-04-30 15:09",Status:"Executed",Response:"OK"}
+    ],result:true},
+    records:6,
+    size:'2.4 KB'
+  },
+  setexp: {
+    method:'GET',
+    path:'/api/v2/WebAPI/SetUserExpiration',
+    params:'?APIKey={key}&SerialNumber=C26044C84F352331&EmployeeCode={p1}&ExpirationDate={p2}',
+    body:null,
+    res:"Command Send Successfully.",
+    records:1,
+    size:'472 B'
+  }
+};
+
+function updateTester() {
+  const k = document.getElementById('t-endpoint').value;
+  const fix = TEST_FIXTURES[k];
+  const p1 = document.getElementById('t-p1');
+  const p2 = document.getElementById('t-p2');
+  // adjust placeholders for context
+  if (k === 'upload')      { p1.value = 'STF1042';            p2.value = 'Rajesh Kumar'; }
+  else if (k === 'fetchusers') { p1.value = 'C26044C84F352331'; p2.value = '—'; }
+  else if (k === 'setexp') { p1.value = 'STF1042';            p2.value = '2030-12-31'; }
+  else                     { p1.value = '2026-04-25';         p2.value = '2026-05-02'; }
+  buildRequestPreview();
+}
+
+function buildRequestPreview() {
+  const k = document.getElementById('t-endpoint').value;
+  const fix = TEST_FIXTURES[k];
+  const base = document.getElementById('api-base').value;
+  const key  = document.getElementById('api-key').value;
+  const acc  = document.getElementById('api-account').value;
+  const p1   = document.getElementById('t-p1').value;
+  const p2   = document.getElementById('t-p2').value;
+  const params = fix.params.replace('{key}', key).replace('{acc}', acc).replace('{p1}', encodeURIComponent(p1)).replace('{p2}', encodeURIComponent(p2));
+  const fullUrl = base + fix.path + params;
+
+  const reqText = `<span class="lc">// ${fix.method} request</span>
+<span class="j-key">URL</span>     <span class="j-str">${escapeHtml(fullUrl)}</span>
+<span class="j-key">Method</span>  <span class="j-str">${fix.method}</span>
+<span class="j-key">Headers</span> <span class="j-str">{ Content-Type, X-Account-Name, X-Request-ID }</span>
+<span class="j-key">Body</span>    <span class="j-str">${fix.body || '(none — query string only)'}</span>`;
+  document.getElementById('req-pre').innerHTML = reqText;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+}
+
+function fmtJson(obj) {
+  const json = JSON.stringify(obj, null, 2);
+  return escapeHtml(json)
+    .replace(/(&quot;[^&]+?&quot;)(\s*:)/g, '<span class="j-key">$1</span>$2')
+    .replace(/:\s*(&quot;.*?&quot;)/g, ': <span class="j-str">$1</span>')
+    .replace(/:\s*(\d+\.?\d*)/g, ': <span class="j-num">$1</span>')
+    .replace(/:\s*(true|false|null)/g, ': <span class="j-num">$1</span>');
+}
+
+function runTest() {
+  const k = document.getElementById('t-endpoint').value;
+  const fix = TEST_FIXTURES[k];
+  const t = Date.now();
+
+  // status indicator → loading
+  document.getElementById('t-status').textContent = '⟳ ...';
+  document.getElementById('t-status').className = 'ss-val warn';
+  document.getElementById('t-status-n').textContent = 'In flight';
+
+  buildRequestPreview();
+
+  setTimeout(() => {
+    const lat = 180 + Math.floor(Math.random() * 250);
+    document.getElementById('t-status').textContent = '200 OK';
+    document.getElementById('t-status').className = 'ss-val ok';
+    document.getElementById('t-status-n').textContent = 'Success';
+    document.getElementById('t-latency').textContent = lat + ' ms';
+    document.getElementById('t-records').textContent = fix.records;
+    document.getElementById('t-size').textContent = fix.size;
+
+    // Response body
+    document.getElementById('res-pre').innerHTML = typeof fix.res === 'string'
+      ? `<span class="j-str">"${fix.res}"</span>`
+      : fmtJson(fix.res);
+
+    // Activity log
+    const base = document.getElementById('api-base').value;
+    const acc  = document.getElementById('api-account').value;
+    const lines = [
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">REQUEST</span>  ${fix.method} ${fix.path}`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">HOST</span>     ${base}`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">ACCOUNT</span>  ${acc}`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">AUTH</span>     APIKey ✓ valid`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">DNS</span>      resolved in 12ms`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">TLS</span>      handshake 64ms (TLS 1.3)`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="lk">SEND</span>     query string built (${(fix.params || '').length} bytes)`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="ls">RESPONSE</span> 200 OK · ${fix.records} records · ${fix.size}`,
+      `<span class="lc">[${new Date().toLocaleTimeString()}]</span> <span class="ls">DONE</span>     completed in ${lat}ms`,
+    ];
+    document.getElementById('t-log').innerHTML = lines.map(l => `<div>${l}</div>`).join('');
+
+    showToast('Test fired — ' + lat + 'ms · ' + fix.records + ' records');
+  }, 800);
+}
+
+function switchSimPane(name, btn) {
+  document.querySelectorAll('.sim-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.sim-pane').forEach(p => p.classList.remove('on'));
+  document.getElementById('sp-' + name).classList.add('on');
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────────────
+function showToast(msg, isErr) {
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  buildRequestPreview();
+  // pre-render initial response
+  setTimeout(() => {
+    const fix = TEST_FIXTURES['pull'];
+    document.getElementById('res-pre').innerHTML = fmtJson(fix.res);
+    document.getElementById('t-log').innerHTML = `<div><span class="lc">[ready]</span> Click <span class="lk">Send</span> to fire a test request.</div>`;
+  }, 100);
+});
+</script>
+</body>
+</html>
