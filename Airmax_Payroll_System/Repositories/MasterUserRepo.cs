@@ -10,9 +10,7 @@ namespace Airmax_Payroll_System.Repositories
         private readonly IDapperHelper _dapper;
         private readonly ILogger<MasterUserRepo>? _logger;
 
-        public MasterUserRepo(
-            IDapperHelper dapperHelper,
-            ILogger<MasterUserRepo>? logger = null)
+        public MasterUserRepo( IDapperHelper dapperHelper, ILogger<MasterUserRepo>? logger = null)
         {
             _dapper = dapperHelper;
             _logger = logger;
@@ -78,7 +76,6 @@ namespace Airmax_Payroll_System.Repositories
                 param.Add("@Email", model.Email);
                 param.Add("@Mobile", model.Mobile);
                 param.Add("@RoleName", model.RoleName);
-
                 param.Add("@UserActionBy", model.E_By);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(

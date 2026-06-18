@@ -102,6 +102,8 @@ builder.Services.AddScoped<MasterBiomatricDevicesService>();
 builder.Services.AddScoped<MasterLocationDeviceMappingService>();
 builder.Services.AddScoped<MasterPayRollApiConfigrationService>();
 
+builder.Services.AddScoped<DeviceLogService>();
+builder.Services.AddScoped<AttendanceCalculationService>();
 // ---------------------------------
 // JWT AUTH
 // ---------------------------------

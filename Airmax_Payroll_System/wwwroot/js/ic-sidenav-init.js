@@ -1,5 +1,6 @@
 "use strict"
-var icSettingsOptions = {};
+//var icSettingsOptions = {};
+var icThemeSet4 = {};
 
 function getUrlParams(dParam) {
 	var dPageURL = window.location.search.substring(1),
@@ -56,9 +57,9 @@ function getUrlParams(dParam) {
 		/*Check container layout on resize */
 		///alert(icSettingsOptions.primary);
 
-		icSettingsOptions.containerLayout = $('#container_layout').val();
+		icThemeSet4.containerLayout = $('#container_layout').val();
 		/*Check container layout on resize END */
-		new icSettings(icSettingsOptions);
+		new icSettings(icThemeSet4);
 	});
 
 	if (direction == 'rtl' || body.attr('direction') == 'rtl') {

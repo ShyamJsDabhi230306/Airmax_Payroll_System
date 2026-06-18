@@ -94,9 +94,7 @@ namespace Airmax_Payroll_System.Controllers.API
         {
             try
             {
-                var result = await _service.LoginAsync(
-                    request.UserName,
-                    request.Password);
+                var result = await _service.LoginAsync(request.UserName,request.Password);
 
                 if (!result.Success)
                     return Ok(ApiResponse<LoginResponse>.FailResponse(

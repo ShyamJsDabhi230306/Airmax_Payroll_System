@@ -89,6 +89,7 @@ function setFreq(m) {
 }
 
 function saveAll() {
-    if (typeof toastr !== 'undefined') toastr.success('All settings saved to database!');
+    if (typeof toastr !== 'undefined')
+        toastr.success('All settings saved to database!');
     else alert('All settings saved!');
 }
