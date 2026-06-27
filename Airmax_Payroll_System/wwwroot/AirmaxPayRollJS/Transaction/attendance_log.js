@@ -1,9 +1,21 @@
-﻿let fetchedLogs = [];
-let groupedLogs = [];
+﻿
+// Global variables to manage the state of raw and calculated logs
 
-const SHIFT_START = "09:00:00";
-const SHIFT_END = "18:00:00";
+let fetchedLogs = [];
+let calculatedLogs = [];
 
+let currentBatchKey = "";
+let rawCurrentPage = 1;
+let rawPageSize = 100;
+let rawTotalLoaded = 0;
+let rawFetchCompleted = false;
+let rawFetchTimer = null;
+let calculatedCurrentPage = 1;
+let calculatedPageSize = 25;
+let calculatedTotalRecords = 0;
+let manualEditLogs = [];
+
+// Function to fetch raw logs based on selected month and initialize the fetching process
 async function fetchLogs() {
     const monthVal = document.getElementById("filterMonth").value;
 
@@ -12,157 +24,297 @@ async function fetchLogs() {
         return;
     }
 
-    const [year, month] = monthVal.split("-");
-    const firstDay = `${year}-${month}-01`;
-    const lastDay = new Date(year, month, 0).getDate();
-    const lastDayFormatted = `${year}-${month}-${lastDay.toString().padStart(2, "0")}`;
+    const { firstDay, lastDayFormatted } = getMonthDateRange(monthVal);
 
     const tableBody = document.getElementById("tblLogsBody");
     const saveBtn = document.getElementById("btnSave");
+    const info = document.getElementById("rawFetchInfo");
+
+    currentBatchKey = "";
+    rawCurrentPage = 1;
+    rawTotalLoaded = 0;
+    rawFetchCompleted = false;
+    fetchedLogs = [];
+
+    if (rawFetchTimer) {
+        clearInterval(rawFetchTimer);
+        rawFetchTimer = null;
+    }
+
+    saveBtn.disabled = true;
+
+    if (info) {
+        info.innerText = "Starting fetch...";
+    }
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin me-2"></i>Starting device fetch...
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(`/api/DeviceLog/start-fetch?fromDate=${firstDay}&toDate=${lastDayFormatted}`, {
+            method: "POST"
+        });
+
+        const result = await readJsonResponse(response);
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Failed to start fetch.");
+        }
+
+        currentBatchKey = result.batchKey || result.BatchKey;
+
+        showToast("success", "Device fetch started.");
+
+        await loadRawPage(1);
+
+        rawFetchTimer = setInterval(async function () {
+            try {
+                await loadRawPage(rawCurrentPage);
+
+                if (rawFetchCompleted) {
+                    clearInterval(rawFetchTimer);
+                    rawFetchTimer = null;
+
+                    saveBtn.disabled = rawTotalLoaded === 0;
+
+                    showToast("success", "All logs fetched. You can now Save & Calculate.");
+                }
+            } catch (err) {
+                clearInterval(rawFetchTimer);
+                rawFetchTimer = null;
+                showToast("danger", err.message);
+            }
+        }, 1500);
+
+    } catch (err) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center text-danger py-4">
+                    Failed to fetch logs. Reason: ${err.message}
+                </td>
+            </tr>
+        `;
+
+        if (info) {
+            info.innerText = "Fetch failed.";
+        }
+
+        console.error(err);
+    }
+}
+
+
+
+// Function to load a specific page of raw logs based on the current batch key
+async function loadRawPage(page) {
+    if (!currentBatchKey) {
+        return;
+    }
+
+    const response = await fetch(`/api/DeviceLog/fetch-page?batchKey=${currentBatchKey}&page=${page}&pageSize=${rawPageSize}`);
+    const result = await readJsonResponse(response);
+
+    if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to load raw page.");
+    }
+
+    fetchedLogs = result.records || result.Records || [];
+    rawTotalLoaded = result.totalLoaded || result.TotalLoaded || 0;
+    rawFetchCompleted = result.isCompleted || result.IsCompleted || false;
+    rawCurrentPage = page;
+
+    sortRawLogs(fetchedLogs);
+    renderRawLogs(fetchedLogs);
+    updateRawFetchInfo();
+}
+
+
+// Function to update the raw fetch information display
+function updateRawFetchInfo() {
+    const info = document.getElementById("rawFetchInfo");
+
+    if (!info) {
+        return;
+    }
+
+    if (rawTotalLoaded === 0) {
+        info.innerText = "No records loaded.";
+        return;
+    }
+
+    const startRecord = ((rawCurrentPage - 1) * rawPageSize) + 1;
+    const endRecord = Math.min(rawCurrentPage * rawPageSize, rawTotalLoaded);
+
+    info.innerText = `Showing ${startRecord} to ${endRecord} of ${rawTotalLoaded} loaded records${rawFetchCompleted ? " | Completed" : " | Fetching..."}`;
+}
+
+// Function to navigate to the next page of raw logs
+async function nextRawPage() {
+    if (!currentBatchKey) {
+        showToast("warning", "Please fetch logs first.");
+        return;
+    }
+
+    const maxPage = Math.ceil(rawTotalLoaded / rawPageSize);
+
+    if (rawCurrentPage >= maxPage) {
+        showToast("info", rawFetchCompleted ? "No more records." : "More records are still loading.");
+        return;
+    }
+
+    await loadRawPage(rawCurrentPage + 1);
+}
+
+// Function to navigate to the previous page of raw logs
+
+async function previousRawPage() {
+    if (!currentBatchKey) {
+        showToast("warning", "Please fetch logs first.");
+        return;
+    }
+
+    if (rawCurrentPage <= 1) {
+        return;
+    }
+
+    await loadRawPage(rawCurrentPage - 1);
+}
+
+
+// Function to change the page size for raw logs and fetch the first page
+
+async function changeRawPageSize() {
+    const pageSizeValue = document.getElementById("rawPageSize").value;
+
+    rawPageSize = parseInt(pageSizeValue, 10);
+    rawCurrentPage = 1;
+
+    if (!currentBatchKey) {
+        return;
+    }
+
+    await loadRawPage(1);
+}
+
+
+// Function to save the fetched logs and calculate attendance
+async function saveLogs() {
+    if (!currentBatchKey) {
+        showToast("warning", "Please fetch logs first.");
+        return;
+    }
+
+    if (!rawFetchCompleted) {
+        showToast("warning", "Please wait until all logs are fetched.");
+        return;
+    }
+
+    if (rawTotalLoaded === 0) {
+        showToast("warning", "No raw logs available to save.");
+        return;
+    }
+
+    const saveBtn = document.getElementById("btnSave");
+
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>Saving...`;
+
+    try {
+        const response = await fetch(`/api/DeviceLog/save-batch?batchKey=${currentBatchKey}`, {
+            method: "POST"
+        });
+
+        const result = await readJsonResponse(response);
+
+        if (response.ok && result.success) {
+            calculatedLogs = result.dailySummary || result.DailySummary || [];
+
+            sortSummaryRows(calculatedLogs);
+            renderCalculatedLogs(calculatedLogs);
+
+            showToast("success", result.message || "Attendance saved and calculated successfully.");
+        } else {
+            throw new Error(result.message || "Failed to save attendance.");
+        }
+
+    } catch (err) {
+        showToast("danger", err.message);
+        saveBtn.disabled = false;
+    } finally {
+        saveBtn.innerHTML = `<i class="fas fa-calculator me-1"></i>Save & Calculate`;
+    }
+}
+
+
+// Function to fetch calculated logs based on selected month, search value, and pagination
+async function fetchCalculatedLogs(page = 1) {
+    const monthVal = document.getElementById("calculatedFilterMonth").value;
+
+    if (!monthVal) {
+        showToast("warning", "Please select a month.");
+        return;
+    }
+
+    const searchValue = document.getElementById("calculatedSearch").value.trim();
+    const { firstDay, lastDayFormatted } = getMonthDateRange(monthVal);
+    const tableBody = document.getElementById("tblCalculatedLogsBody");
+
+    calculatedCurrentPage = page;
 
     tableBody.innerHTML = `
         <tr>
             <td colspan="12" class="text-center py-4">
-                <i class="fas fa-spinner fa-spin me-2"></i>Loading logs from API...
+                <i class="fas fa-spinner fa-spin me-2"></i>Loading calculated attendance...
             </td>
         </tr>
     `;
 
-    saveBtn.disabled = true;
-
     try {
-        const response = await fetch(`/api/DeviceLog?fromDate=${firstDay}&toDate=${lastDayFormatted}`);
+        const response = await fetch(
+            `/api/DeviceLog/summary-paged?fromDate=${firstDay}&toDate=${lastDayFormatted}&page=${calculatedCurrentPage}&pageSize=${calculatedPageSize}&search=${encodeURIComponent(searchValue)}`
+        );
 
-        if (!response.ok) {
-            throw new Error("API call failed.");
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Failed to fetch calculated attendance.");
         }
 
-        const data = await response.json();
+        calculatedLogs = result.data || result.Data || [];
+        calculatedTotalRecords = result.totalRecords || result.TotalRecords || 0;
 
-        fetchedLogs = data.rawLogs || data.RawLogs || [];
-        groupedLogs = data.dailySummary || data.DailySummary || [];
-        groupedLogs.sort((a, b) => {
-            const dateA = a.attendenceDate || a.AttendenceDate;
-            const dateB = b.attendenceDate || b.AttendenceDate;
+        renderCalculatedLogs(calculatedLogs);
+        renderCalculatedPagination();
 
-            const dateCompare = new Date(dateA) - new Date(dateB);
+        //showToast("success", `${calculatedTotalRecords} calculated records found.`);
 
-            if (dateCompare !== 0) {
-                return dateCompare;
-            }
+    } catch (err) {
+        resetDataTable("#tblCalculatedLogs");
 
-            const codeA = a.employeeCode || a.EmployeeCode || "";
-            const codeB = b.employeeCode || b.EmployeeCode || "";
-
-            return String(codeA).localeCompare(String(codeB), undefined, {
-                numeric: true
-            });
-        });
-        if (!fetchedLogs || fetchedLogs.length === 0) {
-            tableBody.innerHTML = `
+        tableBody.innerHTML = `
             <tr>
-                <td colspan="12" class="text-center text-muted py-4">
-                    No records found for the selected month.
+                <td colspan="12" class="text-center text-danger py-4">
+                    Failed to fetch calculated data. Reason: ${err.message}
                 </td>
             </tr>
         `;
-            return;
-        }
-
-        applyGlobalFilter();
-
-        saveBtn.disabled = false;
-        showToast("success", `${fetchedLogs.length} logs fetched successfully.`);
-
-    } catch (err) {
-        tableBody.innerHTML = `
-        <tr>
-            <td colspan="12" class="text-center text-danger py-4">
-                Failed to fetch logs. Reason: ${err.message}
-            </td>
-        </tr>
-    `;
         console.error(err);
     }
 }
-// Group logs employee-wise and date-wise
-function groupAttendanceLogs(logs) {
-    const grouped = {};
 
-    logs.forEach(log => {
-        const employeeCode = log.employeeCode || log.EmployeeCode;
-        const logDateValue = log.logDate || log.LogDate;
-        const serialNumber = log.serialNumber || log.SerialNumber;
-        const direction = (log.punchDirection || log.PunchDirection || "").toLowerCase();
-        const temperature = log.temperature || log.Temperature;
-        const temperatureState = log.temperatureState || log.TemperatureState;
-
-        if (!employeeCode || !logDateValue) {
-            return;
-        }
-
-        const logDateObj = new Date(logDateValue);
-
-        const dateOnly = formatDate(logDateObj);
-        const timeOnly = formatTime(logDateObj);
-
-        const key = `${employeeCode}_${dateOnly}`;
-
-        if (!grouped[key]) {
-            grouped[key] = {
-                employeeCode: employeeCode,
-                date: dateOnly,
-                inTime: "",
-                outTime: "",
-                inDevice: "",
-                outDevice: "",
-                temperature: temperature,
-                temperatureState: temperatureState,
-                allLogs: []
-            };
-        }
-
-        grouped[key].allLogs.push(log);
-
-        if (direction === "in") {
-            if (!grouped[key].inTime || logDateObj < new Date(grouped[key].inDateTime)) {
-                grouped[key].inTime = timeOnly;
-                grouped[key].inDateTime = logDateValue;
-                grouped[key].inDevice = serialNumber;
-            }
-        }
-
-        if (direction === "out") {
-            if (!grouped[key].outTime || logDateObj > new Date(grouped[key].outDateTime)) {
-                grouped[key].outTime = timeOnly;
-                grouped[key].outDateTime = logDateValue;
-                grouped[key].outDevice = serialNumber;
-            }
-        }
-    });
-
-    return Object.values(grouped).sort((a, b) => {
-        const dateCompare = new Date(a.date) - new Date(b.date);
-
-        if (dateCompare !== 0) {
-            return dateCompare;
-        }
-
-        return String(a.employeeCode).localeCompare(String(b.employeeCode),
-         undefined, {
-            numeric: true
-        });
-    });
-}
-
-// Render grouped logs into table
-function renderGroupedLogs(logs) {
+// Function to render the raw logs in the table
+function renderRawLogs(logs) {
     const tableBody = document.getElementById("tblLogsBody");
 
     if (!logs || logs.length === 0) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="12" class="text-center text-muted py-4">
+                <td colspan="6" class="text-center text-muted py-4">
                     No records found.
                 </td>
             </tr>
@@ -172,7 +324,47 @@ function renderGroupedLogs(logs) {
 
     tableBody.innerHTML = logs.map(log => {
         const employeeCode = log.employeeCode || log.EmployeeCode;
+        const logDate = log.logDate || log.LogDate;
+        const serialNumber = log.serialNumber || log.SerialNumber;
+        const direction = log.punchDirection || log.PunchDirection;
+        const temperature = log.temperature ?? log.Temperature;
+        const temperatureState = log.temperatureState || log.TemperatureState;
+
+        return `
+            <tr>
+                <td><strong>${employeeCode || "-"}</strong></td>
+                <td>${formatDateTimeDisplay(logDate)}</td>
+                <td class="font-monospace">${serialNumber || "-"}</td>
+                <td>${getDirectionBadge(direction)}</td>
+                <td>${temperature ?? "-"}</td>
+                <td>${temperatureState || "-"}</td>
+            </tr>
+        `;
+    }).join("");
+}
+
+
+// Function to render the calculated logs in the table
+function renderCalculatedLogs(logs) {
+    const tableBody = document.getElementById("tblCalculatedLogsBody");
+
+    resetDataTable("#tblCalculatedLogs");
+
+    if (!logs || logs.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="12" class="text-center text-muted py-4">
+                    No calculated records found.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tableBody.innerHTML = logs.map(log => {
+        const employeeCode = log.employeeCode || log.EmployeeCode;
         const employeeName = log.employeeName || log.EmployeeName;
+        const departmentName = log.departmentName || log.DepartmentName;
         const attendenceDate = log.attendenceDate || log.AttendenceDate;
         const inTime = log.inTime || log.InTime;
         const outTime = log.outTime || log.OutTime;
@@ -194,6 +386,7 @@ function renderGroupedLogs(logs) {
             <tr>
                 <td><strong>${employeeCode || "-"}</strong></td>
                 <td>${employeeName || "-"}</td>
+                <td>${departmentName || "-"}</td>
                 <td>${formatDateOnly(attendenceDate)}</td>
                 <td>${inTime ? `<span class="badge bg-success">${formatTimeOnly(inTime)}</span>` : "-"}</td>
                 <td>${outTime ? `<span class="badge bg-primary">${formatTimeOnly(outTime)}</span>` : "-"}</td>
@@ -203,304 +396,293 @@ function renderGroupedLogs(logs) {
                 <td>${getStatusBadge(status)}</td>
                 <td class="font-monospace">${inDevice || "-"}</td>
                 <td class="font-monospace">${outDevice || "-"}</td>
-                <td>-</td>
             </tr>
         `;
     }).join("");
-}
-// Format date as yyyy-MM-dd
-function formatDate(dateObj) {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getDate()).padStart(2, "0");
 
-    return `${year}-${month}-${day}`;
+    initializeCalculatedDataTable();
 }
 
-// Format time as hh:mm:ss AM/PM
-function formatTime(dateObj) {
-    return dateObj.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
-    });
-}
-function prepareLogsForSave(logs) {
-    return logs.map(log => {
-        return {
-            EmployeeCode: log.employeeCode || log.EmployeeCode,
-            LogDate: log.logDate || log.LogDate,
-            SerialNumber: log.serialNumber || log.SerialNumber,
-            PunchDirection: log.punchDirection || log.PunchDirection,
-            Temperature: log.temperature || log.Temperature,
-            TemperatureState: log.temperatureState || log.TemperatureState,
 
-            IsActive: true,
-            IsDelete: false,
-
-            E_By: null,
-            E_Date: new Date().toISOString(),
-
-            U_By: null,
-            U_Date: null
-        };
-    });
-}
-// Post records back to backend to save into DB
-async function saveLogs() {
-    if (!fetchedLogs || fetchedLogs.length === 0) {
-        return;
-    }
-
-    const saveBtn = document.getElementById("btnSave");
-
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>Saving...`;
-
-    try {
-        const response = await fetch("/api/DeviceLog/save", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(fetchedLogs)
-        });
-
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-            showToast("success", result.message);
-
-            fetchedLogs = [];
-            groupedLogs = [];
-
-            document.getElementById("tblLogsBody").innerHTML = `
-                <tr>
-                    <td colspan="12" class="text-center text-success py-4">
-                        Attendance logs and daily summary saved successfully!
-                    </td>
-                </tr>
-            `;
-        } else {
-            throw new Error(result.message || "Failed to save.");
-        }
-
-    } catch (err) {
-        showToast("danger", err.message);
-        saveBtn.disabled = false;
-    } finally {
-        saveBtn.innerHTML = `<i class="fas fa-save me-2"></i>Save`;
-    }
-}
-function applyGlobalFilter() {
+// Function to apply the raw logs filter based on search value
+function applyRawFilter() {
     const searchValue = document.getElementById("globalSearch").value.trim().toLowerCase();
 
-    if (!groupedLogs || groupedLogs.length === 0) {
-        renderGroupedLogs([]);
+    if (!fetchedLogs || fetchedLogs.length === 0) {
+        renderRawLogs([]);
         return;
     }
 
     if (!searchValue) {
-        renderGroupedLogs(groupedLogs);
+        renderRawLogs(fetchedLogs);
         return;
     }
 
-    const filteredLogs = groupedLogs.filter(log => {
+    const filteredLogs = fetchedLogs.filter(log => {
         const searchableText = [
             log.employeeCode || log.EmployeeCode,
-            log.employeeName || log.EmployeeName,
-            log.attendenceDate || log.AttendenceDate,
-            log.inTime || log.InTime,
-            log.outTime || log.OutTime,
-            log.totalWorkingHour ?? log.TotalWorkingHour,
-            log.totalWorkingMinute ?? log.TotalWorkingMinute,
-            log.lateHour ?? log.LateHour,
-            log.lateMinute ?? log.LateMinute,
-            log.otHour ?? log.OTHour,
-            log.otMinute ?? log.OTMinute,
-            log.attendenceStatus || log.AttendenceStatus,
-            log.inDevice || log.InDevice,
-            log.outDevice || log.OutDevice
+            log.logDate || log.LogDate,
+            log.serialNumber || log.SerialNumber,
+            log.punchDirection || log.PunchDirection,
+            log.temperature ?? log.Temperature,
+            log.temperatureState || log.TemperatureState
         ].join(" ").toLowerCase();
 
         return searchableText.includes(searchValue);
     });
 
-    renderGroupedLogs(filteredLogs);
+    renderRawLogs(filteredLogs);
 }
-function calculateAttendanceSummary(logs) {
-    const grouped = {};
 
-    logs.forEach(log => {
-        const employeeCode = log.employeeCode || log.EmployeeCode;
-        const logDateValue = log.logDate || log.LogDate;
-        const serialNumber = log.serialNumber || log.SerialNumber;
-        const direction = (log.punchDirection || log.PunchDirection || "").toLowerCase();
-        const temperatureState = log.temperatureState || log.TemperatureState;
+// Function to apply the calculated logs filter based on selected month and search value
+function applyCalculatedFilter() {
+    fetchCalculatedLogs(1);
+}
 
-        if (!employeeCode || !logDateValue) {
-            return;
+
+// Function to change the page size for calculated logs and fetch the first page
+async function changeCalculatedPageSize() {
+    const pageSizeValue = document.getElementById("calculatedPageSize").value;
+
+    calculatedPageSize = parseInt(pageSizeValue, 10);
+    calculatedCurrentPage = 1;
+
+    await fetchCalculatedLogs(1);
+}
+
+
+// Function to navigate to the next page of calculated logs
+async function nextCalculatedPage() {
+    const maxPage = Math.ceil(calculatedTotalRecords / calculatedPageSize);
+
+    if (calculatedCurrentPage >= maxPage) {
+        showToast("info", "No more records.");
+        return;
+    }
+
+    await fetchCalculatedLogs(calculatedCurrentPage + 1);
+}
+
+// Function to navigate to the previous page of calculated logs
+async function previousCalculatedPage() {
+    if (calculatedCurrentPage <= 1) {
+        return;
+    }
+
+    await fetchCalculatedLogs(calculatedCurrentPage - 1);
+}
+
+// Function to render pagination information for calculated logs
+function renderCalculatedPagination() {
+    const info = document.getElementById("calculatedFetchInfo");
+
+    if (!info) {
+        return;
+    }
+
+    if (calculatedTotalRecords === 0) {
+        info.innerText = "No records loaded.";
+        return;
+    }
+
+    const startRecord = ((calculatedCurrentPage - 1) * calculatedPageSize) + 1;
+    const endRecord = Math.min(calculatedCurrentPage * calculatedPageSize, calculatedTotalRecords);
+
+    info.innerText = `Showing ${startRecord} to ${endRecord} of ${calculatedTotalRecords} records`;
+}
+
+//  Function to recalculate attendance for the selected month
+async function recalculateAttendance() {
+    const monthVal = document.getElementById("calculatedFilterMonth").value;
+
+    if (!monthVal) {
+        showToast("warning", "Please select a month.");
+        return;
+    }
+
+    const { firstDay, lastDayFormatted } = getMonthDateRange(monthVal);
+    const tableBody = document.getElementById("tblCalculatedLogsBody");
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="12" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin me-2"></i>Recalculating attendance...
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(`/api/DeviceLog/recalculate?fromDate=${firstDay}&toDate=${lastDayFormatted}`, {
+            method: "POST"
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Failed to recalculate attendance.");
         }
 
-        const logDateObj = parseDate(logDateValue);
-        const dateOnly = formatDate(logDateObj);
-        const key = `${employeeCode}_${dateOnly}`;
+        calculatedLogs = result.dailySummary || result.DailySummary || [];
 
-        if (!grouped[key]) {
-            grouped[key] = {
-                employeeCode: employeeCode,
-                employeeName: "",
-                date: dateOnly,
-                inDateTime: null,
-                outDateTime: null,
-                inTime: "",
-                outTime: "",
-                totalWorkingHour: 0,
-                totalWorkingMinute: 0,
-                lateHour: 0,
-                lateMinute: 0,
-                otHour: 0,
-                otMinute: 0,
-                status: "",
-                inDevice: "",
-                outDevice: "",
-                temperatureState: temperatureState || "-"
-            };
-        }
+        sortSummaryRows(calculatedLogs);
+        renderCalculatedLogs(calculatedLogs);
 
-        if (direction === "in") {
-            if (!grouped[key].inDateTime || logDateObj < grouped[key].inDateTime) {
-                grouped[key].inDateTime = logDateObj;
-                grouped[key].inTime = formatTime(logDateObj);
-                grouped[key].inDevice = serialNumber;
-            }
-        }
+        showToast("success", result.message || "Attendance recalculated successfully.");
 
-        if (direction === "out") {
-            if (!grouped[key].outDateTime || logDateObj > grouped[key].outDateTime) {
-                grouped[key].outDateTime = logDateObj;
-                grouped[key].outTime = formatTime(logDateObj);
-                grouped[key].outDevice = serialNumber;
-            }
-        }
+    } catch (err) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="12" class="text-center text-danger py-4">
+                    Failed to recalculate attendance. Reason: ${err.message}
+                </td>
+            </tr>
+        `;
+        console.error(err);
+    }
+}
+
+function resetDataTable(tableSelector) {
+    if ($.fn.DataTable.isDataTable(tableSelector)) {
+        $(tableSelector).DataTable().destroy();
+    }
+}
+// Initializes the raw logs DataTable with specific configurations
+function initializeRawDataTable() {
+    const table = $("#tblRawLogs").DataTable({
+        searching: false,
+        paging: false,
+        info: false,
+        lengthChange: false,
+        ordering: false,
+        autoWidth: false,
+        scrollX: true,
+        scrollY: "430px",
+        scrollCollapse: true
     });
 
-    const result = Object.values(grouped);
-
-    result.forEach(row => {
-        calculateRowHours(row);
+    setTimeout(function () {
+        table.columns.adjust();
+    }, 100);
+}
+// Initializes the calculated logs DataTable with specific configurations
+function initializeCalculatedDataTable() {
+    const table = $("#tblCalculatedLogs").DataTable({
+        searching: false,
+        paging: false,
+        info: false,
+        lengthChange: false,
+        ordering: false,
+        autoWidth: false,
+        scrollX: true,
+        scrollY: "430px",
+        scrollCollapse: true
     });
 
-    return result.sort((a, b) => {
-        const dateCompare = new Date(a.date) - new Date(b.date);
+    setTimeout(function () {
+        table.columns.adjust();
+    }, 100);
+}
+// Sorts the raw logs based on employee code and log date
+function sortRawLogs(rows) {
+    if (!rows) {
+        return;
+    }
+
+    rows.sort((a, b) => {
+        const codeA = a.employeeCode || a.EmployeeCode || "";
+        const codeB = b.employeeCode || b.EmployeeCode || "";
+
+        const codeCompare = String(codeA).localeCompare(String(codeB), undefined, {
+            numeric: true
+        });
+
+        if (codeCompare !== 0) {
+            return codeCompare;
+        }
+
+        const dateA = parseServerDate(a.logDate || a.LogDate);
+        const dateB = parseServerDate(b.logDate || b.LogDate);
+
+        return (dateA || 0) - (dateB || 0);
+    });
+}
+// Sorts the summary rows based on attendance date and employee code
+function sortSummaryRows(rows) {
+    if (!rows) {
+        return;
+    }
+
+    rows.sort((a, b) => {
+        const dateA = parseServerDate(a.attendenceDate || a.AttendenceDate);
+        const dateB = parseServerDate(b.attendenceDate || b.AttendenceDate);
+
+        const dateCompare = (dateA || 0) - (dateB || 0);
 
         if (dateCompare !== 0) {
             return dateCompare;
         }
 
-        return String(a.employeeCode).localeCompare(String(b.employeeCode), undefined, {
+        const codeA = a.employeeCode || a.EmployeeCode || "";
+        const codeB = b.employeeCode || b.EmployeeCode || "";
+
+        return String(codeA).localeCompare(String(codeB), undefined, {
             numeric: true
         });
     });
 }
+// Function to get the first and last date of a given month in YYYY-MM-DD format
+function getMonthDateRange(monthVal) {
+    const [year, month] = monthVal.split("-");
+    const firstDay = `${year}-${month}-01`;
+    const lastDay = new Date(year, month, 0).getDate();
+    const lastDayFormatted = `${year}-${month}-${lastDay.toString().padStart(2, "0")}`;
 
-function calculateRowHours(row) {
-    const shiftStart = parseDate(`${row.date} ${SHIFT_START}`);
-    const shiftEnd = parseDate(`${row.date} ${SHIFT_END}`);
-
-    if (row.inDateTime && row.outDateTime && row.outDateTime > row.inDateTime) {
-        row.status = "Present";
-
-        const workingMinutes = diffMinutes(row.inDateTime, row.outDateTime);
-        row.totalWorkingHour = Math.floor(workingMinutes / 60);
-        row.totalWorkingMinute = workingMinutes % 60;
-
-        if (row.inDateTime > shiftStart) {
-            const lateMinutes = diffMinutes(shiftStart, row.inDateTime);
-            row.lateHour = Math.floor(lateMinutes / 60);
-            row.lateMinute = lateMinutes % 60;
-        }
-
-        if (row.outDateTime > shiftEnd) {
-            const otMinutes = diffMinutes(shiftEnd, row.outDateTime);
-            row.otHour = Math.floor(otMinutes / 60);
-            row.otMinute = otMinutes % 60;
-        }
-
-        return;
+    return {
+        firstDay,
+        lastDayFormatted
+    };
+}
+// Function to parse server date string into a Date object
+function parseServerDate(value) {
+    if (!value) {
+        return null;
     }
 
-    if (row.inDateTime && !row.outDateTime) {
-        row.status = "Missing Out";
-
-        if (row.inDateTime > shiftStart) {
-            const lateMinutes = diffMinutes(shiftStart, row.inDateTime);
-            row.lateHour = Math.floor(lateMinutes / 60);
-            row.lateMinute = lateMinutes % 60;
-        }
-
-        return;
+    if (value instanceof Date) {
+        return isNaN(value.getTime()) ? null : value;
     }
 
-    if (!row.inDateTime && row.outDateTime) {
-        row.status = "Missing In";
-        return;
+    const text = String(value).trim();
+
+    let dateObj = new Date(text.replace(" ", "T"));
+
+    if (!isNaN(dateObj.getTime())) {
+        return dateObj;
     }
 
-    row.status = "Invalid";
-}
+    const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2}):(\d{2})$/);
 
-function parseDate(value) {
-    return new Date(String(value).replace(" ", "T"));
-}
+    if (match) {
+        const month = Number(match[1]) - 1;
+        const day = Number(match[2]);
+        const year = Number(match[3]);
+        const hour = Number(match[4]);
+        const minute = Number(match[5]);
+        const second = Number(match[6]);
 
-function diffMinutes(startDate, endDate) {
-    return Math.floor((endDate - startDate) / 60000);
-}
+        dateObj = new Date(year, month, day, hour, minute, second);
 
-function formatDate(dateObj) {
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
-}
-
-function formatTime(dateObj) {
-    return dateObj.toLocaleTimeString("en-IN", {
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true
-    });
-}
-
-function formatHourMinute(hour, minute) {
-    return `${String(hour || 0).padStart(2, "0")}:${String(minute || 0).padStart(2, "0")}`;
-}
-
-function getStatusBadge(status) {
-    if (status === "Present") {
-        return `<span class="badge bg-success">Present</span>`;
+        return isNaN(dateObj.getTime()) ? null : dateObj;
     }
 
-    if (status === "Missing Out" || status === "Missing In") {
-        return `<span class="badge bg-warning text-dark">${status}</span>`;
-    }
-
-    return `<span class="badge bg-danger">${status || "Invalid"}</span>`;
+    return null;
 }
-
+// Function to format date only for display
 function formatDateOnly(value) {
-    if (!value) {
-        return "-";
-    }
+    const dateObj = parseServerDate(value);
 
-    const dateObj = new Date(String(value).replace(" ", "T"));
-
-    if (isNaN(dateObj.getTime())) {
-        return value;
+    if (!dateObj) {
+        return value || "-";
     }
 
     const year = dateObj.getFullYear();
@@ -509,16 +691,12 @@ function formatDateOnly(value) {
 
     return `${year}-${month}-${day}`;
 }
-
+// Function to format time only for display
 function formatTimeOnly(value) {
-    if (!value) {
-        return "-";
-    }
+    const dateObj = parseServerDate(value);
 
-    const dateObj = new Date(String(value).replace(" ", "T"));
-
-    if (isNaN(dateObj.getTime())) {
-        return value;
+    if (!dateObj) {
+        return value || "-";
     }
 
     return dateObj.toLocaleTimeString("en-IN", {
@@ -528,11 +706,35 @@ function formatTimeOnly(value) {
         hour12: true
     });
 }
+// Function to format date and time for display
+function formatDateTimeDisplay(value) {
+    const dateObj = parseServerDate(value);
 
+    if (!dateObj) {
+        return value || "-";
+    }
+
+    return `${formatDateOnly(value)} ${formatTimeOnly(value)}`;
+}
+// Function to format hours and minutes into HH:MM format
 function formatHourMinute(hour, minute) {
     return `${String(hour || 0).padStart(2, "0")}:${String(minute || 0).padStart(2, "0")}`;
 }
+// Function to get direction badge based on punch direction
+function getDirectionBadge(direction) {
+    const value = String(direction || "").toLowerCase();
 
+    if (value === "in") {
+        return `<span class="badge bg-success">IN</span>`;
+    }
+
+    if (value === "out") {
+        return `<span class="badge bg-primary">OUT</span>`;
+    }
+
+    return `<span class="badge bg-secondary">${direction || "-"}</span>`;
+}
+// Function to get status badge based on attendance status
 function getStatusBadge(status) {
     if (status === "Present") {
         return `<span class="badge bg-success">Present</span>`;
@@ -542,6 +744,224 @@ function getStatusBadge(status) {
         return `<span class="badge bg-warning text-dark">${status}</span>`;
     }
 
-    return `<span class="badge bg-danger">${status || "Invalid"}</span>`;
+    if (status === "Invalid Punch") {
+        return `<span class="badge bg-danger">Invalid Punch</span>`;
+    }
+
+    return `<span class="badge bg-secondary">${status || "-"}</span>`;
 }
 
+// Function to fetch manual edit logs based on selected month and search value
+
+window.fetchManualEditList = async function () {
+    const monthVal = document.getElementById("manualEditMonth").value;
+    const searchValue = document.getElementById("manualEditSearch").value.trim();
+
+    if (!monthVal) {
+        showToast("warning", "Please select a month.");
+        return;
+    }
+
+    if (!searchValue) {
+        showToast("warning", "Please enter employee code or name.");
+        return;
+    }
+
+    const { firstDay, lastDayFormatted } = getMonthDateRange(monthVal);
+    const tableBody = document.getElementById("tblManualEditLogsBody");
+
+    tableBody.innerHTML = `
+        <tr>
+            <td colspan="11" class="text-center py-4">
+                <i class="fas fa-spinner fa-spin me-2"></i>Loading employee attendance...
+            </td>
+        </tr>
+    `;
+
+    try {
+        const response = await fetch(
+            `/api/DeviceLog/manual-edit-list?fromDate=${firstDay}&toDate=${lastDayFormatted}&search=${encodeURIComponent(searchValue)}`
+        );
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Failed to fetch manual edit data.");
+        }
+
+        manualEditLogs = result.data || result.Data || [];
+
+        renderManualEditRows(manualEditLogs);
+
+        showToast("success", `${manualEditLogs.length} records loaded.`);
+
+    } catch (err) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center text-danger py-4">
+                    Failed to fetch data. Reason: ${err.message}
+                </td>
+            </tr>
+        `;
+        console.error(err);
+    }
+};
+
+
+// Function to render manual edit logs in the table
+function renderManualEditRows(logs) {
+    const tableBody = document.getElementById("tblManualEditLogsBody");
+
+    if (!logs || logs.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="11" class="text-center text-muted py-4">
+                    No attendance records found for this employee.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tableBody.innerHTML = logs.map((log, index) => {
+        const employeeCode = log.employeeCode || log.EmployeeCode;
+        const employeeName = log.employeeName || log.EmployeeName;
+        const departmentName = log.departmentName || log.DepartmentName;
+        const attendenceDate = log.attendenceDate || log.AttendenceDate;
+        const inTime = log.inTime || log.InTime;
+        const outTime = log.outTime || log.OutTime;
+
+        const totalWorkingHour = log.totalWorkingHour ?? log.TotalWorkingHour;
+        const totalWorkingMinute = log.totalWorkingMinute ?? log.TotalWorkingMinute;
+
+        const lateHour = log.lateHour ?? log.LateHour;
+        const lateMinute = log.lateMinute ?? log.LateMinute;
+
+        const otHour = log.otHour ?? log.OTHour;
+        const otMinute = log.otMinute ?? log.OTMinute;
+
+        const status = log.attendenceStatus || log.AttendenceStatus;
+
+        return `
+            <tr>
+                <td><strong>${employeeCode || "-"}</strong></td>
+                <td>${employeeName || "-"}</td>
+                <td>${departmentName || "-"}</td>
+                <td>${formatDateOnly(attendenceDate)}</td>
+                <td>${inTime ? `<span class="badge bg-success">${formatTimeOnly(inTime)}</span>` : "-"}</td>
+                <td>${outTime ? `<span class="badge bg-primary">${formatTimeOnly(outTime)}</span>` : "-"}</td>
+                <td>${formatHourMinute(totalWorkingHour, totalWorkingMinute)}</td>
+                <td>${formatHourMinute(lateHour, lateMinute)}</td>
+                <td>${formatHourMinute(otHour, otMinute)}</td>
+                <td>${getStatusBadge(status)}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm"
+                            onclick="openManualEditModal(${index})">
+                        Edit
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+// Function to open the manual edit modal for a specific log entry
+function openManualEditModal(index) {
+    const log = manualEditLogs[index];
+
+    if (!log) {
+        return;
+    }
+
+    const id =
+        log.idAttendenceDailySummary ||
+        log.IDAttendenceDailySummary ||
+        log.idAttendanceDailySummary ||
+        log.IDAttendanceDailySummary;
+    const employeeCode = log.employeeCode || log.EmployeeCode;
+    const employeeName = log.employeeName || log.EmployeeName;
+    const attendenceDate = log.attendenceDate || log.AttendenceDate;
+    const inTime = log.inTime || log.InTime;
+    const outTime = log.outTime || log.OutTime;
+
+    document.getElementById("manualEditSummaryId").value = id || "";
+    document.getElementById("manualEditEmployeeText").value = `${employeeCode || ""} - ${employeeName || ""}`;
+    document.getElementById("manualEditDate").value = formatDateOnly(attendenceDate);
+
+    document.getElementById("manualEditInTime").value = toDateTimeLocalValue(inTime);
+    document.getElementById("manualEditOutTime").value = toDateTimeLocalValue(outTime);
+
+    const modal = new bootstrap.Modal(document.getElementById("manualEditModal"));
+    modal.show();
+}
+
+
+// Function to convert a date value to a format suitable for datetime-local input
+function toDateTimeLocalValue(value) {
+    const dateObj = parseServerDate(value);
+
+    if (!dateObj) {
+        return "";
+    }
+
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const hour = String(dateObj.getHours()).padStart(2, "0");
+    const minute = String(dateObj.getMinutes()).padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+async function saveManualAttendanceTime() {
+    const id = parseInt(document.getElementById("manualEditSummaryId").value, 10);
+    const inTime = document.getElementById("manualEditInTime").value;
+    const outTime = document.getElementById("manualEditOutTime").value;
+
+if (!id || isNaN(id))  {
+        showToast("danger", "Invalid attendance record.");
+        return;
+    }
+
+    if (!inTime && !outTime) {
+        showToast("warning", "Please enter In Time or Out Time.");
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/DeviceLog/manual-update", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                idAttendenceDailySummary: parseInt(id),
+                inTime: inTime,
+                outTime: outTime
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.message || "Failed to update attendance time.");
+        }
+
+        manualEditLogs = result.data || result.Data || [];
+
+        renderManualEditRows(manualEditLogs);
+
+        const modalElement = document.getElementById("manualEditModal");
+        const modal = bootstrap.Modal.getInstance(modalElement);
+
+        if (modal) {
+            modal.hide();
+        }
+
+        showToast("success", result.message || "Attendance time updated successfully.");
+
+    } catch (err) {
+        showToast("danger", err.message);
+        console.error(err);
+    }
+}

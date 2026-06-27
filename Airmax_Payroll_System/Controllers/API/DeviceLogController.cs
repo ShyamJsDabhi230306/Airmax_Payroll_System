@@ -16,7 +16,7 @@ namespace Airmax_Payroll_System.Controllers.API
         {
             _deviceLogService = deviceLogService;
             _attendanceCalculationService = attendanceCalculationService;
-            _attendanceCalculationService = attendanceCalculationService;
+            
         }
         //// GET: api/DeviceLog?fromDate=2026-06-01&toDate=2026-06-15
         //[HttpGet]
@@ -31,7 +31,7 @@ namespace Airmax_Payroll_System.Controllers.API
         //}
         [HttpGet]
         public async Task<IActionResult> GetLogs([FromQuery] string fromDate, [FromQuery] string toDate)
-            {
+        {
             if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
             {
                 return BadRequest("FromDate and ToDate parameters are required.");
@@ -54,22 +54,241 @@ namespace Airmax_Payroll_System.Controllers.API
 
             return Ok(response);
         }
+        [HttpGet("fetch-page")]
+        public IActionResult GetFetchPage(
+    [FromQuery] string batchKey,
+    [FromQuery] int page = 1,
+    [FromQuery] int pageSize = 100)
+        {
+            if (string.IsNullOrEmpty(batchKey))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "BatchKey is required."
+                });
+            }
+
+            var result = _deviceLogService.GetFetchBatchPage(batchKey, page, pageSize);
+
+            return Ok(result);
+        }
+        [HttpPost("save-batch")]
+        public async Task<IActionResult> SaveBatch([FromQuery] string batchKey)
+        {
+            if (string.IsNullOrEmpty(batchKey))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "BatchKey is required."
+                });
+            }
+
+            var username = User.Identity?.Name ?? "System";
+
+            var summary = await _deviceLogService.SaveDeviceLogsByBatchAsync(batchKey, username);
+
+            return Ok(new
+            {
+                success = summary != null && summary.Count > 0,
+                message = "Attendance logs saved and calculated successfully.",
+                dailySummary = summary
+            });
+        }
+        [HttpPost("start-fetch")]
+        public IActionResult StartFetch([FromQuery] string fromDate, [FromQuery] string toDate)
+        {
+            if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "FromDate and ToDate parameters are required."
+                });
+            }
+
+            var username = User.Identity?.Name ?? "System";
+
+            var batchKey = _deviceLogService.StartDeviceLogFetchBatch(fromDate, toDate, username);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Device log fetch started.",
+                batchKey = batchKey
+            });
+        }
         // POST: api/DeviceLog/save
         [HttpPost("save")]
         public async Task<IActionResult> SaveLogs([FromBody] List<DeviceLog> logs)
         {
             if (logs == null || logs.Count == 0)
             {
-                return BadRequest("No log records were provided to save.");
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "No attendance logs received."
+                });
             }
-            // Retrieve logged-in username or default to "System"
-            var loggedInUserFullName = User.FindFirst("FullName")?.Value ?? "System";
-            var success = await _deviceLogService.SaveDeviceLogsAsync(logs, loggedInUserFullName);
-            if (success)
+
+            var username = User.Identity?.Name ?? "System";
+
+            var summary = await _deviceLogService.SaveDeviceLogsAsync(logs, username);
+
+            if (summary == null || summary.Count == 0)
             {
-                return Ok(new { success = true, message = $"{logs.Count} logs saved successfully." });
+                return Ok(new
+                {
+                    success = false,
+                    message = "Attendance logs saved, but no calculated summary found.",
+                    dailySummary = summary
+                });
             }
-            return StatusCode(500, new { success = false, message = "Failed to save logs to the database." });
+
+            return Ok(new
+            {
+                success = true,
+                message = "Attendance logs saved and calculated successfully.",
+                dailySummary = summary
+            });
+        }
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetCalculatedSummary([FromQuery] string fromDate, [FromQuery] string toDate)
+        {
+            if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
+            {
+                return BadRequest("FromDate and ToDate parameters are required.");
+            }
+
+            var from = Convert.ToDateTime(fromDate);
+            var to = Convert.ToDateTime(toDate);
+
+            var summary = await _deviceLogService.GetAttendanceDailySummaryAsync(from, to);
+
+            return Ok(summary);
+        }
+        [HttpPost("recalculate")]
+        public async Task<IActionResult> RecalculateAttendance([FromQuery] string fromDate, [FromQuery] string toDate)
+        {
+            if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "FromDate and ToDate parameters are required."
+                });
+            }
+
+            var from = Convert.ToDateTime(fromDate);
+            var to = Convert.ToDateTime(toDate);
+            var username = User.Identity?.Name ?? "System";
+
+            var summary = await _deviceLogService.RecalculateAttendanceAsync(from, to, username);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Attendance recalculated successfully.",
+                dailySummary = summary
+            });
+        }
+
+
+        [HttpGet("summary-paged")]
+        public async Task<IActionResult> GetCalculatedSummaryPaged(
+                                         [FromQuery] string fromDate,
+                                         [FromQuery] string toDate,
+                                         [FromQuery] int page = 1,
+                                         [FromQuery] int pageSize = 25,
+                                         [FromQuery] string search = "")
+        {
+            if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "FromDate and ToDate parameters are required."
+                });
+            }
+
+            var from = Convert.ToDateTime(fromDate);
+            var to = Convert.ToDateTime(toDate);
+
+            var result = await _deviceLogService.GetAttendanceDailySummaryPagedAsync(
+                from,
+                to,
+                page,
+                pageSize,
+                search ?? ""
+            );
+
+            return Ok(new
+            {
+                success = true,
+                data = result.Data,
+                totalRecords = result.TotalRecords,
+                page = result.Page,
+                pageSize = result.PageSize
+            });
+        }
+
+        [HttpGet("manual-edit-list")]
+        public async Task<IActionResult> GetManualEditList(
+                 [FromQuery] string fromDate,
+                 [FromQuery] string toDate,
+                 [FromQuery] string search = "")
+        {
+            if (string.IsNullOrEmpty(fromDate) || string.IsNullOrEmpty(toDate))
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "FromDate and ToDate parameters are required."
+                });
+            }
+
+            var from = Convert.ToDateTime(fromDate);
+            var to = Convert.ToDateTime(toDate);
+
+            var data = await _deviceLogService.GetAttendanceSummaryForEditAsync(
+                from,
+                to,
+                search ?? ""
+            );
+
+            return Ok(new
+            {
+                success = true,
+                data = data
+            });
+        }
+
+        [HttpPost("manual-update")]
+        public async Task<IActionResult> ManualUpdate([FromBody] AttendanceManualUpdateRequest request)
+        {
+            if (request == null || request.IDAttendenceDailySummary <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Invalid attendance record."
+                });
+            }
+
+            var username = User.Identity?.Name ?? "System";
+
+            var updatedRows = await _deviceLogService.UpdateAttendanceManualAsync(
+                request,
+                username
+            );
+
+            return Ok(new
+            {
+                success = true,
+                message = "Attendance time updated successfully.",
+                data = updatedRows
+            });
         }
     }
 }

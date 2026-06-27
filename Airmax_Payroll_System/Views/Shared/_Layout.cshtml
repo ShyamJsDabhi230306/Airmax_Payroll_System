@@ -246,7 +246,7 @@ if (currentRight == null) {
                     {
                         <li>
                             <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                                <i class="flaticon-project"></i>
+                                <i class="flaticon-business-and-trade"></i>
                                 <span class="nav-text">Master</span>
                             </a>
                             <ul aria-expanded="false">
@@ -322,42 +322,85 @@ if (currentRight == null) {
                     {
                         <li>
                             <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
-                                <i class="flaticon-filter"></i>
+                                <i class="flaticon-project"></i>
                                 <span class="nav-text">User Configuration</span>
                             </a>
                             <ul aria-expanded="false">
-                                @if (HasRight("User Master")) { <li data-menu="User Master"><a href="/Master/User">User List</a></li> }
-                                @if (HasRight("User Access Management")) { <li data-menu="User Access Management"><a href="/Master/UserRights">User Rights</a></li> }
-                                @if (HasRight("Master Configuration")) { <li data-menu="Master Configuration"><a href="/Master/Configuration">Configuration Master</a></li> }
-                                 @if (HasRight("Pay Configuration")) { <li data-menu="Master Configuration"><a  href="/Master/PayRollApiConfigration"> Pay API Configuration </a></li> }
-                                 @if (HasRight("Emloyee Loan List"))
+                                @if (HasRight("User Master"))
                                 {
-                                   <li data-menu="Attendance Log">
-                                       <a href="/Transaction/AttendanceLog">
-                                           Attendance Log 
-                                       </a>
-                                   </li>
+                                    <li data-menu="User Master">
+                                        <a href="/Master/User">User List</a>
+                                    </li>
                                 }
-
+                    
+                                @if (HasRight("User Access Management"))
+                                {
+                                    <li data-menu="User Access Management">
+                                        <a href="/Master/UserRights">User Rights</a>
+                                    </li>
+                                }
                             </ul>
                         </li>
-                    <li>
+                    }
+
+                    @if (HasRight("Master Configuration")
+                        || HasRight("Pay Configuration")
+                        || HasRight("Emloyee Loan List"))
+                    {
+                        <li>
                             <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
                                 <i class="flaticon-filter"></i>
                                 <span class="nav-text">Payroll Configuration</span>
                             </a>
                             <ul aria-expanded="false">
-                                    <li data-menu="Master Configuration"><a href="/Master/PayrollConfigurationList">Payroll Configuration</a></li> 
+                                @if (HasRight("Master Configuration"))
+                                {
+                                    <li data-menu="Master Configuration">
+                                        <a href="/Master/Configuration">Configuration Master</a>
+                                    </li>
+                                }
+                    
+                                @if (HasRight("Pay Configuration"))
+                                {
+                                    <li data-menu="Pay Configuration">
+                                        <a href="/Master/PayRollApiConfigration">Pay API Configuration</a>
+                                    </li>
+                                }
+                    
+                                @if (HasRight("Emloyee Loan List"))
+                                {
+                                    <li data-menu="Attendance Log">
+                                        <a href="/Transaction/AttendanceLog">Attendance Log</a>
+                                    </li>
+                                }
+                    
+                                <li data-menu="Payroll Configuration">
+                                    <a href="/Master/PayrollConfigurationList">Payroll Configuration</a>
+                                </li>
                             </ul>
                         </li>
                     }
+                    @if (HasRight("Salary Process"))
+{
+    <li>
+        <a class="has-arrow ai-icon" href="javascript:void(0);" aria-expanded="false">
+            <i class="flaticon-calculator"></i>
+            <span class="nav-text">Salary</span>
+        </a>
 
+        <ul aria-expanded="false">
+            <li data-menu="Salary Process">
+                <a href="/Transaction/SalaryProcess">Salary Process</a>
+            </li>
+        </ul>
+    </li>
+}
                     
                 </ul>
-
+                    
             </div>
         </div>
-
+                    
 
 
 

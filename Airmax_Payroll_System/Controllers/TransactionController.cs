@@ -58,6 +58,10 @@ namespace Airmax_Payroll_System.Controllers
         {
             return View();
         }
-
+        public IActionResult SalaryProcess()
+        {
+            ViewBag.Title = "Salary Process";
+            return View();
+        }
     }
 }

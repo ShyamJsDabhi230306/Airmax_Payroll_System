@@ -106,6 +106,10 @@ builder.Services.AddScoped<MasterPayRollApiConfigrationService>();
 
 builder.Services.AddScoped<DeviceLogService>();
 builder.Services.AddScoped<AttendanceCalculationService>();
+builder.Services.AddSingleton<AttendanceFetchCacheService>();
+
+builder.Services.AddScoped<TransactionSalaryRepo>();
+builder.Services.AddScoped<TransactionSalaryService>();
 // ---------------------------------
 // JWT AUTH
 // ---------------------------------

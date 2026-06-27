@@ -1,0 +1,337 @@
+﻿@{
+    ViewBag.Title = "Salary Process";
+}
+
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0 fw-bold text-white">
+                <i class="fas fa-calculator me-2"></i>Salary Process
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#configurationPane" type="button">Configuration</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#monthlyMetricsPane" type="button">Monthly Metrics</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dailyAttendancePane" type="button">Employee Daily Attendance</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#breakdownPane" type="button">Live Breakdown</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#previewPane" type="button">Salary Preview</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#savedPane" type="button">Saved Salary</button></li>
+            </ul>
+
+            <div class="tab-content">
+
+                <div class="tab-pane fade show active" id="configurationPane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="configCompany" class="form-control form-control-lg salary-company"></select>
+                        </div>
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Employee Group</label>
+                            <select id="configEmployeeGroup" class="form-control form-control-lg salary-group"></select>
+                        </div>
+                        <div class="col-xl-2 col-md-6">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSalaryConfiguration()">
+                                <i class="fas fa-sync-alt me-2"></i>Fetch
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="configInfo" class="small text-muted mb-3">Select company and click Fetch.</div>
+                    <div class="row g-3" id="configurationCards"></div>
+
+                    <div class="table-responsive border rounded mt-3">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr>
+                                    <th>Group</th>
+                                    <th>Component</th>
+                                    <th>Formula</th>
+                                    <th>Taxable</th>
+                                    <th>Payslip</th>
+                                    <th>Sort</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblSalaryComponentsBody">
+                                <tr><td colspan="6" class="text-center text-muted py-4">No components loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive border rounded mt-3">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr>
+                                    <th>Group</th>
+                                    <th>Slab Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Deduction Type</th>
+                                    <th>Deduction Value</th>
+                                    <th>OT Hours</th>
+                                    <th>Rate Multiplier</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblSalarySlabsBody">
+                                <tr><td colspan="8" class="text-center text-muted py-4">No slabs loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="monthlyMetricsPane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Salary Month</label>
+                            <input type="month"
+                                   id="metricsSalaryMonth"
+                                   class="form-control form-control-lg"
+                                   value="@DateTime.Now.ToString("yyyy-MM")">
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="metricsCompany" class="form-control form-control-lg salary-company">
+                                <option value="">Select Company</option>
+                            </select>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Location</label>
+                            <select id="metricsLocation" class="form-control form-control-lg salary-location">
+                                <option value="">All Locations</option>
+                            </select>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Division</label>
+                            <select id="metricsDivision" class="form-control form-control-lg salary-division">
+                                <option value="">All Divisions</option>
+                            </select>
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
+                                    onclick="fetchMonthlyMetrics()">
+                                <i class="fas fa-sync-alt me-2"></i>
+                                Fetch Metrics
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="metricsInfo" class="small text-muted mb-2">No metrics loaded.</div>
+
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Group</th>
+                                    <th>Working</th>
+                                    <th>Present</th>
+                                    <th>Extra</th>
+                                    <th>Absent</th>
+                                    <th>Total Work</th>
+                                    <th>Late</th>
+                                    <th>OT</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblMonthlyMetricsBody">
+                                <tr><td colspan="11" class="text-center text-muted py-4">No monthly metrics loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="dailyAttendancePane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Salary Month</label>
+                            <input type="month" id="dailySalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")">
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="dailyCompany" class="form-control form-control-lg salary-company"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Location</label>
+                            <select id="dailyLocation" class="form-control form-control-lg salary-location"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Division</label>
+                            <select id="dailyDivision" class="form-control form-control-lg salary-division"></select>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Employee</label>
+                            <select id="dailyEmployee" class="form-control form-control-lg salary-employee"></select>
+                        </div>
+                        <div class="col-xl-1 col-md-6">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchEmployeeDailyAttendance()">Fetch</button>
+                        </div>
+                        <div class="col-xl-1 col-md-6">
+                            <button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="openManualAttendanceModal()">Add</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr>
+                                    <th>Date</th>
+                                    <th>In Time</th>
+                                    <th>Out Time</th>
+                                    <th>Total Working</th>
+                                    <th>Late</th>
+                                    <th>OT</th>
+                                    <th>Status</th>
+                                    <th>Manual</th>
+                                    <th>Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblDailyAttendanceBody">
+                                <tr><td colspan="9" class="text-center text-muted py-4">No daily attendance loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="breakdownPane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="breakdownSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="breakdownCompany" class="form-control form-control-lg salary-company"></select></div>
+                        <div class="col-xl-4 col-md-6"><label class="form-label fw-semibold text-dark">Employee</label><select id="breakdownEmployee" class="form-control form-control-lg salary-employee"></select></div>
+                        <div class="col-xl-2 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchLiveBreakdown()">Fetch Breakdown</button></div>
+                    </div>
+
+                    <div id="breakdownHeader" class="mb-3"></div>
+
+                    <div class="table-responsive border rounded">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr><th>Line Item</th><th>Formula</th><th>Source</th><th class="text-end">Amount</th></tr>
+                            </thead>
+                            <tbody id="tblBreakdownBody">
+                                <tr><td colspan="4" class="text-center text-muted py-4">No breakdown loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="previewPane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="previewSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="previewCompany" class="form-control form-control-lg salary-company"></select></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Department</label><select id="previewDepartment" class="form-control form-control-lg salary-department"></select></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Employee Group</label><select id="previewEmployeeGroup" class="form-control form-control-lg salary-group"></select></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Employee</label><select id="previewEmployee" class="form-control form-control-lg salary-employee"></select></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Search</label><input type="text" id="previewSearch" class="form-control form-control-lg" placeholder="Search..."></div>
+                        <div class="col-xl-3 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSalaryPreview()">Fetch Preview</button></div>
+                        <div class="col-xl-3 col-md-6"><button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="saveSalaryProcess()">Save Salary</button></div>
+                    </div>
+
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Group</th>
+                                    <th>Pr Days</th>
+                                    <th>Late</th>
+                                    <th>Salary</th>
+                                    <th>Salary Amt</th>
+                                    <th>Bonus</th>
+                                    <th>Leave</th>
+                                    <th>OT</th>
+                                    <th>Gross</th>
+                                    <th>PF</th>
+                                    <th>ESIC</th>
+                                    <th>PT</th>
+                                    <th>Late Ded</th>
+                                    <th>Loan</th>
+                                    <th>Kharchi</th>
+                                    <th>Net</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tblPreviewBody">
+                                <tr><td colspan="17" class="text-center text-muted py-4">No salary preview loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="savedPane">
+                    <div class="row g-3 mb-3 align-items-end">
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="savedSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="savedCompany" class="form-control form-control-lg salary-company"></select></div>
+                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Search</label><input type="text" id="savedSearch" class="form-control form-control-lg" placeholder="Search..."></div>
+                        <div class="col-xl-3 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSavedSalary()">Fetch Saved</button></div>
+                    </div>
+
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr><th>Action</th><th>Employee</th><th>Department</th><th>Group</th><th>Gross</th><th>Deduction</th><th>Net</th><th>Status</th><th>Finalized</th><th>Paid</th></tr>
+                            </thead>
+                            <tbody id="tblSavedSalaryBody">
+                                <tr><td colspan="10" class="text-center text-muted py-4">No saved salary loaded.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-responsive border rounded mt-3">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase">
+                                <tr><th>Component</th><th>Type</th><th>Source</th><th>Formula</th><th class="text-end">Amount</th></tr>
+                            </thead>
+                            <tbody id="tblSavedComponentsBody">
+                                <tr><td colspan="5" class="text-center text-muted py-4">Select saved salary row.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="manualAttendanceModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title text-white">Add Manual Attendance Day</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3">
+                    <div class="col-md-6"><label class="form-label">Employee</label><input id="manualEmployeeText" class="form-control" readonly></div>
+                    <div class="col-md-6"><label class="form-label">Date</label><input type="date" id="manualAttendenceDate" class="form-control"></div>
+                    <div class="col-md-4"><label class="form-label">Status</label><select id="manualStatus" class="form-control"><option>Present</option><option>Late</option><option>Half Day</option><option>Absent</option></select></div>
+                    <div class="col-md-4"><label class="form-label">Working Hour</label><input type="number" id="manualWorkingHour" class="form-control" value="8"></div>
+                    <div class="col-md-4"><label class="form-label">Working Minute</label><input type="number" id="manualWorkingMinute" class="form-control" value="0"></div>
+                    <div class="col-md-4"><label class="form-label">Late Hour</label><input type="number" id="manualLateHour" class="form-control" value="0"></div>
+                    <div class="col-md-4"><label class="form-label">Late Minute</label><input type="number" id="manualLateMinute" class="form-control" value="0"></div>
+                    <div class="col-md-4"><label class="form-label">Manual Type</label><input id="manualEntryType" class="form-control" value="Official Duty"></div>
+                    <div class="col-md-6"><label class="form-label">Approved By</label><input id="manualApprovedBy" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label">Approval Reference</label><input id="manualApprovalReference" class="form-control"></div>
+                    <div class="col-12"><label class="form-label">Reason</label><textarea id="manualReason" class="form-control" rows="3"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-success" onclick="saveManualAttendance()">Save Manual Day</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Transaction/salary_process.js" asp-append-version="true"></script>
+}

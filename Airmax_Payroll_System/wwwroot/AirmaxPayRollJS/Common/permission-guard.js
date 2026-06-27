@@ -135,37 +135,69 @@ function show403(customMessage) {
 //         401 → redirect to login
 //         403 → show 403 overlay, return null
 // ============================================================
+//async function apiFetch(url, options = {}) {
+//    // Standardized token name: auth_token
+//    const token = localStorage.getItem("auth_token");
+
+//    options.headers = {
+//        "Content-Type": "application/json",
+//        "Authorization": `Bearer ${token}`,
+//        ...options.headers
+//    };
+
+//    const response = await fetch(url, options);
+//    // 🛡️ GLOBAL SAFE OBJECT: Prevents "null.json()" crashes
+//    const safeObject = {
+//        ok: false,
+//        status: response.status,
+//        json: async () => ({ success: false, data: [] }), // Returns empty data so it doesn't crash
+//        text: async () => ""
+//    };
+//    if (response.status === 401) {
+//        clearAuthData();
+//        window.location.href = "/Account/Login";
+//        return safeObject; // ✅ Changed from null to safeObject
+//    }
+//    if (response.status === 403) {
+//        show403("You do not have the right to perform this action.");
+//        return safeObject; // ✅ Changed from null to safeObject
+//    }
+//    return response;
+//}
+
 async function apiFetch(url, options = {}) {
-    // Standardized token name: auth_token
     const token = localStorage.getItem("auth_token");
 
     options.headers = {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
         ...options.headers
     };
 
+    if (token) {
+        options.headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, options);
-    // 🛡️ GLOBAL SAFE OBJECT: Prevents "null.json()" crashes
+
     const safeObject = {
         ok: false,
         status: response.status,
-        json: async () => ({ success: false, data: [] }), // Returns empty data so it doesn't crash
+        json: async () => ({ success: false, data: [], message: `Request failed with status ${response.status}` }),
         text: async () => ""
     };
+
     if (response.status === 401) {
-        clearAuthData();
-        window.location.href = "/Account/Login";
-        return safeObject; // ✅ Changed from null to safeObject
+        console.error("API unauthorized:", url);
+        return safeObject;
     }
+
     if (response.status === 403) {
         show403("You do not have the right to perform this action.");
-        return safeObject; // ✅ Changed from null to safeObject
+        return safeObject;
     }
+
     return response;
 }
-
-
 // ============================================================
 // STEP 4: Helper to CLEAR ALL auth data (LocalStorage & Cookie)
 // ============================================================
