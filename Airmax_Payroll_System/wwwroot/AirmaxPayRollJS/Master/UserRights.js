@@ -46,20 +46,23 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 async function loadPermissions(userId) {
     const res = await apiFetch(`${API_URL}/get-permissions/${userId}`);
+    if (!res) return;
+
     const json = await res.json();
     if (!json.success) return;
 
-    // Use exact classes from CSS to maintain alignment
-    DOM.tbody().innerHTML = json.data.map(p => `
-        <tr data-page-id="${p.pageId}">
-            <td class="col-name"><strong>${p.pageName}</strong></td>
-            <td class="col-check"><input type="checkbox" class="chk-premium chk-view" ${p.canView ? 'checked' : ''} /></td>
-            <td class="col-check"><input type="checkbox" class="chk-premium chk-create" ${p.canCreate ? 'checked' : ''} /></td>
-            <td class="col-check"><input type="checkbox" class="chk-premium chk-edit" ${p.canEdit ? 'checked' : ''} /></td>
-            <td class="col-check"><input type="checkbox" class="chk-premium chk-delete" ${p.canDelete ? 'checked' : ''} /></td>
-        </tr>`).join("");
-}
+    const data = json.data || json.Data || [];
 
+    DOM.tbody().innerHTML = data.map(p => `
+        <tr data-page-id="${p.pageId || p.PageId}">
+            <td class="col-name"><strong>${p.pageName || p.PageName}</strong></td>
+            <td class="col-check"><input type="checkbox" class="chk-premium chk-view" ${(p.canView ?? p.CanView) ? "checked" : ""} /></td>
+            <td class="col-check"><input type="checkbox" class="chk-premium chk-create" ${(p.canCreate ?? p.CanCreate) ? "checked" : ""} /></td>
+            <td class="col-check"><input type="checkbox" class="chk-premium chk-edit" ${(p.canEdit ?? p.CanEdit) ? "checked" : ""} /></td>
+            <td class="col-check"><input type="checkbox" class="chk-premium chk-delete" ${(p.canDelete ?? p.CanDelete) ? "checked" : ""} /></td>
+        </tr>
+    `).join("");
+}
 function setupSelectAll() {
     ["View", "Create", "Edit", "Delete"].forEach(type => {
         const id = `selectAll${type}`;
@@ -72,10 +75,15 @@ function setupSelectAll() {
 
 async function loadCompanies() {
     const res = await apiFetch("/api/master/company/get-all");
+    if (!res) return;
+
     const json = await res.json();
+    const data = json.data || json.Data || [];
+
     DOM.company().innerHTML = `<option value="0">Select Company...</option>` +
-        json.data.map(x => `<option value="${x.idCompany}">${x.companyName}</option>`).join("");
-    $(DOM.company()).selectpicker('refresh');
+        data.map(x => `<option value="${x.idCompany || x.IDCompany}">${x.companyName || x.CompanyName}</option>`).join("");
+
+    $(DOM.company()).selectpicker("refresh");
 }
 
 async function loadLocations(id) {

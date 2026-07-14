@@ -98,5 +98,11 @@ namespace Airmax_Payroll_System.Controllers
         {
             return View();
         }
+
+        
+        public IActionResult Holiday()
+        {
+            return View();
+        }
     }
 }

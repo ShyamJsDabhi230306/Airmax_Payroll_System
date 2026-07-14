@@ -15,6 +15,23 @@ let calculatedPageSize = 25;
 let calculatedTotalRecords = 0;
 let manualEditLogs = [];
 
+
+async function readJsonResponse(response) {
+    const text = await response.text();
+
+    if (!text) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch {
+        return {
+            success: false,
+            message: text
+        };
+    }
+}
 // Function to fetch raw logs based on selected month and initialize the fetching process
 async function fetchLogs() {
     const monthVal = document.getElementById("filterMonth").value;
@@ -66,7 +83,17 @@ async function fetchLogs() {
             throw new Error(result.message || "Failed to start fetch.");
         }
 
-        currentBatchKey = result.batchKey || result.BatchKey;
+        currentBatchKey =
+            result.batchKey ||
+            result.BatchKey ||
+            result.data?.batchKey ||
+            result.data?.BatchKey ||
+            result.Data?.batchKey ||
+            result.Data?.BatchKey;
+
+        if (!currentBatchKey) {
+            throw new Error(result.message || "Batch key not found from fetch response.");
+        }
 
         showToast("success", "Device fetch started.");
 
@@ -751,217 +778,3 @@ function getStatusBadge(status) {
     return `<span class="badge bg-secondary">${status || "-"}</span>`;
 }
 
-// Function to fetch manual edit logs based on selected month and search value
-
-window.fetchManualEditList = async function () {
-    const monthVal = document.getElementById("manualEditMonth").value;
-    const searchValue = document.getElementById("manualEditSearch").value.trim();
-
-    if (!monthVal) {
-        showToast("warning", "Please select a month.");
-        return;
-    }
-
-    if (!searchValue) {
-        showToast("warning", "Please enter employee code or name.");
-        return;
-    }
-
-    const { firstDay, lastDayFormatted } = getMonthDateRange(monthVal);
-    const tableBody = document.getElementById("tblManualEditLogsBody");
-
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="11" class="text-center py-4">
-                <i class="fas fa-spinner fa-spin me-2"></i>Loading employee attendance...
-            </td>
-        </tr>
-    `;
-
-    try {
-        const response = await fetch(
-            `/api/DeviceLog/manual-edit-list?fromDate=${firstDay}&toDate=${lastDayFormatted}&search=${encodeURIComponent(searchValue)}`
-        );
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || "Failed to fetch manual edit data.");
-        }
-
-        manualEditLogs = result.data || result.Data || [];
-
-        renderManualEditRows(manualEditLogs);
-
-        showToast("success", `${manualEditLogs.length} records loaded.`);
-
-    } catch (err) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="11" class="text-center text-danger py-4">
-                    Failed to fetch data. Reason: ${err.message}
-                </td>
-            </tr>
-        `;
-        console.error(err);
-    }
-};
-
-
-// Function to render manual edit logs in the table
-function renderManualEditRows(logs) {
-    const tableBody = document.getElementById("tblManualEditLogsBody");
-
-    if (!logs || logs.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="11" class="text-center text-muted py-4">
-                    No attendance records found for this employee.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    tableBody.innerHTML = logs.map((log, index) => {
-        const employeeCode = log.employeeCode || log.EmployeeCode;
-        const employeeName = log.employeeName || log.EmployeeName;
-        const departmentName = log.departmentName || log.DepartmentName;
-        const attendenceDate = log.attendenceDate || log.AttendenceDate;
-        const inTime = log.inTime || log.InTime;
-        const outTime = log.outTime || log.OutTime;
-
-        const totalWorkingHour = log.totalWorkingHour ?? log.TotalWorkingHour;
-        const totalWorkingMinute = log.totalWorkingMinute ?? log.TotalWorkingMinute;
-
-        const lateHour = log.lateHour ?? log.LateHour;
-        const lateMinute = log.lateMinute ?? log.LateMinute;
-
-        const otHour = log.otHour ?? log.OTHour;
-        const otMinute = log.otMinute ?? log.OTMinute;
-
-        const status = log.attendenceStatus || log.AttendenceStatus;
-
-        return `
-            <tr>
-                <td><strong>${employeeCode || "-"}</strong></td>
-                <td>${employeeName || "-"}</td>
-                <td>${departmentName || "-"}</td>
-                <td>${formatDateOnly(attendenceDate)}</td>
-                <td>${inTime ? `<span class="badge bg-success">${formatTimeOnly(inTime)}</span>` : "-"}</td>
-                <td>${outTime ? `<span class="badge bg-primary">${formatTimeOnly(outTime)}</span>` : "-"}</td>
-                <td>${formatHourMinute(totalWorkingHour, totalWorkingMinute)}</td>
-                <td>${formatHourMinute(lateHour, lateMinute)}</td>
-                <td>${formatHourMinute(otHour, otMinute)}</td>
-                <td>${getStatusBadge(status)}</td>
-                <td>
-                    <button class="btn btn-primary btn-sm"
-                            onclick="openManualEditModal(${index})">
-                        Edit
-                    </button>
-                </td>
-            </tr>
-        `;
-    }).join("");
-}
-
-// Function to open the manual edit modal for a specific log entry
-function openManualEditModal(index) {
-    const log = manualEditLogs[index];
-
-    if (!log) {
-        return;
-    }
-
-    const id =
-        log.idAttendenceDailySummary ||
-        log.IDAttendenceDailySummary ||
-        log.idAttendanceDailySummary ||
-        log.IDAttendanceDailySummary;
-    const employeeCode = log.employeeCode || log.EmployeeCode;
-    const employeeName = log.employeeName || log.EmployeeName;
-    const attendenceDate = log.attendenceDate || log.AttendenceDate;
-    const inTime = log.inTime || log.InTime;
-    const outTime = log.outTime || log.OutTime;
-
-    document.getElementById("manualEditSummaryId").value = id || "";
-    document.getElementById("manualEditEmployeeText").value = `${employeeCode || ""} - ${employeeName || ""}`;
-    document.getElementById("manualEditDate").value = formatDateOnly(attendenceDate);
-
-    document.getElementById("manualEditInTime").value = toDateTimeLocalValue(inTime);
-    document.getElementById("manualEditOutTime").value = toDateTimeLocalValue(outTime);
-
-    const modal = new bootstrap.Modal(document.getElementById("manualEditModal"));
-    modal.show();
-}
-
-
-// Function to convert a date value to a format suitable for datetime-local input
-function toDateTimeLocalValue(value) {
-    const dateObj = parseServerDate(value);
-
-    if (!dateObj) {
-        return "";
-    }
-
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
-    const day = String(dateObj.getDate()).padStart(2, "0");
-    const hour = String(dateObj.getHours()).padStart(2, "0");
-    const minute = String(dateObj.getMinutes()).padStart(2, "0");
-
-    return `${year}-${month}-${day}T${hour}:${minute}`;
-}
-
-async function saveManualAttendanceTime() {
-    const id = parseInt(document.getElementById("manualEditSummaryId").value, 10);
-    const inTime = document.getElementById("manualEditInTime").value;
-    const outTime = document.getElementById("manualEditOutTime").value;
-
-if (!id || isNaN(id))  {
-        showToast("danger", "Invalid attendance record.");
-        return;
-    }
-
-    if (!inTime && !outTime) {
-        showToast("warning", "Please enter In Time or Out Time.");
-        return;
-    }
-
-    try {
-        const response = await fetch("/api/DeviceLog/manual-update", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                idAttendenceDailySummary: parseInt(id),
-                inTime: inTime,
-                outTime: outTime
-            })
-        });
-
-        const result = await response.json();
-
-        if (!response.ok || !result.success) {
-            throw new Error(result.message || "Failed to update attendance time.");
-        }
-
-        manualEditLogs = result.data || result.Data || [];
-
-        renderManualEditRows(manualEditLogs);
-
-        const modalElement = document.getElementById("manualEditModal");
-        const modal = bootstrap.Modal.getInstance(modalElement);
-
-        if (modal) {
-            modal.hide();
-        }
-
-        showToast("success", result.message || "Attendance time updated successfully.");
-
-    } catch (err) {
-        showToast("danger", err.message);
-        console.error(err);
-    }
-}

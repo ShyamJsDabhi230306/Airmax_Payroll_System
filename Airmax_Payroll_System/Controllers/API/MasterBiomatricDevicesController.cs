@@ -1,12 +1,14 @@
 ﻿using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
-    [Route("api/master/biometric-device")]
+    [Authorize]
     [ApiController]
+    [Route("api/master/biometric-device")]
     public class MasterBiomatricDevicesController : ControllerBase
     {
         private readonly MasterBiomatricDevicesService _service;

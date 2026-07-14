@@ -1,10 +1,13 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction.Salary;
+using Airmax_Payroll_System.Models.Transaction.SalarySlip;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [ApiController]
     [Route("api/transaction/salary")]
     public class TransactionSalaryController : ControllerBase
@@ -93,7 +96,7 @@ namespace Airmax_Payroll_System.Controllers.API
 
         [HttpPost("preview")]
         public async Task<IActionResult> GetSalaryPreview([FromBody] SalaryFilterRequest request)
-        {
+         {
             var result = await _salaryService.GetSalaryPreviewAsync(request);
 
             return Ok(ApiResponse<IEnumerable<SalaryPreviewRow>>.SuccessResponse(
@@ -159,6 +162,27 @@ namespace Airmax_Payroll_System.Controllers.API
 
             return Ok(ApiResponse<IEnumerable<SalaryProcessComponent>>.SuccessResponse(
                 "Saved salary components loaded successfully.",
+                result
+            ));
+        }
+
+        [HttpGet("payslip")]
+        public async Task<IActionResult> GetSalaryPayslip(
+    [FromQuery] DateTime salaryMonth,
+    [FromQuery] int idCompany,
+    [FromQuery] int idEmployee)
+        {
+            var result = await _salaryService.GetSalaryPayslipAsync(salaryMonth, idCompany, idEmployee);
+
+            if (result?.Header == null || result.Header.Result != 1)
+            {
+                return Ok(ApiResponse<string>.FailResponse(
+                    result?.Header?.Message ?? "Payslip not found."
+                ));
+            }
+
+            return Ok(ApiResponse<SalaryPayslipResponse>.SuccessResponse(
+                "Payslip loaded successfully.",
                 result
             ));
         }

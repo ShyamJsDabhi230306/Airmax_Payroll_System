@@ -1,12 +1,14 @@
 ﻿using Airmax_Payroll_System.Models.Master.Payroll;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
-    [Route("api/master/payroll-configuration")]
+    [Authorize]
     [ApiController]
+    [Route("api/master/payroll-configuration")]
     public class MasterPayrollConfigurationController : ControllerBase
     {
         private readonly MasterPayrollConfigurationService _service;

@@ -1,11 +1,13 @@
 ﻿using Airmax_Payroll_System.Models.DeviceLog;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [ApiController]
     [Route("api/DeviceLog")]
     public class DeviceLogController : ControllerBase
@@ -55,10 +57,7 @@ namespace Airmax_Payroll_System.Controllers.API
             return Ok(response);
         }
         [HttpGet("fetch-page")]
-        public IActionResult GetFetchPage(
-    [FromQuery] string batchKey,
-    [FromQuery] int page = 1,
-    [FromQuery] int pageSize = 100)
+        public IActionResult GetFetchPage([FromQuery] string batchKey,[FromQuery] int page = 1,[FromQuery] int pageSize = 100)
         {
             if (string.IsNullOrEmpty(batchKey))
             {
@@ -267,27 +266,64 @@ namespace Airmax_Payroll_System.Controllers.API
         [HttpPost("manual-update")]
         public async Task<IActionResult> ManualUpdate([FromBody] AttendanceManualUpdateRequest request)
         {
-            if (request == null || request.IDAttendenceDailySummary <= 0)
+            if (request == null)
             {
                 return BadRequest(new
                 {
                     success = false,
-                    message = "Invalid attendance record."
+                    message = "Invalid request."
+                });
+            }
+
+            if (request.IDAttendenceDailySummary <= 0 && request.IDEmployee <= 0)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Employee is required for new attendance entry."
+                });
+            }
+
+            if (request.IDAttendenceDailySummary <= 0 && request.AttendenceDate == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Attendance date is required for new attendance entry."
+                });
+            }
+
+            if (request.InTime == null && request.OutTime == null)
+            {
+                return BadRequest(new
+                {
+                    success = false,
+                    message = "Please enter In Time or Out Time."
                 });
             }
 
             var username = User.Identity?.Name ?? "System";
 
-            var updatedRows = await _deviceLogService.UpdateAttendanceManualAsync(
+            var result = await _deviceLogService.UpdateAttendanceManualAsync(
                 request,
                 username
             );
 
+            if (result.Result != 1)
+            {
+                return Ok(new
+                {
+                    success = false,
+                    message = result.Message,
+                    errorCode = result.ErrorCode
+                });
+            }
+
             return Ok(new
             {
                 success = true,
-                message = "Attendance time updated successfully.",
-                data = updatedRows
+                message = result.Message,
+                data = result
             });
         }
     }

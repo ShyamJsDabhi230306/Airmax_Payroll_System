@@ -2,9 +2,12 @@
 using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
 using DRSPortal.Models.Account;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
@@ -88,26 +91,130 @@ namespace Airmax_Payroll_System.Controllers.API
         // ---------------------------------------------------------
         // LOGIN (NO AUTH)
         // ---------------------------------------------------------
+        //[AllowAnonymous]
+        //[HttpPost("login")]
+        //public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        //{
+        //    try
+        //    {
+        //        var result = await _service.LoginAsync(request.UserName,request.Password);
+
+        //        if (!result.Success)
+        //            return Ok(ApiResponse<LoginResponse>.FailResponse(
+        //                result.Message));
+
+        //        return Ok(ApiResponse<LoginResponse>.SuccessResponse(
+        //            "Login successful", result));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Ok(ApiResponse<string>.FailResponse(
+        //            "Login failed. " + ex.Message));
+        //    }
+        //}
+
+
+
         [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             try
             {
-                var result = await _service.LoginAsync(request.UserName,request.Password);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                HttpContext.Session.Clear();
 
-                if (!result.Success)
+                var result = await _service.LoginAsync(request.UserName, request.Password);
+
+                if (!result.Success || result.User == null)
+                {
                     return Ok(ApiResponse<LoginResponse>.FailResponse(
                         result.Message));
+                }
+
+                var user = result.User;
+
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.IDUser.ToString()),
+            new Claim("IDUser", user.IDUser.ToString()),
+            new Claim(ClaimTypes.Name, user.UserName ?? ""),
+            new Claim("UserName", user.UserName ?? ""),
+            new Claim("FullName", user.FullName ?? ""),
+            new Claim(ClaimTypes.Role, user.Role ?? ""),
+            new Claim("Role", user.Role ?? ""),
+            new Claim("IDCompany", user.IDCompany.ToString()),
+            new Claim("IDLocation", user.IDLocation.ToString()),
+            new Claim("IDDepartment", user.IDDepartment.ToString())
+        };
+
+                var identity = new ClaimsIdentity(
+                    claims,
+                    CookieAuthenticationDefaults.AuthenticationScheme
+                );
+
+                var principal = new ClaimsPrincipal(identity);
+
+                var authProperties = new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(4),
+                    AllowRefresh = true
+                };
+
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    principal,
+                    authProperties
+                );
 
                 return Ok(ApiResponse<LoginResponse>.SuccessResponse(
-                    "Login successful", result));
+                    "Login successful",
+                    result));
             }
             catch (Exception ex)
             {
                 return Ok(ApiResponse<string>.FailResponse(
                     "Login failed. " + ex.Message));
             }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.Session.Clear();
+
+            Response.Cookies.Delete("Airmax.Auth");
+            Response.Cookies.Delete("jwt_token");
+
+            return Ok(ApiResponse<string>.SuccessResponse(
+                "Logout successful",
+                "Logged out"));
+        }
+
+
+        [HttpGet("me")]
+        public IActionResult Me()
+        {
+            if (User?.Identity?.IsAuthenticated != true)
+            {
+                return Unauthorized(ApiResponse<string>.FailResponse("Not logged in."));
+            }
+
+            var user = new
+            {
+                IDUser = User.FindFirst("IDUser")?.Value,
+                UserName = User.FindFirst("UserName")?.Value,
+                FullName = User.FindFirst("FullName")?.Value,
+                Role = User.FindFirst("Role")?.Value,
+                IDCompany = User.FindFirst("IDCompany")?.Value,
+                IDLocation = User.FindFirst("IDLocation")?.Value,
+                IDDepartment = User.FindFirst("IDDepartment")?.Value
+            };
+
+            return Ok(ApiResponse<object>.SuccessResponse("Current user loaded.", user));
         }
     }
 }

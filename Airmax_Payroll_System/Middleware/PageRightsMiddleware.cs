@@ -18,25 +18,77 @@ namespace Airmax_Payroll_System.Middlewares
         {
             var path = context.Request.Path.Value?.ToLower() ?? "";
 
-            // 1. 🌈 SYSTEM ACCESS: Always allowed
-            if (path.Contains("/login") || path.Contains("/accessdenied") || path.Contains("/logout") ||
-                path.EndsWith(".png") || path.EndsWith(".jpg") || path.EndsWith(".jpeg") || path.EndsWith(".gif") ||
-                path.Contains("/vendor/") || path.Contains("/css/") || path.Contains("/js/") ||
-                path.Contains("/logo/") || path.Contains("/favicon.ico") ||
-                path.Contains("/dropdown") || path.Contains("/by-") ||
-                path.Contains("/generate-") || path.Contains("/get-permissions"))
-            {
-                await _next(context); return;
-            }
+            // 1. SYSTEM ACCESS: Always allowed
+            if (
 
-            // 2. 🔐 AUTH CHECK
-            if (context.User.Identity == null || !context.User.Identity.IsAuthenticated)
+
+
+                path.Contains("/get-all") ||
+                path.Contains("/dropdown") ||
+                path.Contains("/by-") ||
+                path.Contains("/get-locations") ||
+                path.Contains("/get-departments") ||
+                path.Contains("/get-users") ||
+                path.Contains("/get-employees") ||
+                path.Contains("/get-divisions") ||
+                path.Contains("/get-groups")||
+
+
+
+
+                path.StartsWith("/account") ||
+                path.StartsWith("/api/master/user/login") ||
+                path.StartsWith("/api/master/user/logout") ||
+                path.StartsWith("/api/master/user/me") ||
+
+                path.StartsWith("/css") ||
+                path.StartsWith("/js") ||
+                path.StartsWith("/lib") ||
+                path.StartsWith("/images") ||
+                path.StartsWith("/vendor") ||
+                path.StartsWith("/logo") ||
+                path.StartsWith("/favicon") ||
+
+                path.Contains("browserlink") ||
+                path.Contains("signalr") ||
+                path.Contains("/negotiate") ||
+
+                path.Contains("/dropdown") ||
+                path.Contains("/by-") ||
+                path.Contains("/generate-") ||
+                path.Contains("/get-permissions")
+            )
             {
-                if (path.Contains("/api/")) { context.Response.StatusCode = 401; return; }
-                string returnUrl = context.Request.Path.Value ?? "/";
-                context.Response.Redirect($"/Account/Login?ReturnUrl={Uri.EscapeDataString(returnUrl)}&message=403%20-%20Access%20Restricted.");
+                await _next(context);
                 return;
             }
+
+            //// 2. 🔐 AUTH CHECK
+            //if (context.User.Identity == null || !context.User.Identity.IsAuthenticated)
+            //{
+            //    if (path.Contains("/api/")) { context.Response.StatusCode = 401; return; }
+            //    string returnUrl = context.Request.Path.Value ?? "/";
+            //    context.Response.Redirect($"/Account/Login?ReturnUrl={Uri.EscapeDataString(returnUrl)}&message=403%20-%20Access%20Restricted.");
+            //    return;
+            //}
+            // 2. AUTH CHECK
+            //if (context.User.Identity == null || !context.User.Identity.IsAuthenticated)
+            //{
+            //    if (path.StartsWith("/api"))
+            //    {
+            //        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            //        await context.Response.WriteAsJsonAsync(new
+            //        {
+            //            success = false,
+            //            message = "Login required."
+            //        });
+            //        return;
+            //    }
+
+            //    string returnUrl = context.Request.Path.Value ?? "/";
+            //    context.Response.Redirect($"/Account/Login?ReturnUrl={Uri.EscapeDataString(returnUrl)}");
+            //    return;
+            //}
 
             // 3. 👑 ADMIN BYPASS
             if (context.User.IsInRole("Admin") || context.User.IsInRole("Administrator"))
@@ -55,12 +107,24 @@ namespace Airmax_Payroll_System.Middlewares
             // 5. 🔍 IDENTIFY CURRENT PAGE(S)
             string normalizedPath = NormalizePath(path);
 
-            // Allow root or home
-            if (string.IsNullOrEmpty(normalizedPath) || normalizedPath == "/" || normalizedPath == "/home")
-            {
-                await _next(context); return;
-            }
+            //// Allow root or home
+            //if (string.IsNullOrEmpty(normalizedPath) || normalizedPath == "/" || normalizedPath == "/home")
+            //{
+            //    await _next(context); return;
+            //}
 
+
+            // Allow root or home
+            if (
+                string.IsNullOrEmpty(normalizedPath) ||
+                normalizedPath == "/" ||
+                normalizedPath == "/home" ||
+                normalizedPath == "/home/index"
+            )
+            {
+                await _next(context);
+                return;
+            }
             // Find ALL pages that normalize to this path
             var matchingPageNames = _pageMap
                 .Where(p => NormalizePath(p.PageUrl) == normalizedPath)
@@ -130,7 +194,21 @@ namespace Airmax_Payroll_System.Middlewares
             }
 
             // Strip action suffixes
-            string[] suffixes = { "/save", "/delete", "/get-all", "/get-by-id", "/index", "/active-deactive", "/dropdown", "/get-permissions", "/generate-no", "list", "entry" };
+            //string[] suffixes = { "/save", "/delete", "/get-all", "/get-by-id", "/index", "/active-deactive", "/dropdown", "/get-permissions", "/generate-no", "list", "entry" };
+            string[] suffixes =
+{
+    "/save",
+    "/delete",
+    "/get-all",
+    "/get-by-id",
+    "/index",
+    "/active-deactive",
+    "/dropdown",
+    "/get-permissions",
+    "/generate-no",
+    "/list",
+    "/entry"
+};
             foreach (var s in suffixes)
             {
                 if (normalized.Contains(s))

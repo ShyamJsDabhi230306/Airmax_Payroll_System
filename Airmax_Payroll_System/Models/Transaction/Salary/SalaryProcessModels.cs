@@ -18,64 +18,86 @@
             public decimal? TotalOtherDeduction { get; set; }
         }
 
-        public class SalaryPreviewRow
-        {
-            public DateTime? SalaryMonth { get; set; }
+    public class SalaryPreviewRow
+    {
+        public DateTime? SalaryMonth { get; set; }
 
-            public int? IDCompany { get; set; }
-            public int? IDLocation { get; set; }
-            public int? IDDivision { get; set; }
-            public int? IDDepartment { get; set; }
-            public int? IDDesignation { get; set; }
-            public int? IDEmployeeGroup { get; set; }
-            public string EmployeeGroupName { get; set; }
+        public int? IDCompany { get; set; }
+        public int? IDLocation { get; set; }
+        public int? IDDivision { get; set; }
+        public int? IDDepartment { get; set; }
+        public int? IDDesignation { get; set; }
+        public int? IDEmployeeGroup { get; set; }
+        public string? EmployeeGroupName { get; set; }
 
-            public int? IDEmployee { get; set; }
-            public string EmployeeCode { get; set; }
-            public string EmployeeName { get; set; }
+        public int? IDEmployee { get; set; }
+        public string? EmployeeCode { get; set; }
+        public string? EmployeeName { get; set; }
+        public DateTime? JoiningDate { get; set; }
 
-            public decimal? WorkingDays { get; set; }
-            public decimal? PresentDays { get; set; }
-            public decimal? ExtraWorkingDays { get; set; }
-            public decimal? AbsentDays { get; set; }
+        public decimal? WorkingDays { get; set; }
+        public decimal? PresentDays { get; set; }
+        public decimal? ExtraWorkingDays { get; set; }
+        public decimal? UnpaidHolidayDays { get; set; }
+        public decimal? PaidHolidayDays { get; set; }
+        public decimal? TRDays { get; set; }
+        public decimal? OTDays { get; set; }
+        public decimal? LateDays { get; set; }
+        public decimal? TotalAttendance { get; set; }
 
-            public int? TotalWorkingHour { get; set; }
-            public int? TotalWorkingMinute { get; set; }
+        public decimal? TotalDays { get; set; }
+        public decimal? AttendancePercentage { get; set; }
+        public decimal? AbsentDays { get; set; }
 
-            public int? LateHour { get; set; }
-            public int? LateMinute { get; set; }
+        public int? TotalWorkingHour { get; set; }
+        public int? TotalWorkingMinute { get; set; }
 
-            public int? OTHour { get; set; }
-            public int? OTMinute { get; set; }
+        public int? LateHour { get; set; }
+        public int? LateMinute { get; set; }
 
-            public decimal? MonthlySalary { get; set; }
-            public decimal? PerDaySalary { get; set; }
-            public decimal? SecondSalary { get; set; }
+        public int? EarlyHour { get; set; }
+        public int? EarlyMinute { get; set; }
 
-            public decimal? SalaryAmount { get; set; }
-            public decimal? LeaveAmount { get; set; }
-            public decimal? BonusAmount { get; set; }
-            public decimal? OTAmount { get; set; }
+        public int? OTHour { get; set; }
+        public int? OTMinute { get; set; }
 
-            public decimal? GrossSalary { get; set; }
+        public decimal? SalaryRate { get; set; }
+        public decimal? MonthlySalary { get; set; }
+        public decimal? PerDaySalary { get; set; }
+        public decimal? PerHourSalary { get; set; }
+        public decimal? SecondSalary { get; set; }
 
-            public decimal? PFSalary { get; set; }
-            public decimal? PFAmount { get; set; }
-            public decimal? ESICAmount { get; set; }
-            public decimal? PTAmount { get; set; }
-            public decimal? LateDeductionAmount { get; set; }
-            public decimal? LoanAmount { get; set; }
-            public decimal? KharchiAmount { get; set; }
+        public decimal? SalaryAmount { get; set; }
+        public decimal? LeaveAmount { get; set; }
+        public decimal? BonusAmount { get; set; }
+        public decimal? BonusPercentage { get; set; }
+        public decimal? OTAmount { get; set; }
+        public decimal? TeaAmount { get; set; }
+        public decimal? ExtraEarnAmount { get; set; }
 
-            public decimal? TotalDeduction { get; set; }
-            public decimal? ActualNetSalary { get; set; }
-            public decimal? NetSalary { get; set; }
-            public decimal? RoundOffAmount { get; set; }
+        public decimal? GrossSalary { get; set; }
 
-            public string SalaryStatus { get; set; }
-        }
+        public decimal? PFSalary { get; set; }
+        public decimal? PFAmount { get; set; }
+        public decimal? ESICAmount { get; set; }
+        public decimal? PTAmount { get; set; }
+        public decimal? ChqAmount { get; set; }
 
-        public class SalaryBreakdownHeader
+        public decimal? LateDeductionAmount { get; set; }
+        public decimal? LoanAmount { get; set; }
+        public decimal? KharchiAmount { get; set; }
+        public decimal? AdvanceAmount { get; set; }
+        public decimal? ExtraDeductionAmount { get; set; }
+
+        public decimal? TotalDeduction { get; set; }
+        public decimal? ActualNetSalary { get; set; }
+        public decimal? NetSalary { get; set; }
+        public decimal? RoundOffAmount { get; set; }
+
+        public string? SalaryStatus { get; set; }
+    }
+
+    public class SalaryBreakdownHeader
         {
             public int? IDEmployee { get; set; }
             public string EmployeeCode { get; set; }
@@ -166,7 +188,7 @@
             public int? IDEmployeeGroup { get; set; }
             public int? IDEmployee { get; set; }
 
-            public string Search { get; set; }
+            public string? Search { get; set; }
         }
     
 }

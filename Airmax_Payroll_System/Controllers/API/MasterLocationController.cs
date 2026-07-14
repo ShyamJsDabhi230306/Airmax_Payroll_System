@@ -1,10 +1,12 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
+    [Authorize]
     [ApiController]
     [Route("api/master/location")]
     public class MasterLocationController : ControllerBase

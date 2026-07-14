@@ -1,6 +1,7 @@
 ﻿using Airmax_Payroll_System.Helpers;
 using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction.Salary;
+using Airmax_Payroll_System.Models.Transaction.SalarySlip;
 using Dapper;
 using System.Data;
 
@@ -215,12 +216,20 @@ namespace Airmax_Payroll_System.Repositories
         {
             try
             {
-                var param = BuildFilterParameters(request);
+                var param = new DynamicParameters();
+
+                param.Add("@SalaryMonth", request.SalaryMonth);
+                param.Add("@IDCompany", request.IDCompany);
+                param.Add("@IDLocation", request.IDLocation);
+                param.Add("@IDDivision", request.IDDivision);
+                param.Add("@IDEmployeeGroup", request.IDEmployeeGroup);
+                param.Add("@IDEmployee", request.IDEmployee);
                 param.Add("@Username", username);
 
                 var result = await _dapper.QueryFirstOrDefaultAsync<SaveResult>(
                     "usp_Transaction_Salary_Process_Save",
-                    param
+                    param,
+                    commandType: CommandType.StoredProcedure
                 );
 
                 return result ?? SaveResult.Success("Salary saved successfully.");
@@ -284,5 +293,62 @@ namespace Airmax_Payroll_System.Repositories
 
             return param;
         }
+
+
+        public async Task<SalaryPayslipResponse?> GetSalaryPayslipAsync(DateTime salaryMonth, int idCompany, int idEmployee)
+        {
+            try
+            {
+                var param = new DynamicParameters();
+                param.Add("@SalaryMonth", salaryMonth);
+                param.Add("@IDCompany", idCompany);
+                param.Add("@IDEmployee", idEmployee);
+
+                var resultSet = await _dapper.QueryMultipleAsync(
+                    "usp_Transaction_Salary_Payslip_Get",
+                    param,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                using var multi = resultSet.Reader;
+                using var conn = resultSet.Conn;
+
+                var header = await multi.ReadFirstOrDefaultAsync<SalaryPayslipHeader>();
+
+                if (header == null || header.Result != 1)
+                {
+                    return new SalaryPayslipResponse
+                    {
+                        Header = header
+                    };
+                }
+
+                var earnings = (await multi.ReadAsync<SalaryPayslipComponent>()).ToList();
+                var deductions = (await multi.ReadAsync<SalaryPayslipComponent>()).ToList();
+                var totals = await multi.ReadFirstOrDefaultAsync<SalaryPayslipTotal>();
+
+                return new SalaryPayslipResponse
+                {
+                    Header = header,
+                    Earnings = earnings,
+                    Deductions = deductions,
+                    Totals = totals
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Error in TransactionSalaryRepo.GetSalaryPayslipAsync");
+
+                return new SalaryPayslipResponse
+                {
+                    Header = new SalaryPayslipHeader
+                    {
+                        Result = 0,
+                        Message = "Failed to load payslip. " + ex.Message
+                    }
+                };
+            }
+        }
+
     }
 }

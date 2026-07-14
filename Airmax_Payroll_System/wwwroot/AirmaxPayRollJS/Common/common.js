@@ -645,3 +645,38 @@ function formatDateShort(dateValue) {
         year: "numeric"
     });
 }
+
+
+async function apiFetch(url, options = {}) {
+    options.credentials = "same-origin";
+
+    options.headers = {
+        ...(options.headers || {})
+    };
+
+    if (options.body && options.body instanceof FormData) {
+        delete options.headers["Content-Type"];
+        delete options.headers["content-type"];
+    } else if (options.body) {
+        options.headers["Content-Type"] = "application/json";
+    }
+
+    const response = await fetch(url, options);
+
+    if (response.status === 401) {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "/Account/Login";
+        return null;
+    }
+
+    if (response.status === 403) {
+        if (typeof showToast === "function") {
+            showToast("danger", "You do not have permission.", "Access Denied");
+        } else {
+            alert("You do not have permission.");
+        }
+    }
+
+    return response;
+}

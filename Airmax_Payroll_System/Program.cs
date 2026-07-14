@@ -3,6 +3,7 @@ using Airmax_Payroll_System.Middlewares;
 using Airmax_Payroll_System.Repositories;
 using Airmax_Payroll_System.Services;
 using DRSPortal.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -33,8 +34,7 @@ builder.Services.AddSession(options =>
 });
 
 
-// Add services to the container.
-//builder.Services.AddControllersWithViews();
+
 // 🔒 GLOBAL LOCK: Every page now requires a login by default
 builder.Services.AddControllersWithViews(options =>
 {
@@ -46,7 +46,7 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddSingleton<JwtHelper>();
 builder.Services.AddScoped<IDapperHelper, DapperHelper>();
-// this is the Repo layer
+//  this is the master Repo layer
 builder.Services.AddScoped<MasterCompanyRepo>();
 builder.Services.AddScoped<MasterLocationRepo>();
 builder.Services.AddScoped<MasterDivisionRepo>();
@@ -61,7 +61,7 @@ builder.Services.AddScoped<UserRightsRepo>();
 builder.Services.AddScoped<MasterPageRepo>();
 builder.Services.AddScoped<MasterConfigurationRepo>();
 builder.Services.AddScoped<MasterPayrollConfigurationRepo>();          // Payroll Config Repo
-
+builder.Services.AddScoped<MasterHolidayRepo>();
 // Master Configuration Module
 
 // In your Program.cs, add these lines:
@@ -78,7 +78,7 @@ builder.Services.AddScoped<MasterBiomatricDevicesRepo>();
 builder.Services.AddScoped<MasterLocationDeviceMappingRepo>();
 builder.Services.AddScoped<MasterPayRollApiConfigrationRepo>();
 
-// this is the service layer
+// this is the master service layer
 builder.Services.AddScoped<MasterCompanyService>();
 builder.Services.AddScoped<MasterLocationService>();
 builder.Services.AddScoped<MasterDivisionService>();
@@ -93,7 +93,7 @@ builder.Services.AddScoped<UserRightsService>();
 builder.Services.AddScoped<MasterPageService>();
 builder.Services.AddScoped<MasterConfigurationService>();
 builder.Services.AddScoped<MasterPayrollConfigurationService>();          // Payroll Config service
-
+builder.Services.AddScoped<MasterHolidayService>();
 
 // FOR TRANSACTION SERVICE
 builder.Services.AddScoped<TransactionEmployeeKharchiService>();
@@ -113,28 +113,83 @@ builder.Services.AddScoped<TransactionSalaryService>();
 // ---------------------------------
 // JWT AUTH
 // ---------------------------------
-var jwtKey = Encoding.UTF8.GetBytes(
-    builder.Configuration["Jwt:Key"]
-        ?? throw new Exception("Jwt:Key missing")
-);
+//var jwtKey = Encoding.UTF8.GetBytes(
+//    builder.Configuration["Jwt:Key"]
+//        ?? throw new Exception("Jwt:Key missing")
+//);
+
+//builder.Services
+//    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        options.RequireHttpsMetadata = false;
+
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = false,
+//            ValidateAudience = false,
+//            ValidateLifetime = true,
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+//            ClockSkew = TimeSpan.Zero
+//        };
+//    });
+
+
+
+
+//builder.Services
+//    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//        options.LoginPath = "/Account/Login";
+//        options.AccessDeniedPath = "/Account/AccessDenied";
+//        options.Cookie.Name = "Airmax.Auth";
+//        options.Cookie.HttpOnly = true;
+//        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+//        options.Cookie.SameSite = SameSiteMode.Lax;
+//        options.SlidingExpiration = true;
+//        options.ExpireTimeSpan = TimeSpan.FromHours(4);
+//    });
+
 
 builder.Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
     {
-        options.RequireHttpsMetadata = false;
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Cookie.Name = "Airmax.Auth";
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.SlidingExpiration = true;
+        options.ExpireTimeSpan = TimeSpan.FromHours(4);
 
-        options.TokenValidationParameters = new TokenValidationParameters
+        options.Events.OnRedirectToLogin = context =>
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
-            ClockSkew = TimeSpan.Zero
+            if (context.Request.Path.StartsWithSegments("/api"))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            }
+
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
+        };
+
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            if (context.Request.Path.StartsWithSegments("/api"))
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            }
+
+            context.Response.Redirect(context.RedirectUri);
+            return Task.CompletedTask;
         };
     });
-
 // ---------------------------------
 // SWAGGER
 // ---------------------------------
@@ -181,18 +236,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 // 🔑 Inject JWT from Cookie into Header
-app.Use(async (context, next) =>
-{
-    if (!context.Request.Headers.ContainsKey("Authorization") &&
-        context.Request.Cookies.TryGetValue("jwt_token", out var token))
-    {
-        context.Request.Headers["Authorization"] = "Bearer " + token;
-    }
-    await next();
-});
+//app.Use(async (context, next) =>
+//{
+//    if (!context.Request.Headers.ContainsKey("Authorization") &&
+//        context.Request.Cookies.TryGetValue("jwt_token", out var token))
+//    {
+//        context.Request.Headers["Authorization"] = "Bearer " + token;
+//    }
+//    await next();
+//});
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 
 app.UseAuthorization();

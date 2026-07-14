@@ -257,12 +257,12 @@
                         </div>
                     </div>
                 </div>
+               
                 <!-- MANUAL EDIT TAB -->
                 <div class="tab-pane fade"
                      id="manualEditAttendanceTab"
                      role="tabpanel"
                      aria-labelledby="manual-edit-tab">
-
                     <div class="row g-2 mb-3 align-items-end">
                         <div class="col-xl-3 col-lg-3 col-md-6">
                             <label class="form-label fw-semibold text-dark mb-1">
@@ -274,50 +274,134 @@
                                    value="@DateTime.Now.ToString("yyyy-MM")">
                         </div>
 
-                        <div class="col-xl-4 col-lg-4 col-md-6">
+                        <div class="col-xl-3 col-lg-3 col-md-6">
                             <label class="form-label fw-semibold text-dark mb-1">
                                 <i class="fas fa-search me-2 text-primary"></i>Employee Code / Name
                             </label>
-                            <input type="text"
-                                   id="manualEditSearch"
-                                   class="form-control"
-                                   placeholder="Search employee code or name...">
+                            <select id="manualEditEmployee"
+                                    class="selectpicker"
+                                    data-live-search="true"
+                                    data-size="6"
+                                    data-width="100%"
+                                    data-container="body"
+                                    data-dropup-auto="false"
+                                    title="Search employee code or name...">
+                            </select>
                         </div>
 
-                        <div class="col-xl-5 col-lg-5 col-md-12 text-end">
-                            <button class="btn btn-primary btn-sm"
+                        <div class="col-xl-3 col-lg-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark mb-1">
+                                <i class="fas fa-filter me-2 text-primary"></i>Filter Result
+                            </label>
+                            <input type="text"
+                                   id="manualEditTableSearch"
+                                   class="form-control"
+                                   placeholder="Search date, status, time...">
+                        </div>
+
+                        <div class="col-xl-3 col-lg-3 col-md-6 text-end">
+                            <button type="button"
+                                    class="btn btn-primary btn-sm w-"
                                     onclick="fetchManualEditList()">
                                 <i class="fas fa-search me-1"></i>
-                                Fetch Employee Attendance
+                                Fetch Emp Atd
                             </button>
                         </div>
                     </div>
 
-                    <div class="table-responsive">
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height: 550px; max-width: 100%;">
                         <table class="table table-hover table-striped border align-middle small mb-0 text-nowrap" id="tblManualEditLogs">
                             <thead class="table-light text-uppercase">
                                 <tr>
-                                    <th>Employee Code</th>
-                                    <th>Employee Name</th>
-                                    <th>Department</th>
-                                    <th>Date</th>
-                                    <th>In Time</th>
-                                    <th>Out Time</th>
-                                    <th>Total Working</th>
-                                    <th>Late</th>
-                                    <th>OT</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Employee Code</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Employee Name</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Division</th>
+                                    @* <th class="position-sticky top-0 bg-light" style="z-index: 1;">Date</th> *@
+                                 
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">In Date</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">In Time</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Out Date</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Out Time</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Total Working</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Late</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">OT</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Status</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="tblManualEditLogsBody">
                                 <tr>
-                                    <td colspan="11" class="text-center text-muted py-4">
-                                        Select month, enter employee code/name and click Fetch.
+                                    <td colspan="13" class="text-center text-muted py-4">
+                                        Select month, select employee and click Fetch.
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <div id="manualEditTotals" class="row g-2 mt-3 d-none">
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Month Days</div>
+                                <div class="fw-bold" id="totalMonthDays">0</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Working Days</div>
+                                <div class="fw-bold" id="totalWorkingDays">0</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Present Days</div>
+                                <div class="fw-bold" id="totalPresentDays">0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Payable Days</div>
+                                <div class="fw-bold" id="totalPayableDays">0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Total Work</div>
+                                <div class="fw-bold" id="totalWorkingTime">00:00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Total Late</div>
+                                <div class="fw-bold text-danger" id="totalLateTime">00:00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Total OT</div>
+                                <div class="fw-bold text-success" id="totalOTTime">00:00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">OT Days</div>
+                                <div class="fw-bold" id="totalOTDays">0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="col-xl-2 col-md-4">
+                            <div class="border rounded p-2 bg-light">
+                                <div class="small text-muted">Late Count</div>
+                                <div class="fw-bold" id="lateEntryCount">0</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -335,6 +419,8 @@
 
             <div class="modal-body">
                 <input type="hidden" id="manualEditSummaryId">
+                
+                <input type="hidden" id="manualEditEmployeeId">
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Employee</label>
@@ -343,17 +429,48 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Attendance Date</label>
-                    <input type="text" id="manualEditDate" class="form-control" readonly>
+                    <input type="date" id="manualEditDate" class="form-control" readonly>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label fw-semibold text-dark mb-1">In Time</label>
+                    <div class="row g-1">
+                        <div class="col-5">
+                            <input type="date" id="manualEditInDate" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <input type="time" id="manualEditInTime12" class="form-control">
+                        </div>
+                        <div class="col-3">
+                            <select id="manualEditInAmPm" class="form-control">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-0">
+                    <label class="form-label fw-semibold text-dark mb-1">Out Time</label>
+                    <div class="row g-1">
+                        <div class="col-5">
+                            <input type="date" id="manualEditOutDate" class="form-control">
+                        </div>
+                        <div class="col-4">
+                            <input type="time" id="manualEditOutTime12" class="form-control">
+                        </div>
+                        <div class="col-3">
+                            <select id="manualEditOutAmPm" class="form-control">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">In Time</label>
-                    <input type="datetime-local" id="manualEditInTime" class="form-control">
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Out Time</label>
-                    <input type="datetime-local" id="manualEditOutTime" class="form-control">
+                    <label class="form-label fw-semibold">Reason</label>
+                    <input type="text" id="manualEditReason" class="form-control" placeholder="Manual edit reason">
                 </div>
             </div>
 
@@ -365,8 +482,8 @@
                 </button>
 
                 <button type="button"
-                        class="btn btn-primary btn-sm"
-                        onclick="saveManualAttendanceTime()">
+                        id="btnSaveManualAttendance"
+                        class="btn btn-primary btn-sm">
                     Save Changes
                 </button>
             </div>
@@ -376,4 +493,5 @@
 </div>
 @section Scripts {
     <script src="~/AirmaxPayRollJS/Transaction/attendance_log.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/attendance_manual_edit.js" asp-append-version="true"></script>
 }

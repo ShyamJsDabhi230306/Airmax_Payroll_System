@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
- 
-    [Route("api/master/payroll-api-config")]
+    [Authorize]
     [ApiController]
+    [Route("api/master/payroll-api-config")]
     public class MasterPayRollApiConfigrationController : ControllerBase
     {
         private readonly MasterPayRollApiConfigrationService _service;

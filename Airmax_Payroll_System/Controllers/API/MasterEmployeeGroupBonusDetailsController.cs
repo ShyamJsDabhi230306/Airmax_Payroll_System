@@ -1,13 +1,15 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Master;
 using Airmax_Payroll_System.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
-    [Route("api/master/employeegroupbonusdetails")]
+    [Authorize]
     [ApiController]
+    [Route("api/master/employeegroupbonusdetails")]
     public class MasterEmployeeGroupBonusDetailsController : ControllerBase
     {
         private readonly MasterEmployeeGroupBonusDetailsService _service;

@@ -13,11 +13,16 @@
         <div class="card-body">
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#configurationPane" type="button">Configuration</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#monthlyMetricsPane" type="button">Monthly Metrics</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dailyAttendancePane" type="button">Employee Daily Attendance</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#breakdownPane" type="button">Live Breakdown</button></li>
+                @* <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#monthlyMetricsPane" type="button">Monthly Metrics</button></li> *@
+                @* <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#dailyAttendancePane" type="button">Employee Daily Attendance</button></li> *@
+                @* <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#breakdownPane" type="button">Live Breakdown</button></li> *@
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#previewPane" type="button">Salary Preview</button></li>
                 <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#savedPane" type="button">Saved Salary</button></li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#payslipPane" type="button">
+                        Salary Slip
+                    </button>
+                </li>
             </ul>
 
             <div class="tab-content">
@@ -26,14 +31,16 @@
                     <div class="row g-3 mb-3 align-items-end">
                         <div class="col-xl-4 col-md-6">
                             <label class="form-label fw-semibold text-dark">Company</label>
-                            <select id="configCompany" class="form-control form-control-lg salary-company"></select>
+                            <select id="configCompany" class="form-control form-control-md salary-company"></select>
                         </div>
+
                         <div class="col-xl-4 col-md-6">
                             <label class="form-label fw-semibold text-dark">Employee Group</label>
-                            <select id="configEmployeeGroup" class="form-control form-control-lg salary-group"></select>
+                            <select id="configEmployeeGroup" class="form-control form-control-md salary-group"></select>
                         </div>
-                        <div class="col-xl-2 col-md-6">
-                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSalaryConfiguration()">
+
+                        <div class="col-xl-4 col-md-6 d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm px-4" onclick="fetchSalaryConfiguration()">
                                 <i class="fas fa-sync-alt me-2"></i>Fetch
                             </button>
                         </div>
@@ -81,7 +88,7 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="monthlyMetricsPane">
+              @*   <div class="tab-pane fade" id="monthlyMetricsPane">
                     <div class="row g-3 mb-3 align-items-end">
                         <div class="col-xl-3 col-lg-3 col-md-6">
                             <label class="form-label fw-semibold text-dark">Salary Month</label>
@@ -205,9 +212,29 @@
                 <div class="tab-pane fade" id="breakdownPane">
                     <div class="row g-3 mb-3 align-items-end">
                         <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="breakdownSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="breakdownCompany" class="form-control form-control-lg salary-company"></select></div>
-                        <div class="col-xl-4 col-md-6"><label class="form-label fw-semibold text-dark">Employee</label><select id="breakdownEmployee" class="form-control form-control-lg salary-employee"></select></div>
-                        <div class="col-xl-2 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchLiveBreakdown()">Fetch Breakdown</button></div>
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="breakdownCompany" class="form-control form-control-lg salary-company"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Location</label>
+                            <select id="breakdownLocation" class="form-control form-control-lg salary-location"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Division</label>
+                            <select id="breakdownDivision" class="form-control form-control-lg salary-division"></select>
+                        </div>
+
+                        <div class="col-xl-4 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Employee</label>
+                            <select id="breakdownEmployee" class="form-control form-control-lg salary-employee"></select>
+                        </div>
+
+                        <div class="col-xl-2 col-md-6">
+                            <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchLiveBreakdown()">Fetch Breakdown</button>
+                        </div>
                     </div>
 
                     <div id="breakdownHeader" class="mb-3"></div>
@@ -215,30 +242,76 @@
                     <div class="table-responsive border rounded">
                         <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
                             <thead class="table-light text-uppercase">
-                                <tr><th>Line Item</th><th>Formula</th><th>Source</th><th class="text-end">Amount</th></tr>
+                                <tr><th>Line Item</th>
+                                    <th>Formula</th>
+                                    <th>Source</th>
+                                    <th class="text-end">Total Working Days</th>
+                                    <th class="text-end">Employee Work Days</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
                             </thead>
                             <tbody id="tblBreakdownBody">
-                                <tr><td colspan="4" class="text-center text-muted py-4">No breakdown loaded.</td></tr>
+                                <tr><td colspan="6" class="text-center text-muted py-4">No breakdown loaded.</td></tr>
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </div> *@
 
                 <div class="tab-pane fade" id="previewPane">
                     <div class="row g-3 mb-3 align-items-end">
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="previewSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="previewCompany" class="form-control form-control-lg salary-company"></select></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Department</label><select id="previewDepartment" class="form-control form-control-lg salary-department"></select></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Employee Group</label><select id="previewEmployeeGroup" class="form-control form-control-lg salary-group"></select></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Employee</label><select id="previewEmployee" class="form-control form-control-lg salary-employee"></select></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Search</label><input type="text" id="previewSearch" class="form-control form-control-lg" placeholder="Search..."></div>
-                        <div class="col-xl-3 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSalaryPreview()">Fetch Preview</button></div>
-                        <div class="col-xl-3 col-md-6"><button class="btn btn-success btn-lg w-100 fw-bold shadow-sm" onclick="saveSalaryProcess()">Save Salary</button></div>
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Salary Month</label>
+                            <input type="month" id="previewSalaryMonth" class="form-control form-control-md" value="@DateTime.Now.ToString("yyyy-MM")">
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="previewCompany" class="form-control form-control-md salary-company"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Location</label>
+                            <select id="previewLocation" class="form-control form-control-md salary-location"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Division</label>
+                            <select id="previewDivision" class="form-control form-control-md salary-division"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Employee Group</label>
+                            <select id="previewEmployeeGroup" class="form-control form-control-md salary-group"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark small mb-1">Search</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text"
+                                       id="previewSearch"
+                                       class="form-control"
+                                       placeholder="Search employee, group, salary, net..."
+                                       oninput="filterSalaryPreviewRows()">
+                            </div>
+                        </div>
+
+                        <div class="col-xl-6 col-md-12 d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm px-4" onclick="fetchSalaryPreview()">
+                                Fetch Preview
+                            </button>
+
+                            <button type="button" class="btn btn-success btn-sm fw-bold shadow-sm px-4" onclick="saveSalaryProcess()">
+                                Save Salary
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                    @* <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
                         <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
-                            <thead class="table-light text-uppercase">
+                            <thead class="table-light text-uppercase sticky-top">
                                 <tr>
                                     <th>Employee</th>
                                     <th>Group</th>
@@ -260,24 +333,122 @@
                                 </tr>
                             </thead>
                             <tbody id="tblPreviewBody">
-                                <tr><td colspan="17" class="text-center text-muted py-4">No salary preview loaded.</td></tr>
+                                <tr>
+                                    <td colspan="17" class="text-center text-muted py-4">No salary preview loaded.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> *@
+
+
+
+                    <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
+                        <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                            <thead class="table-light text-uppercase sticky-top">
+                                <tr>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">SR.NO.</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">EMP CODE</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Employee Name</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">EmployeeGroup </th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">W.D</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">ATT</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">EXT DAY</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">OT HRS</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">TR</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">OT Days</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">P H</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Late Hrs</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Early Hrs</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Late Days</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Total Att.</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Salary Rate</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Amount</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Joining Date</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Total Days</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">(%)</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Bonus</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Leave</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">OT Amt</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Tea</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Extra Earn</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Salary</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Chq Amt</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">PF</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">ESI</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">PT</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Loan</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Kharchi</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Adv</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Late/Early</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Ext.Ded</th>
+                                    <th class="position-sticky top-0 bg-light" style="z-index: 1;">Net Salary</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tblPreviewBody">
+                                <tr>
+                                    <td colspan="35" class="text-center text-muted py-4">
+                                        No salary preview loaded.
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-
                 <div class="tab-pane fade" id="savedPane">
                     <div class="row g-3 mb-3 align-items-end">
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Salary Month</label><input type="month" id="savedSalaryMonth" class="form-control form-control-lg" value="@DateTime.Now.ToString("yyyy-MM")"></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Company</label><select id="savedCompany" class="form-control form-control-lg salary-company"></select></div>
-                        <div class="col-xl-3 col-md-6"><label class="form-label fw-semibold text-dark">Search</label><input type="text" id="savedSearch" class="form-control form-control-lg" placeholder="Search..."></div>
-                        <div class="col-xl-3 col-md-6"><button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm" onclick="fetchSavedSalary()">Fetch Saved</button></div>
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Salary Month</label>
+                            <input type="month" id="savedSalaryMonth" class="form-control form-control-md" value="@DateTime.Now.ToString("yyyy-MM")">
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Company</label>
+                            <select id="savedCompany" class="form-control form-control-md salary-company"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Location</label>
+                            <select id="savedLocation" class="form-control form-control-md salary-location"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Division</label>
+                            <select id="savedDivision" class="form-control form-control-md salary-division"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Employee Group</label>
+                            <select id="savedEmployeeGroup" class="form-control form-control-md salary-group"></select>
+                        </div>
+
+                        <div class="col-xl-3 col-md-6">
+                            <label class="form-label fw-semibold text-dark">Search</label>
+                            <input type="text" id="savedSearch" class="form-control form-control-md" placeholder="Search employee...">
+                        </div>
+
+                        <div class="col-xl-6 col-md-12 d-flex justify-content-end">
+                            <button type="button" class="btn btn-primary btn-sm fw-bold shadow-sm px-4" onclick="fetchSavedSalary()">
+                                Fetch Saved
+                            </button>
+                        </div>
                     </div>
 
                     <div class="table-responsive overflow-auto border rounded w-100" style="max-height:520px;">
                         <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
                             <thead class="table-light text-uppercase">
-                                <tr><th>Action</th><th>Employee</th><th>Department</th><th>Group</th><th>Gross</th><th>Deduction</th><th>Net</th><th>Status</th><th>Finalized</th><th>Paid</th></tr>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Employee</th>
+                                    <th>Department</th>
+                                    <th>Group</th>
+                                    <th>Gross</th>
+                                    <th>Deduction</th>
+                                    <th>Net</th>
+                                    <th>Status</th>
+                                    <th>Finalized</th>
+                                    <th>Paid</th>
+                                </tr>
                             </thead>
                             <tbody id="tblSavedSalaryBody">
                                 <tr><td colspan="10" class="text-center text-muted py-4">No saved salary loaded.</td></tr>
@@ -288,7 +459,13 @@
                     <div class="table-responsive border rounded mt-3">
                         <table class="table table-hover table-striped align-middle small mb-0 text-nowrap">
                             <thead class="table-light text-uppercase">
-                                <tr><th>Component</th><th>Type</th><th>Source</th><th>Formula</th><th class="text-end">Amount</th></tr>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Type</th>
+                                    <th>Source</th>
+                                    <th>Formula</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
                             </thead>
                             <tbody id="tblSavedComponentsBody">
                                 <tr><td colspan="5" class="text-center text-muted py-4">Select saved salary row.</td></tr>
@@ -332,6 +509,70 @@
     </div>
 </div>
 
+
+@* salary slip *@
+
+<div class="tab-pane fade" id="payslipPane">
+    <div class="row g-2 mb-3 align-items-end">
+        <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+            <button type="button" class="btn btn-primary btn-sm fw-bold px-4" onclick="fetchEmployeePayslip()">
+                Employee Slip
+            </button>
+
+            <button type="button" class="btn btn-success btn-sm fw-bold px-4" onclick="fetchDivisionPayslips()">
+                Division Slips
+            </button>
+
+            <button type="button" class="btn btn-dark btn-sm fw-bold px-4" onclick="printSalaryPayslip()">
+                Print
+            </button>
+        </div>
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Salary Month</label>
+            <input type="month" id="payslipSalaryMonth" class="form-control form-control-md" value="@DateTime.Now.ToString("yyyy-MM")">
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Company</label>
+            <select id="payslipCompany" class="form-control form-control-md salary-company"></select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Location</label>
+            <select id="payslipLocation" class="form-control form-control-md salary-location"></select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Division</label>
+            <select id="payslipDivision" class="form-control form-control-md salary-division"></select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Employee Group</label>
+            <select id="payslipEmployeeGroup" class="form-control form-control-md salary-group"></select>
+        </div>
+
+        <div class="col-xl-2 col-lg-3 col-md-4">
+            <label class="form-label fw-semibold text-dark small mb-1">Employee</label>
+            <select id="payslipEmployee" class="form-control form-control-md salary-employee"></select>
+        </div>
+
+       
+    </div>
+
+    <div class="border rounded bg-light p-3">
+        <div id="payslipResult" class="d-flex flex-column align-items-center gap-3">
+            <div class="text-muted py-4">No salary slip loaded.</div>
+        </div>
+    </div>
+</div>
+
+
+
 @section Scripts {
-    <script src="~/AirmaxPayRollJS/Transaction/salary_process.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/Salaryjs/salary_process.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/Salaryjs/salary_configuration.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/Salaryjs/salary_preview.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/Salaryjs/salary_saved.js" asp-append-version="true"></script>
+    <script src="~/AirmaxPayRollJS/Transaction/Salaryjs/salary_payslip.js" asp-append-version="true"></script>
 }

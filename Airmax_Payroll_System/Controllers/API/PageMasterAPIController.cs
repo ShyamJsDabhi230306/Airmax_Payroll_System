@@ -7,9 +7,9 @@ using System.Security.Claims;
 
 namespace Airmax_Payroll_System.Controllers.API
 {
-    [Route("api/master/pagemaster")]
-    [ApiController]
     [Authorize]
+    [ApiController]
+    [Route("api/master/pagemaster")]
     public class PageMasterAPIController : ControllerBase
     {
         private readonly MasterPageService _service;

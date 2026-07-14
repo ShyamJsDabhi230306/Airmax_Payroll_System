@@ -1,5 +1,6 @@
 ﻿using Airmax_Payroll_System.Models.Common;
 using Airmax_Payroll_System.Models.Transaction.Salary;
+using Airmax_Payroll_System.Models.Transaction.SalarySlip;
 using Airmax_Payroll_System.Repositories;
 
 namespace Airmax_Payroll_System.Services
@@ -79,6 +80,11 @@ namespace Airmax_Payroll_System.Services
         public async Task<IEnumerable<SalaryProcessComponent>> GetSavedSalaryComponentsAsync(int idSalaryProcess)
         {
             return await _salaryRepo.GetSavedSalaryComponentsAsync(idSalaryProcess);
+        }
+
+        public async Task<SalaryPayslipResponse?> GetSalaryPayslipAsync(DateTime salaryMonth, int idCompany, int idEmployee)
+        {
+            return await _salaryRepo.GetSalaryPayslipAsync(salaryMonth, idCompany, idEmployee);
         }
     }
 }

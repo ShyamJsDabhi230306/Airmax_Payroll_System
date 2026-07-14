@@ -1,0 +1,155 @@
+﻿@{
+    ViewData["Title"] = "Holiday Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0 fw-bold text-white">Holiday Master</h5>
+    </div>
+
+    <div class="card-body">
+
+        <ul class="nav nav-tabs mb-3" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active"
+                        id="holidayEntryTab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#holidayEntryPane"
+                        type="button"
+                        role="tab">
+                    Holiday Entry
+                </button>
+            </li>
+
+            <li class="nav-item" role="presentation">
+                <button class="nav-link"
+                        id="monthHolidayTab"
+                        data-bs-toggle="tab"
+                        data-bs-target="#monthHolidayPane"
+                        type="button"
+                        role="tab">
+                    Month Wise Holidays
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+
+            <div class="tab-pane fade show active" id="holidayEntryPane" role="tabpanel">
+
+                <input type="hidden" id="IDHoliday" value="0" />
+                <input type="checkbox" id="IsActive" checked hidden />
+
+                <div class="row g-3 align-items-end">
+                    <div class="col-xl-2 col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Holiday Date</label>
+                        <input type="date" id="HolidayDate" class="form-control form-control-md" />
+                    </div>
+
+                    <div class="col-xl-2 col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Holiday Month</label>
+                        <input type="month" id="HolidayMonth" class="form-control form-control-md" readonly />
+                    </div>
+
+                    <div class="col-xl-2 col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Day Name</label>
+                        <input type="text" id="DayName" class="form-control form-control-md" readonly />
+                    </div>
+
+                    <div class="col-xl-2 col-lg-3 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Holiday Type</label>
+                        <select id="HolidayType" class="form-control form-control-md">
+                            <option value="">Select Type</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Unpaid">Unpaid</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xl-2 col-lg-6 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Holiday Name</label>
+                        <input type="text" id="HolidayName" class="form-control form-control-md" placeholder="Enter holiday name" />
+                    </div>
+
+                    <div class="col-xl-2 col-lg-6 col-md-12">
+                        <div class="d-flex justify-content-xl-end justify-content-start gap-2">
+                            <button type="button" id="btnClear" class="btn btn-dark btn-sm px-4">
+                                Clear
+                            </button>
+                            <button type="button" id="btnSave" class="btn btn-success btn-sm px-4">
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-3" />
+
+                <h6 class="fw-bold mb-2">Holiday List</h6>
+
+                <div class="table-responsive border rounded">
+                    <table id="holidayList" class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Month</th>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">No holidays loaded.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="monthHolidayPane" role="tabpanel">
+
+                <div class="row g-3 align-items-end mb-3">
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <label class="form-label fw-semibold text-dark">Select Month</label>
+                        <input type="month" id="FilterHolidayMonth" class="form-control form-control-md" />
+                    </div>
+
+                    <div class="col-xl-2 col-lg-3 col-md-6">
+                        <button type="button"
+                                id="btnFetchMonthHolidays"
+                                class="btn btn-primary btn-sm fw-bold px-4">
+                            Fetch
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive border rounded">
+                    <table id="monthHolidayList" class="table table-hover table-striped align-middle small mb-0 text-nowrap">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Month</th>
+                                <th>Date</th>
+                                <th>Day</th>
+                                <th>Type</th>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblMonthHolidayBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">Select month and fetch holidays.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/AirmaxPayRollJS/Master/holiday.js" asp-append-version="true"></script>
+}
